@@ -29,6 +29,17 @@ type Language = 'en' | 'nl';
 
 const EXECUTION_DELAY_MS = 1600;
 
+const focusSegments = [
+  { time: '08:00–09:00', start: 0, duration: 60 },
+  { time: '09:25–10:25', start: 85, duration: 60 },
+  { time: '10:45–11:30', start: 165, duration: 45 },
+  { time: '11:55–12:25', start: 235, duration: 30 },
+  { time: '12:55–13:40', start: 295, duration: 45 },
+  { time: '14:00–15:00', start: 360, duration: 60 },
+  { time: '15:20–16:10', start: 440, duration: 50 },
+  { time: '16:30–17:00', start: 510, duration: 30 },
+] as const;
+
 const content = {
   en: {
     language: 'en',
@@ -56,19 +67,64 @@ const content = {
       weekday: 'TUE 18',
       focus: 'Work that needs you',
       focusDetail: 'Strategy · decisions · people',
+      finalTime: '08:00–17:00',
       tasks: [
-        { label: 'Inbox triage', time: '08:00–08:30', start: 0, span: 1 },
-        { label: 'Follow-ups', time: '08:30–09:00', start: 1, span: 1 },
-        { label: 'Leave request', time: '09:30–10:00', start: 3, span: 1 },
-        { label: 'Meeting prep', time: '10:30–11:30', start: 5, span: 2 },
-        { label: 'Update records', time: '12:00–12:30', start: 8, span: 1 },
-        { label: 'Send reminders', time: '13:00–13:30', start: 10, span: 1 },
-        { label: 'Status update', time: '14:00–14:30', start: 12, span: 1 },
+        {
+          label: 'Inbox triage',
+          time: '09:00–09:25',
+          start: 60,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Follow-ups',
+          time: '10:25–10:45',
+          start: 145,
+          duration: 20,
+          incoming: false,
+        },
+        {
+          label: 'Leave request',
+          time: '11:30–11:55',
+          start: 210,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Meeting prep',
+          time: '12:25–12:55',
+          start: 265,
+          duration: 30,
+          incoming: false,
+        },
+        {
+          label: 'Update records',
+          time: '13:40–14:00',
+          start: 340,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Send reminders',
+          time: '15:00–15:20',
+          start: 420,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Status update',
+          time: '16:10–16:30',
+          start: 490,
+          duration: 20,
+          incoming: false,
+        },
       ],
       handled: 'Handled by Anna',
       handledCount: '7 routine tasks completed',
       returned: 'Time returned',
       returnedAmount: '2h 40m',
+      before: 'Before · 7 routine tasks split up the day',
+      after: 'After · 08:00–17:00 for work that needs you',
     },
     problemKicker: 'Useful work. Wrong use of your time.',
     problemTitle: 'Anna handles the work around the work.',
@@ -257,29 +313,64 @@ const content = {
       weekday: 'DI 18',
       focus: 'Werk dat jou nodig heeft',
       focusDetail: 'Strategie · besluiten · mensen',
+      finalTime: '08:00–17:00',
       tasks: [
-        { label: 'Inbox verwerken', time: '08:00–08:30', start: 0, span: 1 },
-        { label: 'Opvolging', time: '08:30–09:00', start: 1, span: 1 },
-        { label: 'Verlofaanvraag', time: '09:30–10:00', start: 3, span: 1 },
+        {
+          label: 'Inbox verwerken',
+          time: '09:00–09:25',
+          start: 60,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Opvolging',
+          time: '10:25–10:45',
+          start: 145,
+          duration: 20,
+          incoming: false,
+        },
+        {
+          label: 'Verlofaanvraag',
+          time: '11:30–11:55',
+          start: 210,
+          duration: 25,
+          incoming: false,
+        },
         {
           label: 'Overleg voorbereiden',
-          time: '10:30–11:30',
-          start: 5,
-          span: 2,
+          time: '12:25–12:55',
+          start: 265,
+          duration: 30,
+          incoming: false,
         },
-        { label: 'Dossiers bijwerken', time: '12:00–12:30', start: 8, span: 1 },
+        {
+          label: 'Dossiers bijwerken',
+          time: '13:40–14:00',
+          start: 340,
+          duration: 20,
+          incoming: true,
+        },
         {
           label: 'Herinneringen sturen',
-          time: '13:00–13:30',
-          start: 10,
-          span: 1,
+          time: '15:00–15:20',
+          start: 420,
+          duration: 20,
+          incoming: true,
         },
-        { label: 'Status bijwerken', time: '14:00–14:30', start: 12, span: 1 },
+        {
+          label: 'Status bijwerken',
+          time: '16:10–16:30',
+          start: 490,
+          duration: 20,
+          incoming: false,
+        },
       ],
       handled: 'Afgehandeld door Anna',
       handledCount: '7 routinetaken afgerond',
       returned: 'Tijd terug',
       returnedAmount: '2u 40m',
+      before: 'Voor · 7 routinetaken versnipperen de dag',
+      after: 'Na · 08:00–17:00 voor werk dat jou nodig heeft',
     },
     problemKicker: 'Nuttig werk. Verkeerd gebruik van je tijd.',
     problemTitle: 'Anna doet het werk rondom het werk.',
@@ -666,15 +757,33 @@ export default function Home() {
                   <span>16:00</span>
                 </div>
                 <div className="calendar-grid">
-                  <div className="events-layer">
+                  <div className="focus-layer" aria-hidden="true">
+                    {focusSegments.map((segment) => (
+                      <div
+                        className="focus-fragment"
+                        key={segment.time}
+                        style={
+                          {
+                            '--event-start': `${(segment.start / 540) * 100}%`,
+                            '--event-duration': `${(segment.duration / 540) * 100}%`,
+                          } as CSSProperties
+                        }
+                      >
+                        <small>{segment.time}</small>
+                        <span>{t.day.focus}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="events-layer" aria-hidden="true">
                     {t.day.tasks.map((task) => (
                       <div
                         className="calendar-event"
                         key={task.label}
+                        data-incoming={task.incoming}
                         style={
                           {
-                            '--event-start': task.start,
-                            '--event-span': task.span,
+                            '--event-start': `${(task.start / 540) * 100}%`,
+                            '--event-duration': `${(task.duration / 540) * 100}%`,
                           } as CSSProperties
                         }
                       >
@@ -684,27 +793,35 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="focus-block">
-                    <span className="focus-dot" aria-hidden="true" />
+                    <div className="focus-block-header">
+                      <span className="focus-dot" aria-hidden="true" />
+                      <small>{t.day.finalTime}</small>
+                    </div>
                     <strong>{t.day.focus}</strong>
                     <small>{t.day.focusDetail}</small>
                   </div>
-                  <div className="anna-tray">
-                    <span className="anna-tray-mark" aria-hidden="true">
-                      A
-                    </span>
-                    <div>
-                      <small>{t.day.handled}</small>
-                      <strong>
-                        <Check size={13} aria-hidden="true" />
-                        {t.day.handledCount}
-                      </strong>
-                    </div>
-                    <span className="returned-time">
-                      <small>{t.day.returned}</small>
-                      {t.day.returnedAmount}
-                    </span>
-                  </div>
                 </div>
+              </div>
+              <div className="anna-tray calendar-summary">
+                <span className="anna-tray-mark" aria-hidden="true">
+                  A
+                </span>
+                <div>
+                  <small>{t.day.handled}</small>
+                  <strong>
+                    <Check size={13} aria-hidden="true" />
+                    {t.day.handledCount}
+                  </strong>
+                </div>
+                <span className="returned-time">
+                  <small>{t.day.returned}</small>
+                  {t.day.returnedAmount}
+                </span>
+              </div>
+              <div className="reduced-motion-story">
+                <span>{t.day.before}</span>
+                <ChevronRight size={15} aria-hidden="true" />
+                <strong>{t.day.after}</strong>
               </div>
             </figure>
           </div>

@@ -64,22 +64,28 @@ test('uses a familiar calendar that fills with routine work and clears in view',
   }
   assert.match(page, /className="cleared-day"/);
   assert.match(page, /className="calendar-event/);
+  assert.match(page, /className="focus-fragment"/);
+  assert.match(page, /data-incoming=\{task\.incoming\}/);
   assert.match(page, /Work week/);
   assert.match(page, /Werkweek/);
   assert.doesNotMatch(page, /anna-workflow\.png/);
-  assert.match(styles, /@keyframes event-cycle/);
+  assert.match(styles, /@keyframes clear-admin/);
+  assert.match(styles, /@keyframes fill-open-slots/);
+  assert.match(styles, /@keyframes merge-focus/);
+  assert.match(styles, /@keyframes reveal-focus-day/);
   assert.doesNotMatch(styles, /\.cleared-day[^}]*transform:\s*rotate/s);
 });
 
 test('aligns agenda cards to the calendar and labels their timeframes', () => {
   for (const timeframe of [
-    '08:00–08:30',
-    '08:30–09:00',
-    '09:30–10:00',
-    '10:30–11:30',
-    '12:00–12:30',
-    '13:00–13:30',
-    '14:00–14:30',
+    '09:00–09:25',
+    '10:25–10:45',
+    '11:30–11:55',
+    '12:25–12:55',
+    '13:40–14:00',
+    '15:00–15:20',
+    '16:10–16:30',
+    '08:00–17:00',
   ]) {
     assert.ok(
       page.includes(timeframe),
@@ -87,19 +93,51 @@ test('aligns agenda cards to the calendar and labels their timeframes', () => {
     );
   }
   assert.match(page, /--event-start/);
-  assert.match(page, /--event-span/);
+  assert.match(page, /--event-duration/);
   assert.match(styles, /top:\s*calc\(var\(--event-start\)/);
-  assert.match(styles, /height:\s*calc\(var\(--event-span\)/);
+  assert.match(styles, /height:\s*calc\(var\(--event-duration\)/);
 });
 
-test('keeps the mobile Anna summary below the focus block', () => {
-  assert.match(
-    styles,
-    /@media \(max-width: 820px\)[\s\S]*?\.focus-block\s*\{[^}]*bottom:\s*calc\(3 \* \(100% \/ 9\)/,
+test('balances a nine-hour day with exactly 2h 40m handled by Anna', () => {
+  const focusSource = page.match(
+    /const focusSegments = \[([\s\S]*?)\] as const;/,
+  )?.[1];
+  assert.ok(focusSource, 'missing valuable-work schedule');
+  const focusMinutes = [...focusSource.matchAll(/duration:\s*(\d+)/g)].reduce(
+    (total, match) => total + Number(match[1]),
+    0,
   );
+  assert.equal(focusMinutes, 380);
+
+  const taskLists = [...page.matchAll(/tasks: \[([\s\S]*?)\],\n\s*handled:/g)];
+  assert.equal(taskLists.length, 2);
+  for (const [, taskSource] of taskLists) {
+    const routineMinutes = [
+      ...taskSource.matchAll(/duration:\s*(\d+)/g),
+    ].reduce((total, match) => total + Number(match[1]), 0);
+    assert.equal(routineMinutes, 160);
+  }
+});
+
+test('keeps the Anna summary outside the calendar grid at every width', () => {
+  assert.match(page, /className="anna-tray calendar-summary"/);
+  assert.match(styles, /\.anna-tray\s*\{[^}]*position:\s*static/);
+  assert.doesNotMatch(styles, /\.anna-tray\s*\{[^}]*position:\s*absolute/);
+});
+
+test('explains the before and after without motion', () => {
+  for (const phrase of [
+    'Before · 7 routine tasks split up the day',
+    'After · 08:00–17:00 for work that needs you',
+    'Voor · 7 routinetaken versnipperen de dag',
+    'Na · 08:00–17:00 voor werk dat jou nodig heeft',
+  ]) {
+    assert.ok(page.includes(phrase), `missing reduced-motion story: ${phrase}`);
+  }
+  assert.match(page, /className="reduced-motion-story"/);
   assert.match(
     styles,
-    /@media \(max-width: 820px\)[\s\S]*?\.anna-tray\s*\{[^}]*grid-template-columns:\s*auto 1fr/,
+    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reduced-motion-story\s*\{[^}]*display:\s*grid/,
   );
 });
 
