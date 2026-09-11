@@ -3,8 +3,14 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
-const layout = readFileSync(new URL('../app/layout.tsx', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('../app/globals.css', import.meta.url), 'utf8');
+const layout = readFileSync(
+  new URL('../app/layout.tsx', import.meta.url),
+  'utf8',
+);
+const styles = readFileSync(
+  new URL('../app/globals.css', import.meta.url),
+  'utf8',
+);
 const viteConfig = readFileSync(
   new URL('../vite.config.ts', import.meta.url),
   'utf8',
@@ -25,18 +31,78 @@ test('ships complete English and Dutch page copy', () => {
   assert.match(page, /English/);
 });
 
-test('explains one concrete supervised work journey', () => {
+test('explains supervised work journeys from request through reported result', () => {
   for (const phrase of [
-    'A request arrives',
-    'Anna prepares the work',
-    'You stay in control',
-    'Anna completes and reports',
-    'Een verzoek komt binnen',
-    'Anna bereidt het werk voor',
-    'Jij houdt de regie',
-    'Anna rondt af en rapporteert',
+    'Can I take next Friday off?',
+    'I can check that and prepare the request for you.',
+    'Human approval required',
+    'Your leave request is filed',
+    'Kan ik volgende vrijdag vrij nemen?',
+    'Ik kan dat controleren en de aanvraag voor je voorbereiden.',
+    'Menselijke goedkeuring nodig',
+    'Je verlofaanvraag is ingediend',
   ]) {
     assert.ok(page.includes(phrase), `missing workflow copy: ${phrase}`);
+  }
+});
+
+test('uses a calm cleared-day calendar instead of the abstract hero artwork', () => {
+  for (const phrase of [
+    'Work that needs you',
+    'Werk dat jou nodig heeft',
+    'Follow-ups',
+    'Opvolging',
+    'Time returned',
+    'Tijd terug',
+  ]) {
+    assert.ok(
+      page.includes(phrase),
+      `missing cleared-day hero copy: ${phrase}`,
+    );
+  }
+  assert.match(page, /className="cleared-day"/);
+  assert.doesNotMatch(page, /anna-workflow\.png/);
+  assert.match(styles, /@keyframes clear-task/);
+});
+
+test('shows three selectable, replayable conversation demos', () => {
+  assert.match(page, /from '@\/components\/ui\/tabs'/);
+  for (const phrase of [
+    'Leave request',
+    'Desk booking',
+    'Record update',
+    'Verlofaanvraag',
+    'Werkplek boeken',
+    'Dossier bijwerken',
+    'Retrieving context',
+    'Context ophalen',
+    'Replay conversation',
+    'Gesprek opnieuw afspelen',
+    'Pause conversation',
+    'Gesprek pauzeren',
+  ]) {
+    assert.ok(page.includes(phrase), `missing animated demo detail: ${phrase}`);
+  }
+  assert.match(page, /aria-live="polite"/);
+  assert.match(page, /demoStep/);
+});
+
+test('makes Anna boundaries and recognisable team tasks concrete', () => {
+  for (const phrase of [
+    'Anna does',
+    'Anna asks',
+    'Anna never does without permission',
+    'Anna doet',
+    'Anna vraagt',
+    'Anna doet nooit zonder toestemming',
+    'HR',
+    'Operations',
+    'Office management',
+  ]) {
+    assert.ok(
+      page.includes(phrase),
+      `missing operating model detail: ${phrase}`,
+    );
   }
 });
 
@@ -48,9 +114,27 @@ test('offers both requested conversion paths', () => {
 });
 
 test('names supported work surfaces and keeps internal protocol language private', () => {
-  for (const integration of ['Microsoft Teams', 'ClockWise', 'Loket']) {
-    assert.ok(page.includes(integration), `missing integration: ${integration}`);
+  for (const integration of [
+    'Microsoft Teams',
+    'ClockWise',
+    'Loket',
+    'Microsoft 365',
+    'Atlassian',
+    'Jira',
+    'Notion',
+    'GitHub',
+  ]) {
+    assert.ok(
+      page.includes(integration),
+      `missing integration: ${integration}`,
+    );
   }
+  assert.match(page, /Available now/);
+  assert.match(page, /Nu beschikbaar/);
+  assert.match(page, /On the way/);
+  assert.match(page, /Onderweg/);
+  assert.match(page, /Request a connector/);
+  assert.match(page, /Vraag een koppeling aan/);
   assert.doesNotMatch(page, /\bMCP\b/);
 });
 
