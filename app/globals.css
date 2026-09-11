@@ -461,12 +461,17 @@ footer > a:last-child:hover {
   position: absolute;
   display: flex;
   align-items: center;
+  gap: 0.45rem;
+  top: calc(var(--event-start) * (100% / 18) + 2px);
+  right: 3%;
+  left: 3%;
+  height: calc(var(--event-span) * (100% / 18) - 4px);
   overflow: hidden;
   border: 1px solid rgba(47, 99, 255, 0.17);
   border-left: 3px solid var(--blue);
   border-radius: 0.4rem;
   background: #eaf0ff;
-  padding: 0.35rem 0.55rem;
+  padding: 0.2rem 0.5rem;
   box-shadow: 0 6px 15px rgba(11, 22, 48, 0.07);
   color: #374665;
   font-size: 0.62rem;
@@ -475,53 +480,39 @@ footer > a:last-child:hover {
   animation: event-cycle 6.4s cubic-bezier(0.62, 0, 0.34, 1) forwards;
   animation-play-state: paused;
 }
+.calendar-event small {
+  flex: 0 0 auto;
+  color: #65718a;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.calendar-event span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .calendar-event:nth-child(1) {
-  top: 1%;
-  right: 49%;
-  left: 3%;
-  height: 8%;
   animation-delay: 0.15s;
 }
 .calendar-event:nth-child(2) {
-  top: 11%;
-  right: 3%;
-  left: 54%;
-  height: 9%;
   animation-delay: 0.4s;
 }
 .calendar-event:nth-child(3) {
-  top: 22%;
-  right: 32%;
-  left: 3%;
-  height: 9%;
   animation-delay: 0.65s;
 }
 .calendar-event:nth-child(4) {
-  top: 33%;
-  right: 3%;
-  left: 40%;
-  height: 11%;
   animation-delay: 0.9s;
 }
 .calendar-event:nth-child(5) {
-  top: 47%;
-  right: 45%;
-  left: 3%;
-  height: 8%;
   animation-delay: 1.15s;
 }
 .calendar-event:nth-child(6) {
-  top: 58%;
-  right: 3%;
-  left: 58%;
-  height: 8%;
   animation-delay: 1.4s;
 }
 .calendar-event:nth-child(7) {
-  top: 69%;
-  right: 20%;
-  left: 3%;
-  height: 10%;
   animation-delay: 1.65s;
 }
 .calendar-event:nth-child(3n + 2) {
@@ -554,9 +545,9 @@ footer > a:last-child:hover {
 }
 .focus-block {
   position: absolute;
-  top: 17%;
+  top: calc(2 * (100% / 9) + 2px);
   right: 3%;
-  bottom: 22%;
+  bottom: calc(2 * (100% / 9) + 2px);
   left: 3%;
   display: flex;
   flex-direction: column;
@@ -1089,6 +1080,19 @@ footer > a:last-child:hover {
   color: #2e6e43;
   cursor: default;
 }
+.approve-button[data-executing='true'] {
+  background: #fff0c2;
+  color: #76570a;
+}
+.approve-button[data-executing='true'] svg {
+  animation: executing-pulse 700ms ease-in-out infinite alternate;
+}
+@keyframes executing-pulse {
+  to {
+    opacity: 0.45;
+    transform: scale(0.86);
+  }
+}
 .result-message {
   display: flex;
   align-items: flex-start;
@@ -1597,7 +1601,7 @@ footer > a:last-child {
   }
   .focus-block {
     right: 3%;
-    bottom: 25%;
+    bottom: calc(3 * (100% / 9) + 2px);
   }
   .anna-tray {
     grid-template-columns: auto 1fr;

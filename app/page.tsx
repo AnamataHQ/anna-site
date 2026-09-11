@@ -20,11 +20,14 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type Language = 'en' | 'nl';
+
+const EXECUTION_DELAY_MS = 1600;
 
 const content = {
   en: {
@@ -54,13 +57,13 @@ const content = {
       focus: 'Work that needs you',
       focusDetail: 'Strategy · decisions · people',
       tasks: [
-        'Inbox triage',
-        'Follow-ups',
-        'Leave request',
-        'Meeting prep',
-        'Update records',
-        'Send reminders',
-        'Status update',
+        { label: 'Inbox triage', time: '08:00–08:30', start: 0, span: 1 },
+        { label: 'Follow-ups', time: '08:30–09:00', start: 1, span: 1 },
+        { label: 'Leave request', time: '09:30–10:00', start: 3, span: 1 },
+        { label: 'Meeting prep', time: '10:30–11:30', start: 5, span: 2 },
+        { label: 'Update records', time: '12:00–12:30', start: 8, span: 1 },
+        { label: 'Send reminders', time: '13:00–13:30', start: 10, span: 1 },
+        { label: 'Status update', time: '14:00–14:30', start: 12, span: 1 },
       ],
       handled: 'Handled by Anna',
       handledCount: '7 routine tasks completed',
@@ -126,6 +129,7 @@ const content = {
     ready: 'Context ready',
     approvalGate: 'Human approval required',
     approve: 'Approve and continue',
+    executing: 'Anna is carrying this out…',
     approved: 'Approved',
     replay: 'Replay conversation',
     pause: 'Pause conversation',
@@ -254,13 +258,23 @@ const content = {
       focus: 'Werk dat jou nodig heeft',
       focusDetail: 'Strategie · besluiten · mensen',
       tasks: [
-        'Inbox verwerken',
-        'Opvolging',
-        'Verlofaanvraag',
-        'Overleg voorbereiden',
-        'Dossiers bijwerken',
-        'Herinneringen sturen',
-        'Status bijwerken',
+        { label: 'Inbox verwerken', time: '08:00–08:30', start: 0, span: 1 },
+        { label: 'Opvolging', time: '08:30–09:00', start: 1, span: 1 },
+        { label: 'Verlofaanvraag', time: '09:30–10:00', start: 3, span: 1 },
+        {
+          label: 'Overleg voorbereiden',
+          time: '10:30–11:30',
+          start: 5,
+          span: 2,
+        },
+        { label: 'Dossiers bijwerken', time: '12:00–12:30', start: 8, span: 1 },
+        {
+          label: 'Herinneringen sturen',
+          time: '13:00–13:30',
+          start: 10,
+          span: 1,
+        },
+        { label: 'Status bijwerken', time: '14:00–14:30', start: 12, span: 1 },
       ],
       handled: 'Afgehandeld door Anna',
       handledCount: '7 routinetaken afgerond',
@@ -326,6 +340,7 @@ const content = {
     ready: 'Context gereed',
     approvalGate: 'Menselijke goedkeuring nodig',
     approve: 'Goedkeuren en doorgaan',
+    executing: 'Anna voert dit nu uit…',
     approved: 'Goedgekeurd',
     replay: 'Gesprek opnieuw afspelen',
     pause: 'Gesprek pauzeren',
@@ -464,8 +479,10 @@ export default function Home() {
   const [scenarioId, setScenarioId] = useState('leave');
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [isExecuting, setIsExecuting] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const executionTimerRef = useRef<number | null>(null);
   const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>();
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
@@ -506,17 +523,45 @@ export default function Home() {
     return () => window.clearTimeout(timer);
   }, [demoStep, isPaused, reduceMotion, workflowVisible]);
 
+  useEffect(
+    () => () => {
+      if (executionTimerRef.current !== null) {
+        window.clearTimeout(executionTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const clearExecutionTimer = () => {
+    if (executionTimerRef.current !== null) {
+      window.clearTimeout(executionTimerRef.current);
+      executionTimerRef.current = null;
+    }
+    setIsExecuting(false);
+  };
+
   const switchLanguage = () =>
     setLanguage((current) => (current === 'en' ? 'nl' : 'en'));
   const restartDemo = () => {
+    clearExecutionTimer();
     setIsPaused(false);
     setDemoStep(reduceMotion ? 5 : 0);
     setReplayKey((key) => key + 1);
   };
   const changeScenario = (value: string) => {
+    clearExecutionTimer();
     setScenarioId(value);
     setIsPaused(false);
     setDemoStep(reduceMotion ? 5 : 0);
+  };
+  const approveDemo = () => {
+    if (demoStep >= 5 || isExecuting) return;
+    setIsExecuting(true);
+    executionTimerRef.current = window.setTimeout(() => {
+      setDemoStep(5);
+      setIsExecuting(false);
+      executionTimerRef.current = null;
+    }, EXECUTION_DELAY_MS);
   };
 
   return (
@@ -623,8 +668,18 @@ export default function Home() {
                 <div className="calendar-grid">
                   <div className="events-layer">
                     {t.day.tasks.map((task) => (
-                      <div className="calendar-event" key={task}>
-                        <span>{task}</span>
+                      <div
+                        className="calendar-event"
+                        key={task.label}
+                        style={
+                          {
+                            '--event-start': task.start,
+                            '--event-span': task.span,
+                          } as CSSProperties
+                        }
+                      >
+                        <small>{task.time}</small>
+                        <span>{task.label}</span>
                       </div>
                     ))}
                   </div>
@@ -810,11 +865,17 @@ export default function Home() {
                     <button
                       type="button"
                       className="approve-button"
-                      onClick={() => setDemoStep(5)}
-                      disabled={demoStep >= 5}
+                      onClick={approveDemo}
+                      disabled={demoStep >= 5 || isExecuting}
+                      aria-busy={isExecuting}
+                      data-executing={isExecuting}
                     >
                       <Check size={16} aria-hidden="true" />{' '}
-                      {demoStep >= 5 ? t.approved : t.approve}
+                      {demoStep >= 5
+                        ? t.approved
+                        : isExecuting
+                          ? t.executing
+                          : t.approve}
                     </button>
                   </div>
                 </DemoMessage>

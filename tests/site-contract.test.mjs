@@ -71,6 +71,38 @@ test('uses a familiar calendar that fills with routine work and clears in view',
   assert.doesNotMatch(styles, /\.cleared-day[^}]*transform:\s*rotate/s);
 });
 
+test('aligns agenda cards to the calendar and labels their timeframes', () => {
+  for (const timeframe of [
+    '08:00–08:30',
+    '08:30–09:00',
+    '09:30–10:00',
+    '10:30–11:30',
+    '12:00–12:30',
+    '13:00–13:30',
+    '14:00–14:30',
+  ]) {
+    assert.ok(
+      page.includes(timeframe),
+      `missing agenda timeframe: ${timeframe}`,
+    );
+  }
+  assert.match(page, /--event-start/);
+  assert.match(page, /--event-span/);
+  assert.match(styles, /top:\s*calc\(var\(--event-start\)/);
+  assert.match(styles, /height:\s*calc\(var\(--event-span\)/);
+});
+
+test('keeps the mobile Anna summary below the focus block', () => {
+  assert.match(
+    styles,
+    /@media \(max-width: 820px\)[\s\S]*?\.focus-block\s*\{[^}]*bottom:\s*calc\(3 \* \(100% \/ 9\)/,
+  );
+  assert.match(
+    styles,
+    /@media \(max-width: 820px\)[\s\S]*?\.anna-tray\s*\{[^}]*grid-template-columns:\s*auto 1fr/,
+  );
+});
+
 test('starts motion when each experience enters the viewport', () => {
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /heroHasEntered/);
@@ -100,6 +132,15 @@ test('shows three selectable, replayable conversation demos', () => {
   }
   assert.match(page, /aria-live="polite"/);
   assert.match(page, /demoStep/);
+});
+
+test('shows Anna working briefly after approval before reporting completion', () => {
+  assert.match(page, /const EXECUTION_DELAY_MS = 1600/);
+  assert.match(page, /isExecuting/);
+  assert.match(page, /Anna is carrying this out/);
+  assert.match(page, /Anna voert dit nu uit/);
+  assert.match(page, /aria-busy=\{isExecuting\}/);
+  assert.match(page, /window\.setTimeout\([\s\S]*EXECUTION_DELAY_MS/);
 });
 
 test('makes Anna boundaries and recognisable team tasks concrete', () => {
