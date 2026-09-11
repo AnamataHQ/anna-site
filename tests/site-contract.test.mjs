@@ -46,12 +46,14 @@ test('explains supervised work journeys from request through reported result', (
   }
 });
 
-test('uses a calm cleared-day calendar instead of the abstract hero artwork', () => {
+test('uses a familiar calendar that fills with routine work and clears in view', () => {
   for (const phrase of [
     'Work that needs you',
     'Werk dat jou nodig heeft',
     'Follow-ups',
     'Opvolging',
+    'Inbox triage',
+    'Inbox verwerken',
     'Time returned',
     'Tijd terug',
   ]) {
@@ -61,8 +63,21 @@ test('uses a calm cleared-day calendar instead of the abstract hero artwork', ()
     );
   }
   assert.match(page, /className="cleared-day"/);
+  assert.match(page, /className="calendar-event/);
+  assert.match(page, /Work week/);
+  assert.match(page, /Werkweek/);
   assert.doesNotMatch(page, /anna-workflow\.png/);
-  assert.match(styles, /@keyframes clear-task/);
+  assert.match(styles, /@keyframes event-cycle/);
+  assert.doesNotMatch(styles, /\.cleared-day[^}]*transform:\s*rotate/s);
+});
+
+test('starts motion when each experience enters the viewport', () => {
+  assert.match(page, /IntersectionObserver/);
+  assert.match(page, /heroHasEntered/);
+  assert.match(page, /workflowHasEntered/);
+  assert.match(page, /workflowVisible/);
+  assert.match(page, /data-in-view=/);
+  assert.match(styles, /\[data-in-view='true'\]/);
 });
 
 test('shows three selectable, replayable conversation demos', () => {
@@ -113,11 +128,14 @@ test('offers both requested conversion paths', () => {
   assert.match(page, /mailto:info@anamata\.ai/);
 });
 
-test('names supported work surfaces and keeps internal protocol language private', () => {
+test('distinguishes ready, shipping, roadmap and extensible connections', () => {
   for (const integration of [
     'Microsoft Teams',
     'ClockWise',
     'Loket',
+    'Slack',
+    'Mendix office seat booking',
+    'Mendix CV updates',
     'Microsoft 365',
     'Atlassian',
     'Jira',
@@ -131,11 +149,20 @@ test('names supported work surfaces and keeps internal protocol language private
   }
   assert.match(page, /Available now/);
   assert.match(page, /Nu beschikbaar/);
-  assert.match(page, /On the way/);
-  assert.match(page, /Onderweg/);
+  assert.match(page, /Shipping with Anna/);
+  assert.match(page, /Wordt met Anna geleverd/);
+  assert.match(page, /Communication roadmap/);
+  assert.match(page, /Roadmap communicatie/);
+  assert.match(page, /Examples, not limits/);
+  assert.match(page, /Voorbeelden, geen grenzen/);
+  assert.match(page, /SSO-secured MCP connectors/);
+  assert.match(page, /MCP-koppelingen met SSO/);
+  assert.match(page, /If it has an API/);
+  assert.match(page, /Als het een API heeft/);
+  assert.match(page, /thousands of business systems/i);
+  assert.match(page, /duizenden bedrijfssystemen/i);
   assert.match(page, /Request a connector/);
   assert.match(page, /Vraag een koppeling aan/);
-  assert.doesNotMatch(page, /\bMCP\b/);
 });
 
 test('includes transparency and accessibility essentials', () => {

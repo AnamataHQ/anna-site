@@ -20,7 +20,7 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -48,10 +48,22 @@ const content = {
     day: {
       aria: 'A working day where Anna clears routine administration and gives focus time back.',
       date: 'Tuesday · 18 June',
+      view: 'Work week',
+      today: 'Today',
+      weekday: 'TUE 18',
       focus: 'Work that needs you',
       focusDetail: 'Strategy · decisions · people',
-      tasks: ['Follow-ups', 'Leave request', 'Update records'],
+      tasks: [
+        'Inbox triage',
+        'Follow-ups',
+        'Leave request',
+        'Meeting prep',
+        'Update records',
+        'Send reminders',
+        'Status update',
+      ],
       handled: 'Handled by Anna',
+      handledCount: '7 routine tasks completed',
       returned: 'Time returned',
       returnedAmount: '2h 40m',
     },
@@ -186,12 +198,23 @@ const content = {
     fitKicker: 'Fits into the workday',
     fitTitle: 'Works where your team already works.',
     fitBody:
-      'Anna meets colleagues in Microsoft Teams and works with the operational systems behind it. Start with the connections you use today and add more as your workflows grow.',
+      'Anna meets colleagues in the channels they already use and works with the operational systems behind them. Start with what ships with Anna, then connect the rest of your landscape.',
     integrationLabel: 'Your connected workday',
     available: 'Available now',
-    coming: 'On the way',
     availableNote: 'The work surfaces Anna can connect with today.',
-    comingNote: 'A growing connector landscape, shaped around your workflows.',
+    shipping: 'Shipping with Anna',
+    shippingNote:
+      'Anamata’s Mendix workflows, ready as part of the Anna launch.',
+    roadmap: 'Communication roadmap',
+    roadmapNote:
+      'Microsoft Teams today, with Slack on the cards as another way to work with Anna.',
+    examples: 'Examples, not limits',
+    scaleTitle: 'One Anna. Thousands of business systems.',
+    scaleBody:
+      'The next layer is SSO-secured MCP connectors. As full SSO support comes online, they open up the major corporate platforms your organisation already runs. These logos show the breadth, not a fixed catalogue.',
+    customTitle: 'If it has an API, it can join the workflow.',
+    customBody:
+      'For internal or specialist systems without their own connector, Anamata can build one during onboarding.',
     requestConnector: 'Request a connector',
     connectorNote: 'Tell us which system your team needs next.',
     ctaKicker: 'Give time back to the work that needs you',
@@ -225,10 +248,22 @@ const content = {
     day: {
       aria: 'Een werkdag waarin Anna routineadministratie afhandelt en focustijd teruggeeft.',
       date: 'Dinsdag · 18 juni',
+      view: 'Werkweek',
+      today: 'Vandaag',
+      weekday: 'DI 18',
       focus: 'Werk dat jou nodig heeft',
       focusDetail: 'Strategie · besluiten · mensen',
-      tasks: ['Opvolging', 'Verlofaanvraag', 'Dossiers bijwerken'],
+      tasks: [
+        'Inbox verwerken',
+        'Opvolging',
+        'Verlofaanvraag',
+        'Overleg voorbereiden',
+        'Dossiers bijwerken',
+        'Herinneringen sturen',
+        'Status bijwerken',
+      ],
       handled: 'Afgehandeld door Anna',
+      handledCount: '7 routinetaken afgerond',
       returned: 'Tijd terug',
       returnedAmount: '2u 40m',
     },
@@ -367,13 +402,23 @@ const content = {
     fitKicker: 'Past in de werkdag',
     fitTitle: 'Werkt waar jouw team al werkt.',
     fitBody:
-      'Anna ontmoet collega’s in Microsoft Teams en werkt met de operationele systemen daarachter. Begin met de koppelingen die je vandaag gebruikt en voeg toe wanneer je werkprocessen groeien.',
+      'Anna ontmoet collega’s in de kanalen die ze al gebruiken en werkt met de operationele systemen daarachter. Begin met wat met Anna wordt geleverd en verbind daarna de rest van je landschap.',
     integrationLabel: 'Jouw verbonden werkdag',
     available: 'Nu beschikbaar',
-    coming: 'Onderweg',
     availableNote: 'De werkomgevingen waarmee Anna vandaag kan verbinden.',
-    comingNote:
-      'Een groeiend landschap van koppelingen, gevormd rond jouw werkprocessen.',
+    shipping: 'Wordt met Anna geleverd',
+    shippingNote:
+      'De Mendix-werkprocessen van Anamata, klaar als onderdeel van de lancering van Anna.',
+    roadmap: 'Roadmap communicatie',
+    roadmapNote:
+      'Microsoft Teams vandaag, met Slack op de planning als extra manier om met Anna te werken.',
+    examples: 'Voorbeelden, geen grenzen',
+    scaleTitle: 'Eén Anna. Duizenden bedrijfssystemen.',
+    scaleBody:
+      'De volgende laag bestaat uit MCP-koppelingen met SSO. Zodra volledige SSO-ondersteuning beschikbaar is, openen ze de grote bedrijfsplatforms die jouw organisatie al gebruikt. Deze logo’s tonen de breedte, niet een vaste catalogus.',
+    customTitle: 'Als het een API heeft, kan het meedoen in het werkproces.',
+    customBody:
+      'Voor interne of specialistische systemen zonder eigen koppeling kan Anamata er tijdens de onboarding een bouwen.',
     requestConnector: 'Vraag een koppeling aan',
     connectorNote:
       'Vertel ons welk systeem jouw team als volgende nodig heeft.',
@@ -395,7 +440,18 @@ const availableIntegrations = [
   { name: 'Loket', icon: '/brands/loket.png' },
 ] as const;
 
-const comingIntegrations = [
+const shippingIntegrations = {
+  en: [
+    { name: 'Mendix office seat booking', icon: '/brands/mendix.svg' },
+    { name: 'Mendix CV updates', icon: '/brands/mendix.svg' },
+  ],
+  nl: [
+    { name: 'Mendix werkplek boeken', icon: '/brands/mendix.svg' },
+    { name: 'Mendix cv bijwerken', icon: '/brands/mendix.svg' },
+  ],
+} as const;
+
+const ecosystemExamples = [
   { name: 'Microsoft 365', icon: '/brands/microsoft-365.svg' },
   { name: 'Atlassian', icon: '/brands/atlassian.svg' },
   { name: 'Jira', icon: '/brands/jira.svg' },
@@ -406,10 +462,13 @@ const comingIntegrations = [
 export default function Home() {
   const [language, setLanguage] = useState<Language>('en');
   const [scenarioId, setScenarioId] = useState('leave');
-  const [demoStep, setDemoStep] = useState(5);
+  const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>();
+  const [workflowRef, workflowVisible, workflowHasEntered] =
+    useElementVisibility<HTMLElement>(0.28);
   const t = content[language];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
@@ -422,7 +481,7 @@ export default function Home() {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updatePreference = () => {
       setReduceMotion(media.matches);
-      setDemoStep(media.matches ? 5 : 0);
+      if (media.matches) setDemoStep(5);
     };
     const initialUpdate = window.setTimeout(updatePreference, 0);
     media.addEventListener('change', updatePreference);
@@ -433,10 +492,19 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion || isPaused || demoStep >= 4) return;
+    if (!workflowHasEntered) return;
+    const timer = window.setTimeout(() => {
+      setIsPaused(false);
+      setDemoStep(reduceMotion ? 5 : 0);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [workflowHasEntered, reduceMotion]);
+
+  useEffect(() => {
+    if (!workflowVisible || reduceMotion || isPaused || demoStep >= 4) return;
     const timer = window.setTimeout(() => setDemoStep((step) => step + 1), 920);
     return () => window.clearTimeout(timer);
-  }, [demoStep, isPaused, reduceMotion]);
+  }, [demoStep, isPaused, reduceMotion, workflowVisible]);
 
   const switchLanguage = () =>
     setLanguage((current) => (current === 'en' ? 'nl' : 'en'));
@@ -518,39 +586,52 @@ export default function Home() {
             </a>
           </div>
 
-          <div className="hero-visual">
+          <div
+            className="hero-visual"
+            ref={heroRef}
+            data-in-view={heroHasEntered}
+          >
             <figure className="cleared-day" aria-label={t.day.aria}>
               <figcaption className="day-header">
-                <span>
-                  <CalendarDays size={16} aria-hidden="true" /> {t.day.date}
-                </span>
-                <span className="returned-time">
-                  <small>{t.day.returned}</small>
-                  {t.day.returnedAmount}
-                </span>
+                <div className="calendar-controls">
+                  <span className="today-chip">{t.day.today}</span>
+                  <span className="calendar-chevrons" aria-hidden="true">
+                    ‹&nbsp;&nbsp;›
+                  </span>
+                  <span>
+                    <CalendarDays size={16} aria-hidden="true" /> {t.day.date}
+                  </span>
+                </div>
+                <span className="calendar-view">{t.day.view}</span>
               </figcaption>
+              <div className="day-column-header">
+                <span>{t.day.weekday}</span>
+                <i aria-hidden="true" />
+              </div>
               <div className="day-body">
                 <div className="time-rail" aria-hidden="true">
+                  <span>08:00</span>
                   <span>09:00</span>
                   <span>10:00</span>
                   <span>11:00</span>
                   <span>12:00</span>
                   <span>13:00</span>
+                  <span>14:00</span>
+                  <span>15:00</span>
+                  <span>16:00</span>
                 </div>
                 <div className="calendar-grid">
+                  <div className="events-layer">
+                    {t.day.tasks.map((task) => (
+                      <div className="calendar-event" key={task}>
+                        <span>{task}</span>
+                      </div>
+                    ))}
+                  </div>
                   <div className="focus-block">
                     <span className="focus-dot" aria-hidden="true" />
                     <strong>{t.day.focus}</strong>
                     <small>{t.day.focusDetail}</small>
-                  </div>
-                  <div className="admin-task task-one">
-                    <span>{t.day.tasks[0]}</span>
-                  </div>
-                  <div className="admin-task task-two">
-                    <span>{t.day.tasks[1]}</span>
-                  </div>
-                  <div className="admin-task task-three">
-                    <span>{t.day.tasks[2]}</span>
                   </div>
                   <div className="anna-tray">
                     <span className="anna-tray-mark" aria-hidden="true">
@@ -558,13 +639,15 @@ export default function Home() {
                     </span>
                     <div>
                       <small>{t.day.handled}</small>
-                      {t.day.tasks.map((task) => (
-                        <span key={task}>
-                          <Check size={12} aria-hidden="true" />
-                          {task}
-                        </span>
-                      ))}
+                      <strong>
+                        <Check size={13} aria-hidden="true" />
+                        {t.day.handledCount}
+                      </strong>
                     </div>
+                    <span className="returned-time">
+                      <small>{t.day.returned}</small>
+                      {t.day.returnedAmount}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -619,7 +702,12 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="workflow-section" aria-labelledby="workflow-title">
+        <section
+          className="workflow-section"
+          aria-labelledby="workflow-title"
+          ref={workflowRef}
+          data-in-view={workflowHasEntered}
+        >
           <div className="workflow-heading">
             <p className="eyebrow light">{t.workflowKicker}</p>
             <h2 id="workflow-title">{t.workflowTitle}</h2>
@@ -797,28 +885,75 @@ export default function Home() {
               note={t.availableNote}
               integrations={availableIntegrations}
             />
-            <div className="connector-path" aria-hidden="true">
-              <span />
-              <i />
-              <span />
-            </div>
             <IntegrationGroup
-              label={t.coming}
-              note={t.comingNote}
-              integrations={comingIntegrations}
+              label={t.shipping}
+              note={t.shippingNote}
+              integrations={shippingIntegrations[language]}
               muted
             />
-            <a
-              className="connector-request"
-              href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna"
-            >
-              <span>
-                <FileCheck2 size={18} aria-hidden="true" />
-                <strong>{t.requestConnector}</strong>
-                <small>{t.connectorNote}</small>
-              </span>
-              <ArrowRight size={18} aria-hidden="true" />
-            </a>
+
+            <div className="channel-roadmap">
+              <div className="integration-group-heading">
+                <span>{t.roadmap}</span>
+                <p>{t.roadmapNote}</p>
+              </div>
+              <div className="channel-route">
+                <div className="channel-node current">
+                  <Image
+                    src="/brands/microsoft-teams.svg"
+                    alt=""
+                    width={30}
+                    height={30}
+                  />
+                  <strong>Microsoft Teams</strong>
+                </div>
+                <span aria-hidden="true">→</span>
+                <div className="channel-node roadmap-node">
+                  <Image
+                    src="/brands/slack.svg"
+                    alt=""
+                    width={30}
+                    height={30}
+                  />
+                  <strong>Slack</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="ecosystem-card">
+              <span className="ecosystem-badge">{t.examples}</span>
+              <h3>{t.scaleTitle}</h3>
+              <p>{t.scaleBody}</p>
+              <div className="ecosystem-logos">
+                {ecosystemExamples.map((integration) => (
+                  <div key={integration.name} title={integration.name}>
+                    <Image
+                      src={integration.icon}
+                      alt=""
+                      width={28}
+                      height={28}
+                    />
+                    <span>{integration.name}</span>
+                  </div>
+                ))}
+                <span className="more-systems" aria-label={t.scaleTitle}>
+                  +∞
+                </span>
+              </div>
+
+              <div className="custom-connector">
+                <FileCheck2 size={21} aria-hidden="true" />
+                <div>
+                  <strong>{t.customTitle}</strong>
+                  <p>{t.customBody}</p>
+                </div>
+                <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
+                  <span>{t.requestConnector}</span>
+                  <small>{t.connectorNote}</small>
+                  <ArrowRight size={17} aria-hidden="true" />
+                </a>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -911,4 +1046,36 @@ function IntegrationGroup({
       </div>
     </div>
   );
+}
+
+function useElementVisibility<T extends Element>(threshold = 0.2) {
+  const ref = useRef<T>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    if (!('IntersectionObserver' in window)) {
+      const fallback = setTimeout(() => {
+        setIsVisible(true);
+        setHasEntered(true);
+      }, 0);
+      return () => clearTimeout(fallback);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) setHasEntered(true);
+      },
+      { threshold },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return [ref, isVisible, hasEntered] as const;
 }
