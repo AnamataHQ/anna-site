@@ -28,17 +28,80 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 type Language = 'en' | 'nl';
 
 const EXECUTION_DELAY_MS = 1600;
+const CALENDAR_MERGE_DELAY_MS = 6800;
+const CALENDAR_MERGE_DURATION_MS = 2900;
+const INITIAL_FOCUS_WINDOW = { start: 715, end: 745 } as const;
+const FINAL_FOCUS_WINDOW = { start: 480, end: 1020 } as const;
 
 const focusSegments = [
-  { time: '08:00–09:00', start: 0, duration: 60 },
-  { time: '09:25–10:25', start: 85, duration: 60 },
-  { time: '10:45–11:30', start: 165, duration: 45 },
-  { time: '11:55–12:25', start: 235, duration: 30 },
-  { time: '12:55–13:40', start: 295, duration: 45 },
-  { time: '14:00–15:00', start: 360, duration: 60 },
-  { time: '15:20–16:10', start: 440, duration: 50 },
-  { time: '16:30–17:00', start: 510, duration: 30 },
+  {
+    time: '08:00–09:00',
+    start: 0,
+    duration: 60,
+    side: 'before',
+    label: { en: 'Set priorities', nl: 'Prioriteiten bepalen' },
+  },
+  {
+    time: '09:25–10:25',
+    start: 85,
+    duration: 60,
+    side: 'before',
+    label: { en: 'Review proposal', nl: 'Voorstel beoordelen' },
+  },
+  {
+    time: '10:45–11:30',
+    start: 165,
+    duration: 45,
+    side: 'before',
+    label: { en: 'Make hiring decision', nl: 'Wervingsbesluit nemen' },
+  },
+  {
+    time: '11:55–12:25',
+    start: 235,
+    duration: 30,
+    side: 'anchor',
+    label: { en: 'Team check-in', nl: 'Teamoverleg' },
+  },
+  {
+    time: '12:55–13:40',
+    start: 295,
+    duration: 45,
+    side: 'after',
+    label: {
+      en: 'Resolve project blocker',
+      nl: 'Projectblokkade oplossen',
+    },
+  },
+  {
+    time: '14:00–15:00',
+    start: 360,
+    duration: 60,
+    side: 'after',
+    label: { en: 'Coach a colleague', nl: 'Collega coachen' },
+  },
+  {
+    time: '15:20–16:10',
+    start: 440,
+    duration: 50,
+    side: 'after',
+    label: { en: 'Plan the roadmap', nl: 'Roadmap plannen' },
+  },
+  {
+    time: '16:30–17:00',
+    start: 510,
+    duration: 30,
+    side: 'after',
+    label: { en: 'Strategy work', nl: 'Strategiewerk' },
+  },
 ] as const;
+
+const formatCalendarTime = (minutes: number) => {
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  return `${String(hours).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+};
+
+const anchorSegment = focusSegments[3];
 
 const content = {
   en: {
@@ -573,6 +636,10 @@ export default function Home() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [focusWindow, setFocusWindow] = useState<{
+    start: number;
+    end: number;
+  }>(INITIAL_FOCUS_WINDOW);
   const executionTimerRef = useRef<number | null>(null);
   const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>();
   const [workflowRef, workflowVisible, workflowHasEntered] =
@@ -580,6 +647,7 @@ export default function Home() {
   const t = content[language];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
+  const focusTime = `${formatCalendarTime(focusWindow.start)}–${formatCalendarTime(focusWindow.end)}`;
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -598,6 +666,55 @@ export default function Home() {
       media.removeEventListener('change', updatePreference);
     };
   }, []);
+
+  useEffect(() => {
+    if (!heroHasEntered) return;
+
+    let animationFrame = 0;
+    if (reduceMotion) {
+      const resetTimer = window.setTimeout(
+        () => setFocusWindow(FINAL_FOCUS_WINDOW),
+        0,
+      );
+      return () => window.clearTimeout(resetTimer);
+    }
+
+    const resetTimer = window.setTimeout(
+      () => setFocusWindow(INITIAL_FOCUS_WINDOW),
+      0,
+    );
+
+    const mergeTimer = window.setTimeout(() => {
+      const startedAt = window.performance.now();
+      const updateFocusWindow = (now: number) => {
+        const progress = Math.min(
+          (now - startedAt) / CALENDAR_MERGE_DURATION_MS,
+          1,
+        );
+        setFocusWindow({
+          start: Math.round(
+            INITIAL_FOCUS_WINDOW.start +
+              (FINAL_FOCUS_WINDOW.start - INITIAL_FOCUS_WINDOW.start) *
+                progress,
+          ),
+          end: Math.round(
+            INITIAL_FOCUS_WINDOW.end +
+              (FINAL_FOCUS_WINDOW.end - INITIAL_FOCUS_WINDOW.end) * progress,
+          ),
+        });
+        if (progress < 1) {
+          animationFrame = window.requestAnimationFrame(updateFocusWindow);
+        }
+      };
+      animationFrame = window.requestAnimationFrame(updateFocusWindow);
+    }, CALENDAR_MERGE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(resetTimer);
+      window.clearTimeout(mergeTimer);
+      window.cancelAnimationFrame(animationFrame);
+    };
+  }, [heroHasEntered, reduceMotion]);
 
   useEffect(() => {
     if (!workflowHasEntered) return;
@@ -758,21 +875,24 @@ export default function Home() {
                 </div>
                 <div className="calendar-grid">
                   <div className="focus-layer" aria-hidden="true">
-                    {focusSegments.map((segment) => (
-                      <div
-                        className="focus-fragment"
-                        key={segment.time}
-                        style={
-                          {
-                            '--event-start': `${(segment.start / 540) * 100}%`,
-                            '--event-duration': `${(segment.duration / 540) * 100}%`,
-                          } as CSSProperties
-                        }
-                      >
-                        <small>{segment.time}</small>
-                        <span>{t.day.focus}</span>
-                      </div>
-                    ))}
+                    {focusSegments
+                      .filter((segment) => segment.side !== 'anchor')
+                      .map((segment) => (
+                        <div
+                          className="focus-fragment"
+                          data-side={segment.side}
+                          key={segment.time}
+                          style={
+                            {
+                              '--event-start': `${(segment.start / 540) * 100}%`,
+                              '--event-duration': `${(segment.duration / 540) * 100}%`,
+                            } as CSSProperties
+                          }
+                        >
+                          <small>{segment.time}</small>
+                          <span>{segment.label[language]}</span>
+                        </div>
+                      ))}
                   </div>
                   <div className="events-layer" aria-hidden="true">
                     {t.day.tasks.map((task) => (
@@ -792,13 +912,25 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  <div className="focus-block">
-                    <div className="focus-block-header">
-                      <span className="focus-dot" aria-hidden="true" />
-                      <small>{t.day.finalTime}</small>
+                  <div
+                    className="focus-block focus-anchor"
+                    style={
+                      {
+                        '--event-start': `${(anchorSegment.start / 540) * 100}%`,
+                        '--event-duration': `${(anchorSegment.duration / 540) * 100}%`,
+                      } as CSSProperties
+                    }
+                  >
+                    <div className="anchor-compact" aria-hidden="true">
+                      <small>{focusTime}</small>
+                      <span>{anchorSegment.label[language]}</span>
                     </div>
-                    <strong>{t.day.focus}</strong>
-                    <small>{t.day.focusDetail}</small>
+                    <div className="anchor-expanded">
+                      <span className="focus-dot" aria-hidden="true" />
+                      <small className="anchor-time">{focusTime}</small>
+                      <strong>{t.day.focus}</strong>
+                      <span className="anchor-detail">{t.day.focusDetail}</span>
+                    </div>
                   </div>
                 </div>
               </div>

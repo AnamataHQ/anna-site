@@ -72,8 +72,37 @@ test('uses a familiar calendar that fills with routine work and clears in view',
   assert.match(styles, /@keyframes clear-admin/);
   assert.match(styles, /@keyframes fill-open-slots/);
   assert.match(styles, /@keyframes merge-focus/);
-  assert.match(styles, /@keyframes reveal-focus-day/);
+  assert.match(styles, /@keyframes expand-anchor-day/);
   assert.doesNotMatch(styles, /\.cleared-day[^}]*transform:\s*rotate/s);
+});
+
+test('keeps valuable work distinct before merging it into one anchor card', () => {
+  for (const phrase of [
+    'Set priorities',
+    'Make hiring decision',
+    'Team check-in',
+    'Resolve project blocker',
+    'Prioriteiten bepalen',
+    'Wervingsbesluit nemen',
+    'Teamoverleg',
+    'Projectblokkade oplossen',
+  ]) {
+    assert.ok(page.includes(phrase), `missing valuable-work task: ${phrase}`);
+  }
+  assert.match(page, /data-side=\{segment\.side\}/);
+  assert.match(page, /className="focus-block focus-anchor"/);
+  assert.match(page, /className="anchor-compact"/);
+  assert.match(page, /className="anchor-expanded"/);
+});
+
+test('pauses, expands one anchor slowly and counts its timeframe outward', () => {
+  assert.match(page, /const CALENDAR_MERGE_DELAY_MS = 6800/);
+  assert.match(page, /const CALENDAR_MERGE_DURATION_MS = 2900/);
+  assert.match(page, /requestAnimationFrame/);
+  assert.match(page, /formatCalendarTime/);
+  assert.match(page, /focusWindow/);
+  assert.match(styles, /animation:\s*expand-anchor-day 10\.4s/);
+  assert.match(styles, /font-variant-numeric:\s*tabular-nums/);
 });
 
 test('aligns agenda cards to the calendar and labels their timeframes', () => {
@@ -139,6 +168,7 @@ test('explains the before and after without motion', () => {
     styles,
     /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reduced-motion-story\s*\{[^}]*display:\s*grid/,
   );
+  assert.match(page, /setFocusWindow\(FINAL_FOCUS_WINDOW\)/);
 });
 
 test('starts motion when each experience enters the viewport', () => {
