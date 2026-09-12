@@ -11,8 +11,24 @@ const styles = readFileSync(
   new URL('../app/globals.css', import.meta.url),
   'utf8',
 );
-const annaMark = readFileSync(
-  new URL('../public/brands/anna.svg', import.meta.url),
+const annaColourTransparent = readFileSync(
+  new URL('../public/brands/anna-color-transparent.svg', import.meta.url),
+  'utf8',
+);
+const annaColourBlack = readFileSync(
+  new URL('../public/brands/anna-color-black.svg', import.meta.url),
+  'utf8',
+);
+const annaColourNavy = readFileSync(
+  new URL('../public/brands/anna-color-navy.svg', import.meta.url),
+  'utf8',
+);
+const annaMonoDark = readFileSync(
+  new URL('../public/brands/anna-mono-dark.svg', import.meta.url),
+  'utf8',
+);
+const annaMonoLight = readFileSync(
+  new URL('../public/brands/anna-mono-light.svg', import.meta.url),
   'utf8',
 );
 const favicon = readFileSync(
@@ -54,25 +70,67 @@ test('explains supervised work journeys from request through reported result', (
   }
 });
 
-test('uses the real Teams mark and selected Anna Relay everywhere', () => {
+test('uses the real Teams mark and context-appropriate Anna Relay variants', () => {
   assert.match(page, /src="\/brands\/microsoft-teams\.svg"/);
-  assert.match(page, /src="\/brands\/anna\.svg"/);
-  assert.equal(page.match(/src="\/brands\/anna\.svg"/g)?.length, 4);
+  assert.equal(
+    page.match(/src="\/brands\/anna-color-transparent\.svg"/g)?.length,
+    1,
+  );
+  assert.equal(
+    page.match(/src="\/brands\/anna-color-navy\.svg"/g)?.length,
+    1,
+  );
+  assert.equal(
+    page.match(/src="\/brands\/anna-mono-dark\.svg"/g)?.length,
+    1,
+  );
+  assert.equal(
+    page.match(/src="\/brands\/anna-mono-light\.svg"/g)?.length,
+    1,
+  );
+  assert.doesNotMatch(page, /src="\/brands\/anna\.svg"/);
   assert.doesNotMatch(page, /src="\/brands\/anna\.png"/);
   assert.doesNotMatch(page, /className="teams-mini"[^>]*>\s*T\s*</s);
   assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
   assert.doesNotMatch(page, /className="brand-mark"[^>]*>\s*A\s*</s);
   assert.doesNotMatch(page, /className="anna-tray-mark"[^>]*>\s*A\s*</s);
   assert.match(layout, /icons:\s*\{[\s\S]*?icon:\s*'\/favicon\.svg'/);
-  assert.equal(
-    existsSync(new URL('../public/brands/anna.svg', import.meta.url)),
-    true,
-  );
-  assert.match(annaMark, /data-master="restrained-relay-equal-heights"/);
-  for (const colour of ['#2C548C', '#3159C7', '#8D4DFF', '#FF5C42']) {
-    assert.ok(annaMark.includes(colour), `missing Relay colour: ${colour}`);
+  for (const asset of [
+    'anna-color-transparent.svg',
+    'anna-color-black.svg',
+    'anna-color-navy.svg',
+    'anna-mono-dark.svg',
+    'anna-mono-light.svg',
+  ]) {
+    assert.equal(
+      existsSync(new URL(`../public/brands/${asset}`, import.meta.url)),
+      true,
+      `missing Anna brand asset: ${asset}`,
+    );
   }
-  assert.equal(favicon, annaMark);
+  for (const colour of [
+    '#2C548C',
+    '#3159C7',
+    '#6252EF',
+    '#8D4DFF',
+    '#E15091',
+    '#FF5C42',
+  ]) {
+    assert.ok(
+      annaColourTransparent.includes(colour),
+      `missing Relay colour: ${colour}`,
+    );
+  }
+  assert.match(annaColourTransparent, /data-master="relay-master-04"/);
+  assert.match(annaColourTransparent, /offset="0\.49"/);
+  assert.match(annaColourTransparent, /offset="0\.61"/);
+  assert.match(annaColourTransparent, /M42 158V62/);
+  assert.match(annaColourTransparent, /M158 42V138/);
+  assert.match(annaColourBlack, /fill="#000000"/);
+  assert.match(annaColourNavy, /fill="#08152E"/);
+  assert.match(annaMonoDark, /fill="#08152E"/);
+  assert.match(annaMonoLight, /fill="#FFFFFF"/);
+  assert.equal(favicon, annaColourBlack);
 });
 
 test('uses a familiar calendar that fills with routine work and clears in view', () => {
