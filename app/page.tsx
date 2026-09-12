@@ -1065,9 +1065,14 @@ export default function Home() {
             <div className="demo-window" key={`${scenarioId}-${replayKey}`}>
               <div className="demo-toolbar">
                 <div className="demo-channel">
-                  <span className="teams-mini" aria-hidden="true">
-                    T
-                  </span>
+                  <Image
+                    className="teams-mini"
+                    src="/brands/microsoft-teams.svg"
+                    alt=""
+                    width={25}
+                    height={25}
+                    aria-hidden="true"
+                  />
                   <strong>{t.demoChannel}</strong>
                 </div>
                 <span>{t.demoLabel}</span>
@@ -1076,10 +1081,10 @@ export default function Home() {
                 <DemoMessage visible={demoStep >= 0} avatar="Y" kind="person">
                   <p>{scenario.person}</p>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= 1} avatar="A" kind="anna">
+                <DemoMessage visible={demoStep >= 1} kind="anna">
                   <p>{scenario.answer}</p>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= 2} avatar="A" kind="anna">
+                <DemoMessage visible={demoStep >= 2} kind="anna">
                   <div className="context-card" data-ready={demoStep >= 3}>
                     <div className="context-card-title">
                       {demoStep >= 3 ? (
@@ -1104,7 +1109,7 @@ export default function Home() {
                     </div>
                   </div>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= 4} avatar="A" kind="anna">
+                <DemoMessage visible={demoStep >= 4} kind="anna">
                   <div className="approval-card">
                     <div className="approval-kicker">
                       <UserRoundCheck size={16} aria-hidden="true" />
@@ -1128,7 +1133,7 @@ export default function Home() {
                     </button>
                   </div>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= 5} avatar="A" kind="anna">
+                <DemoMessage visible={demoStep >= 5} kind="anna">
                   <div className="result-message">
                     <CheckCircle2 size={18} aria-hidden="true" />
                     <p>{scenario.result}</p>
@@ -1311,7 +1316,7 @@ function DemoMessage({
   children,
 }: {
   visible: boolean;
-  avatar: string;
+  avatar?: string;
   kind: 'person' | 'anna';
   children: React.ReactNode;
 }) {
@@ -1322,7 +1327,11 @@ function DemoMessage({
       aria-hidden={!visible}
     >
       <div className={`avatar ${kind}`} aria-hidden="true">
-        {avatar}
+        {kind === 'anna' ? (
+          <Image src="/brands/anna.png" alt="" width={34} height={34} />
+        ) : (
+          avatar
+        )}
       </div>
       <div className="message-bubble">{children}</div>
     </div>

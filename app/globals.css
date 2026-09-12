@@ -1030,15 +1030,10 @@ footer > a:last-child:hover {
   letter-spacing: 0;
 }
 .teams-mini {
-  display: grid;
+  display: block;
   width: 25px;
   height: 25px;
-  place-items: center;
-  border-radius: 0.4rem;
-  background: #6264a7;
-  color: white;
-  font-size: 0.67rem;
-  font-weight: 800;
+  object-fit: contain;
 }
 .demo-thread {
   min-height: 650px;
@@ -1084,8 +1079,13 @@ footer > a:last-child:hover {
   color: #2f477a;
 }
 .avatar.anna {
-  background: var(--navy);
-  color: white;
+  overflow: hidden;
+  background: transparent;
+}
+.avatar.anna img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .message-bubble {
   max-width: min(84%, 720px);

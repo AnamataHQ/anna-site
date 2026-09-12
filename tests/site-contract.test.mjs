@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
@@ -44,6 +44,17 @@ test('explains supervised work journeys from request through reported result', (
   ]) {
     assert.ok(page.includes(phrase), `missing workflow copy: ${phrase}`);
   }
+});
+
+test('uses the real Teams and Anna marks in the conversation demo', () => {
+  assert.match(page, /src="\/brands\/microsoft-teams\.svg"/);
+  assert.match(page, /src="\/brands\/anna\.png"/);
+  assert.doesNotMatch(page, /className="teams-mini"[^>]*>\s*T\s*</s);
+  assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
+  assert.equal(
+    existsSync(new URL('../public/brands/anna.png', import.meta.url)),
+    true,
+  );
 });
 
 test('uses a familiar calendar that fills with routine work and clears in view', () => {
