@@ -108,16 +108,17 @@ button {
   width: fit-content;
 }
 .brand-mark {
-  display: grid;
+  display: block;
   width: 33px;
   height: 33px;
-  place-items: center;
+  overflow: hidden;
   border-radius: 50%;
-  background: var(--navy);
-  color: white;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.92rem;
-  font-weight: 700;
+}
+.brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .brand-name {
   font-size: 1rem;
@@ -732,16 +733,17 @@ footer > a:last-child:hover {
   }
 }
 .anna-tray-mark {
-  display: grid;
+  display: block;
   width: 32px;
   height: 32px;
-  place-items: center;
+  overflow: hidden;
   border-radius: 50%;
-  background: var(--navy);
-  color: white;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.73rem;
-  font-weight: 750;
+}
+.anna-tray-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .anna-tray > div {
   display: flex;
@@ -1618,10 +1620,6 @@ footer {
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   background: var(--navy);
   color: white;
-}
-.footer-brand .brand-mark {
-  background: white;
-  color: var(--navy);
 }
 .footer-copy strong {
   display: block;

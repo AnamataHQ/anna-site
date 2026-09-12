@@ -46,11 +46,15 @@ test('explains supervised work journeys from request through reported result', (
   }
 });
 
-test('uses the real Teams and Anna marks in the conversation demo', () => {
+test('uses the real Teams and Anna marks everywhere they appear', () => {
   assert.match(page, /src="\/brands\/microsoft-teams\.svg"/);
   assert.match(page, /src="\/brands\/anna\.png"/);
+  assert.equal(page.match(/src="\/brands\/anna\.png"/g)?.length, 4);
   assert.doesNotMatch(page, /className="teams-mini"[^>]*>\s*T\s*</s);
   assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
+  assert.doesNotMatch(page, /className="brand-mark"[^>]*>\s*A\s*</s);
+  assert.doesNotMatch(page, /className="anna-tray-mark"[^>]*>\s*A\s*</s);
+  assert.match(layout, /icons:\s*\{[\s\S]*?icon:\s*'\/brands\/anna\.png'/);
   assert.equal(
     existsSync(new URL('../public/brands/anna.png', import.meta.url)),
     true,

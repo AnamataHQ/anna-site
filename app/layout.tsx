@@ -14,13 +14,21 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Anna | Anamata',
-  description: 'Meet Anna, your digital AI assistant for repetitive coordination and administration.',
+  description:
+    'Meet Anna, your digital AI assistant for repetitive coordination and administration.',
+  icons: {
+    icon: '/brands/anna.png',
+  },
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable}`}>{children}</body>
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        {children}
+      </body>
     </html>
   );
 }
