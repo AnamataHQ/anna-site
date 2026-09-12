@@ -781,7 +781,7 @@ export default function Home() {
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Anna by Anamata, home">
           <span className="brand-mark" aria-hidden="true">
-            <Image src="/brands/anna.png" alt="" width={33} height={33} />
+            <Image src="/brands/anna.svg" alt="" width={33} height={33} />
           </span>
           <span className="brand-name">ANNA</span>
           <span className="brand-by">by anamata.ai</span>
@@ -936,7 +936,7 @@ export default function Home() {
               </div>
               <div className="anna-tray calendar-summary">
                 <span className="anna-tray-mark" aria-hidden="true">
-                  <Image src="/brands/anna.png" alt="" width={32} height={32} />
+                  <Image src="/brands/anna.svg" alt="" width={32} height={32} />
                 </span>
                 <div>
                   <small>{t.day.handled}</small>
@@ -1295,7 +1295,7 @@ export default function Home() {
       <footer>
         <a className="brand footer-brand" href="#top">
           <span className="brand-mark" aria-hidden="true">
-            <Image src="/brands/anna.png" alt="" width={33} height={33} />
+            <Image src="/brands/anna.svg" alt="" width={33} height={33} />
           </span>
           <span className="brand-name">ANNA</span>
         </a>
@@ -1330,7 +1330,7 @@ function DemoMessage({
     >
       <div className={`avatar ${kind}`} aria-hidden="true">
         {kind === 'anna' ? (
-          <Image src="/brands/anna.png" alt="" width={34} height={34} />
+          <Image src="/brands/anna.svg" alt="" width={34} height={34} />
         ) : (
           avatar
         )}

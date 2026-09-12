@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="32 32 136 136" role="img" aria-labelledby="title" data-master="restrained-relay-equal-heights">
+  <title id="title">Anna Relay monochrome mark</title>
+  <g fill="#08152E">
+    <path d="M42 144V62H66V98L100 128V158L66 128V144H42Z"/>
+    <path d="M158 56V138H134V102L100 72V42L134 72V56H158Z"/>
+    <path d="M42 42H65L83 57V80L60 62H42V42Z"/>
+    <path d="M158 158H135L117 143V120L140 138H158V158Z"/>
+  </g>
+</svg>

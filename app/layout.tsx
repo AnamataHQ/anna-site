@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description:
     'Meet Anna, your digital AI assistant for repetitive coordination and administration.',
   icons: {
-    icon: '/brands/anna.png',
+    icon: '/favicon.svg',
   },
 };
 

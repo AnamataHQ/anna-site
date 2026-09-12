@@ -112,7 +112,7 @@ button {
   width: 33px;
   height: 33px;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: 0;
 }
 .brand-mark img {
   display: block;
@@ -737,7 +737,7 @@ footer > a:last-child:hover {
   width: 32px;
   height: 32px;
   overflow: hidden;
-  border-radius: 50%;
+  border-radius: 0;
 }
 .anna-tray-mark img {
   display: block;
@@ -1082,6 +1082,7 @@ footer > a:last-child:hover {
 }
 .avatar.anna {
   overflow: hidden;
+  border-radius: 0;
   background: transparent;
 }
 .avatar.anna img {
