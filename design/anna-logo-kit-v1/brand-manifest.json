@@ -1,0 +1,74 @@
+{
+  "name": "Anna Relay",
+  "version": "1.0.0",
+  "master": "relay-master-04",
+  "description": "The production icon system for Anna, Anamata's digital AI assistant.",
+  "meaning": {
+    "symmetry": "ANNA is a palindrome and remains recognisable from both directions.",
+    "forms": "The two forms represent a controlled transfer of work between a person and Anna.",
+    "gradient": "The color transition moves from insight and trust toward action and completion."
+  },
+  "palette": {
+    "annaNavy": "#08152E",
+    "relayNavy": "#2C548C",
+    "relayBlue": "#3159C7",
+    "relayBlueViolet": "#6252EF",
+    "relayViolet": "#8D4DFF",
+    "relayRose": "#E15091",
+    "relayCoral": "#FF5C42",
+    "white": "#FFFFFF",
+    "black": "#000000"
+  },
+  "variants": [
+    "color-transparent",
+    "color-navy-rounded",
+    "color-black-rounded",
+    "mono-dark",
+    "mono-light"
+  ],
+  "rasterSizes": [
+    16,
+    20,
+    24,
+    32,
+    36,
+    40,
+    48,
+    64,
+    72,
+    80,
+    96,
+    120,
+    128,
+    144,
+    150,
+    180,
+    192,
+    256,
+    384,
+    512,
+    1024
+  ],
+  "avatarSizes": [32, 48, 64, 96, 128, 192, 256, 400, 512, 1024],
+  "teams": {
+    "color": {
+      "width": 192,
+      "height": 192,
+      "safeArea": 120,
+      "background": "#08152E",
+      "roundedCorners": false
+    },
+    "outline": {
+      "width": 32,
+      "height": 32,
+      "foreground": "#FFFFFF",
+      "background": "transparent",
+      "extraPadding": false
+    },
+    "color32x32": {
+      "width": 32,
+      "height": 32,
+      "background": "transparent"
+    }
+  }
+}

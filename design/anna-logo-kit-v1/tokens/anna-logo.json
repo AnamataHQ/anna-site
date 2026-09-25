@@ -1,0 +1,18 @@
+{
+  "name": "Anna Relay",
+  "colors": {
+    "navy": "#08152E",
+    "relayNavy": "#2C548C",
+    "blue": "#3159C7",
+    "blueViolet": "#6252EF",
+    "violet": "#8D4DFF",
+    "rose": "#E15091",
+    "coral": "#FF5C42",
+    "white": "#FFFFFF",
+    "black": "#000000"
+  },
+  "gradient": {
+    "angle": 135,
+    "css": "linear-gradient(135deg, #2C548C 0%, #3159C7 43%, #6252EF 49%, #8D4DFF 55%, #E15091 61%, #FF5C42 100%)"
+  }
+}

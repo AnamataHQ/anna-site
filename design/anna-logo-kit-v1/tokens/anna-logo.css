@@ -1,0 +1,18 @@
+:root {
+  --anna-navy: #08152e;
+  --anna-relay-navy: #2c548c;
+  --anna-relay-blue: #3159c7;
+  --anna-relay-blue-violet: #6252ef;
+  --anna-relay-violet: #8d4dff;
+  --anna-relay-rose: #e15091;
+  --anna-relay-coral: #ff5c42;
+  --anna-relay-gradient: linear-gradient(
+    135deg,
+    #2c548c 0%,
+    #3159c7 43%,
+    #6252ef 49%,
+    #8d4dff 55%,
+    #e15091 61%,
+    #ff5c42 100%
+  );
+}

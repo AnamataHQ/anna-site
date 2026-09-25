@@ -1,0 +1,8 @@
+{
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png",
+    "color32x32": "color32x32.png"
+  },
+  "accentColor": "#2C548C"
+}
