@@ -1,0 +1,13 @@
+{
+  "name": "anna-logo-kit",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/export-icons.mjs",
+    "test": "node --test tests/validate-logo-kit.mjs"
+  },
+  "devDependencies": {
+    "sharp": "0.34.5"
+  }
+}

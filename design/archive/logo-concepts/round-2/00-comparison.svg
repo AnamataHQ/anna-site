@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="760" viewBox="0 0 1600 760" role="img" aria-labelledby="title desc">
+  <title id="title">Anna Relay round two comparison</title>
+  <desc id="desc">Side-by-side comparison of the restrained original Relay, Settled Relay, and Space Relay using the same color palette.</desc>
+  <defs>
+    <linearGradient id="flow" x1="18" y1="24" x2="142" y2="136" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C548C"/>
+      <stop offset="0.38" stop-color="#3159C7"/>
+      <stop offset="0.67" stop-color="#8D4DFF"/>
+      <stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <linearGradient id="flowWide" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C548C"/><stop offset="0.55" stop-color="#8D4DFF"/><stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#08152E" flood-opacity="0.12"/>
+    </filter>
+    <g id="control">
+      <path d="M22 124V42H46V78L80 108V138L46 108V124H22Z" fill="url(#flow)"/>
+      <path d="M138 36V118H114V82L80 52V22L114 52V36H138Z" fill="url(#flow)"/>
+      <path d="M22 27H45L63 42V65L40 47H22V27Z" fill="url(#flow)"/>
+      <path d="M138 133H115L97 118V95L120 113H138V133Z" fill="url(#flow)"/>
+    </g>
+    <g id="settled">
+      <path d="M20 132V28H44L91 69L75 88L46 63V132H20Z" fill="url(#flow)"/>
+      <path d="M140 28V132H116L69 91L85 72L114 97V28H140Z" fill="url(#flow)"/>
+      <path d="M71 78L80 68L89 78L80 88L71 78Z" fill="#F7F4ED"/>
+    </g>
+    <g id="space">
+      <path d="M18 132V28H43L73 54V86L46 63V132H18Z" fill="url(#flow)"/>
+      <path d="M142 28V132H117L87 106V74L114 97V28H142Z" fill="url(#flow)"/>
+      <path d="M74 46L86 56V114L74 104V46Z" fill="#F7F4ED" opacity="0.92"/>
+    </g>
+  </defs>
+  <rect width="1600" height="760" fill="#F7F4ED"/>
+  <rect width="1600" height="12" fill="url(#flowWide)"/>
+  <text x="80" y="86" fill="#3159C7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="3">ANNA IDENTITY · ROUND 02</text>
+  <text x="80" y="142" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700">One palette, three Relay structures</text>
+  <text x="80" y="183" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="21">Compare the silhouette first. Colour is held constant.</text>
+
+  <g transform="translate(80 236)">
+    <rect width="448" height="420" rx="34" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="124" y="45" width="200" height="200" rx="52" fill="#08152E"/>
+    <g transform="translate(144 65)"><use href="#control"/></g>
+    <text x="38" y="303" fill="#3159C7" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">CONTROL</text>
+    <text x="38" y="347" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700">Restrained original</text>
+    <text x="38" y="383" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Four moving pieces, one colour journey.</text>
+  </g>
+  <g transform="translate(576 236)">
+    <rect width="448" height="420" rx="34" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="124" y="45" width="200" height="200" rx="52" fill="#08152E"/>
+    <g transform="translate(144 65)"><use href="#settled"/></g>
+    <text x="38" y="303" fill="#8D4DFF" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">A</text>
+    <text x="38" y="347" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700">Settled Relay</text>
+    <text x="38" y="383" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Two ribbons meet at one precise seam.</text>
+  </g>
+  <g transform="translate(1072 236)">
+    <rect width="448" height="420" rx="34" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="124" y="45" width="200" height="200" rx="52" fill="#08152E"/>
+    <g transform="translate(144 65)"><use href="#space"/></g>
+    <text x="38" y="303" fill="#FF5C42" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="700" letter-spacing="2">C</text>
+    <text x="38" y="347" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700">Space Relay</text>
+    <text x="38" y="383" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">The cleared corridor becomes the idea.</text>
+  </g>
+</svg>

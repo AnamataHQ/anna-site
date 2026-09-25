@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">Anna Balanced Relay</title>
+  <desc id="desc">The four-piece Relay with equal top and bottom extents, a regular central channel, and a concentrated violet transition.</desc>
+  <defs>
+    <linearGradient id="flow" x1="22" y1="22" x2="178" y2="178" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C548C"/>
+      <stop offset="0.43" stop-color="#3159C7"/>
+      <stop offset="0.49" stop-color="#6252EF"/>
+      <stop offset="0.55" stop-color="#8D4DFF"/>
+      <stop offset="0.61" stop-color="#E15091"/>
+      <stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="48" fill="#08152E"/>
+  <g fill="url(#flow)">
+    <path d="M34 48V166H62V132L100 166V128L62 94V48H34Z"/>
+    <path d="M166 34V152H138V108L100 74V34L138 68V34H166Z"/>
+    <path d="M34 34H62L86 54V84L58 62H34V34Z"/>
+    <path d="M166 166H138L114 146V116L142 138H166V166Z"/>
+  </g>
+</svg>

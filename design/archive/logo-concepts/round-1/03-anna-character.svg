@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Anna identity concept 03: Anna as a Character</title>
+  <desc id="desc">A mature, asymmetrical companion avatar with a distinctive coral-violet sweep, shown as a primary lockup, avatar, monochrome mark, and expression system.</desc>
+  <defs>
+    <linearGradient id="characterSweep" x1="34" y1="25" x2="130" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5C42"/>
+      <stop offset="0.5" stop-color="#C44FE0"/>
+      <stop offset="1" stop-color="#3159C7"/>
+    </linearGradient>
+    <linearGradient id="characterFull" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5C42"/>
+      <stop offset="0.48" stop-color="#C44FE0"/>
+      <stop offset="1" stop-color="#3159C7"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#08152E" flood-opacity="0.14"/>
+    </filter>
+    <g id="characterMark">
+      <path d="M80 14C117 14 143 39 143 77C143 116 118 143 80 143C42 143 17 116 17 77C17 39 43 14 80 14Z" fill="#08152E"/>
+      <path d="M31 81C31 48 50 29 80 29C101 29 118 39 129 57C108 52 93 53 78 61C60 71 47 85 36 106C33 98 31 90 31 81Z" fill="url(#characterSweep)"/>
+      <path d="M47 87C52 63 68 49 91 49C113 49 128 66 128 88C128 111 112 128 87 128C63 128 45 112 45 91C45 90 46 88 47 87Z" fill="#F7F4ED"/>
+      <path d="M58 76C64 68 73 64 83 64" fill="none" stroke="#08152E" stroke-width="6" stroke-linecap="round"/>
+      <path d="M100 66C106 69 111 74 114 80" fill="none" stroke="#08152E" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="76" cy="87" r="5.5" fill="#08152E"/>
+      <circle cx="104" cy="87" r="5.5" fill="#08152E"/>
+      <path d="M77 105C85 111 95 111 103 105" fill="none" stroke="#FF5C42" stroke-width="5" stroke-linecap="round"/>
+      <path d="M124 114C135 117 142 125 143 138C130 138 120 133 115 122L124 114Z" fill="#3159C7"/>
+    </g>
+    <g id="characterMono">
+      <path d="M80 14C117 14 143 39 143 77C143 116 118 143 80 143C42 143 17 116 17 77C17 39 43 14 80 14Z" fill="#08152E"/>
+      <path d="M31 81C31 48 50 29 80 29C101 29 118 39 129 57C108 52 93 53 78 61C60 71 47 85 36 106C33 98 31 90 31 81Z" fill="#506078"/>
+      <path d="M47 87C52 63 68 49 91 49C113 49 128 66 128 88C128 111 112 128 87 128C63 128 45 112 45 91C45 90 46 88 47 87Z" fill="#FFFFFF"/>
+      <path d="M58 76C64 68 73 64 83 64M100 66C106 69 111 74 114 80" fill="none" stroke="#08152E" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="76" cy="87" r="5.5" fill="#08152E"/><circle cx="104" cy="87" r="5.5" fill="#08152E"/>
+      <path d="M77 105C85 111 95 111 103 105" fill="none" stroke="#08152E" stroke-width="5" stroke-linecap="round"/>
+      <path d="M124 114C135 117 142 125 143 138C130 138 120 133 115 122L124 114Z" fill="#506078"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="1000" fill="#F7F4ED"/>
+  <path d="M0 0H1600V12H0Z" fill="url(#characterFull)"/>
+
+  <text x="88" y="94" fill="#C44FE0" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="3">DIRECTION 03</text>
+  <text x="88" y="156" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="650">Anna as a Character</text>
+  <text x="88" y="201" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="23">A recognizable presence, not a robot or another anonymous AI glyph.</text>
+
+  <rect x="88" y="255" width="910" height="482" rx="38" fill="#FFFDFC" filter="url(#softShadow)"/>
+  <g transform="translate(170 337) scale(1.92)"><use href="#characterMark"/></g>
+  <text x="535" y="490" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="700" letter-spacing="8">anna</text>
+  <text x="540" y="536" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="600" letter-spacing="3.4">YOUR DIGITAL AI ASSISTANT</text>
+  <text x="170" y="674" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="18">The asymmetrical sweep stays recognizable even when facial detail disappears.</text>
+
+  <text x="1062" y="286" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="2">AVATAR</text>
+  <rect x="1062" y="315" width="202" height="202" rx="52" fill="#FFFFFF" stroke="#D8DDE5"/>
+  <g transform="translate(1083 336)"><use href="#characterMark"/></g>
+
+  <text x="1306" y="286" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="2">MONO</text>
+  <rect x="1306" y="315" width="202" height="202" rx="52" fill="#FFFFFF" stroke="#D8DDE5"/>
+  <g transform="translate(1327 336)"><use href="#characterMono"/></g>
+
+  <text x="1062" y="590" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="2">SMALL-SIZE TEST</text>
+  <rect x="1062" y="622" width="74" height="74" rx="19" fill="#FFFFFF" stroke="#D8DDE5"/>
+  <g transform="translate(1068 628) scale(.39)"><use href="#characterMark"/></g>
+  <rect x="1161" y="631" width="56" height="56" rx="14" fill="#FFFFFF" stroke="#D8DDE5"/>
+  <g transform="translate(1165 635) scale(.3)"><use href="#characterMark"/></g>
+  <rect x="1242" y="639" width="40" height="40" rx="10" fill="#FFFFFF" stroke="#D8DDE5"/>
+  <g transform="translate(1244 641) scale(.225)"><use href="#characterMark"/></g>
+
+  <rect x="88" y="792" width="1420" height="126" rx="30" fill="#08152E"/>
+  <text x="130" y="836" fill="#D687E8" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="700" letter-spacing="3">CHARACTER PRINCIPLE</text>
+  <text x="130" y="876" fill="#F7F4ED" font-family="Arial, Helvetica, sans-serif" font-size="22">Calm by default</text>
+  <circle cx="413" cy="855" r="4" fill="#71809A"/>
+  <text x="445" y="876" fill="#F7F4ED" font-family="Arial, Helvetica, sans-serif" font-size="22">Attentive while working</text>
+  <circle cx="744" cy="855" r="4" fill="#71809A"/>
+  <text x="776" y="876" fill="#F7F4ED" font-family="Arial, Helvetica, sans-serif" font-size="22">Warm when returning control</text>
+</svg>
