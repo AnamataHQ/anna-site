@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">Anna Journey Relay</title>
+  <desc id="desc">Fragmented blue input resolves into one continuous violet-to-coral return structure.</desc>
+  <defs>
+    <linearGradient id="input" x1="28" y1="30" x2="96" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C548C"/>
+      <stop offset="1" stop-color="#3159C7"/>
+    </linearGradient>
+    <linearGradient id="return" x1="82" y1="56" x2="170" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3159C7"/>
+      <stop offset="0.22" stop-color="#8D4DFF"/>
+      <stop offset="0.42" stop-color="#E15091"/>
+      <stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="48" fill="#08152E"/>
+  <path d="M28 32H56L92 62V91L56 61H28V32Z" fill="url(#input)"/>
+  <path d="M28 76H56L92 106V135L56 105H28V76Z" fill="url(#input)"/>
+  <path d="M172 30V170H142V126L96 86V54L142 94V30H172Z" fill="url(#return)"/>
+</svg>

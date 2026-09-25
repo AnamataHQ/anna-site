@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 200 200" role="img" aria-labelledby="title desc">
+  <title id="title">Anna Exchange Relay</title>
+  <desc id="desc">The four Relay pieces drawn closer to one another so the diagonal handoff feels deliberate, with a concentrated violet transition.</desc>
+  <defs>
+    <linearGradient id="flow" x1="22" y1="22" x2="178" y2="178" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C548C"/>
+      <stop offset="0.43" stop-color="#3159C7"/>
+      <stop offset="0.49" stop-color="#6252EF"/>
+      <stop offset="0.55" stop-color="#8D4DFF"/>
+      <stop offset="0.61" stop-color="#E15091"/>
+      <stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="48" fill="#08152E"/>
+  <g fill="url(#flow)">
+    <path d="M30 34H58L94 64V94L58 64H30V34Z"/>
+    <path d="M30 70H58L94 100V130L58 100V166H30V70Z"/>
+    <path d="M170 34H142V100L106 70V100L142 130H170V34Z"/>
+    <path d="M170 166H142L106 136V106L142 136H170V166Z"/>
+  </g>
+</svg>

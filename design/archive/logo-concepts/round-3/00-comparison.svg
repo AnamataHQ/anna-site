@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="830" viewBox="0 0 1800 830" role="img" aria-labelledby="title desc">
+  <title id="title">Anna Relay round three comparison</title>
+  <desc id="desc">The restrained Relay control compared with balanced, exchange, and asymmetric journey refinements.</desc>
+  <defs>
+    <linearGradient id="flowWide" x1="0" y1="0" x2="1800" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C548C"/><stop offset="0.53" stop-color="#8D4DFF"/><stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <linearGradient id="controlFlow" x1="22" y1="22" x2="178" y2="178" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C548C"/><stop offset="0.38" stop-color="#3159C7"/><stop offset="0.67" stop-color="#8D4DFF"/><stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <linearGradient id="tightFlow" x1="22" y1="22" x2="178" y2="178" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2C548C"/><stop offset="0.43" stop-color="#3159C7"/><stop offset="0.49" stop-color="#6252EF"/><stop offset="0.55" stop-color="#8D4DFF"/><stop offset="0.61" stop-color="#E15091"/><stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <linearGradient id="input" x1="28" y1="30" x2="96" y2="130" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2C548C"/><stop offset="1" stop-color="#3159C7"/>
+    </linearGradient>
+    <linearGradient id="return" x1="82" y1="56" x2="170" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#3159C7"/><stop offset="0.22" stop-color="#8D4DFF"/><stop offset="0.42" stop-color="#E15091"/><stop offset="1" stop-color="#FF5C42"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#08152E" flood-opacity="0.12"/>
+    </filter>
+    <g id="control" fill="url(#controlFlow)">
+      <path d="M28 155V53H58V98L100 136V173L58 136V155H28Z"/>
+      <path d="M172 45V147H142V102L100 64V27L142 64V45H172Z"/>
+      <path d="M28 34H57L79 53V82L50 60H28V34Z"/>
+      <path d="M172 166H143L121 147V118L150 140H172V166Z"/>
+    </g>
+    <g id="balanced" fill="url(#tightFlow)">
+      <path d="M34 48V166H62V132L100 166V128L62 94V48H34Z"/>
+      <path d="M166 34V152H138V108L100 74V34L138 68V34H166Z"/>
+      <path d="M34 34H62L86 54V84L58 62H34V34Z"/>
+      <path d="M166 166H138L114 146V116L142 138H166V166Z"/>
+    </g>
+    <g id="exchange" fill="url(#tightFlow)">
+      <path d="M30 34H58L94 64V94L58 64H30V34Z"/>
+      <path d="M30 70H58L94 100V130L58 100V166H30V70Z"/>
+      <path d="M170 34H142V100L106 70V100L142 130H170V34Z"/>
+      <path d="M170 166H142L106 136V106L142 136H170V166Z"/>
+    </g>
+    <g id="journey">
+      <path d="M28 32H56L92 62V91L56 61H28V32Z" fill="url(#input)"/>
+      <path d="M28 76H56L92 106V135L56 105H28V76Z" fill="url(#input)"/>
+      <path d="M172 30V170H142V126L96 86V54L142 94V30H172Z" fill="url(#return)"/>
+    </g>
+  </defs>
+  <rect width="1800" height="830" fill="#F7F4ED"/>
+  <rect width="1800" height="12" fill="url(#flowWide)"/>
+  <text x="70" y="82" fill="#3159C7" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="3">ANNA IDENTITY · ROUND 03</text>
+  <text x="70" y="140" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="46" font-weight="700">Refining the Relay without losing its character</text>
+  <text x="70" y="181" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="21">The original remains visible as the control. Compare silhouette and rhythm before meaning.</text>
+
+  <g transform="translate(70 228)">
+    <rect width="390" height="500" rx="32" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="95" y="42" width="200" height="200" rx="48" fill="#08152E"/>
+    <g transform="translate(95 42)"><use href="#control"/></g>
+    <text x="34" y="302" fill="#3159C7" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2">CONTROL</text>
+    <text x="34" y="345" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700">Restrained Relay</text>
+    <text x="34" y="381" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Original proportions and broader</text>
+    <text x="34" y="406" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">violet transition.</text>
+    <text x="34" y="460" fill="#8793A5" font-family="Arial, Helvetica, sans-serif" font-size="15">Outer extent: intentionally offset</text>
+  </g>
+  <g transform="translate(493 228)">
+    <rect width="390" height="500" rx="32" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="95" y="42" width="200" height="200" rx="48" fill="#08152E"/>
+    <g transform="translate(95 42)"><use href="#balanced"/></g>
+    <text x="34" y="302" fill="#6252EF" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2">01 · BALANCED</text>
+    <text x="34" y="345" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700">Equal heights</text>
+    <text x="34" y="381" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Matched top and bottom extents,</text>
+    <text x="34" y="406" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">more regular central channel.</text>
+    <text x="34" y="460" fill="#8793A5" font-family="Arial, Helvetica, sans-serif" font-size="15">Violet concentrated at centre</text>
+  </g>
+  <g transform="translate(916 228)">
+    <rect width="390" height="500" rx="32" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="95" y="42" width="200" height="200" rx="48" fill="#08152E"/>
+    <g transform="translate(95 42)"><use href="#exchange"/></g>
+    <text x="34" y="302" fill="#8D4DFF" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2">02 · EXCHANGE</text>
+    <text x="34" y="345" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700">Closer handoff</text>
+    <text x="34" y="381" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Pieces approach and trade places</text>
+    <text x="34" y="406" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">across two diagonal lanes.</text>
+    <text x="34" y="460" fill="#8793A5" font-family="Arial, Helvetica, sans-serif" font-size="15">Equal outer heights</text>
+  </g>
+  <g transform="translate(1339 228)">
+    <rect width="390" height="500" rx="32" fill="#FFFDFC" filter="url(#shadow)"/>
+    <rect x="95" y="42" width="200" height="200" rx="48" fill="#08152E"/>
+    <g transform="translate(95 42)"><use href="#journey"/></g>
+    <text x="34" y="302" fill="#FF5C42" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" letter-spacing="2">03 · JOURNEY</text>
+    <text x="34" y="345" fill="#08152E" font-family="Arial, Helvetica, sans-serif" font-size="27" font-weight="700">Fragment to return</text>
+    <text x="34" y="381" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">Two blue inputs resolve into one</text>
+    <text x="34" y="406" fill="#536174" font-family="Arial, Helvetica, sans-serif" font-size="17">continuous coral-side structure.</text>
+    <text x="34" y="460" fill="#8793A5" font-family="Arial, Helvetica, sans-serif" font-size="15">Deliberately asymmetric</text>
+  </g>
+</svg>
