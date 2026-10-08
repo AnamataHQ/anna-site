@@ -29,6 +29,25 @@ gh secret set DEPLOY_SSH_KEY -R AnamataHQ/anna-site < ./anna_site_deploy_key
 Adjust `-R` if the repository lives elsewhere. Keep the `.pub` file for step 3,
 then delete the private key file locally.
 
+### 2b. Pin vps-RGF's host key in GitHub
+
+The deploy trusts only this host key; it does not scan the host on each run.
+On vps-RGF:
+
+```sh
+echo "136.144.164.80 $(cut -d' ' -f1,2 /etc/ssh/ssh_host_ed25519_key.pub)"
+```
+
+Then, on your machine, with that one line as the value:
+
+```sh
+gh variable set DEPLOY_KNOWN_HOSTS -R AnamataHQ/anna-site --body '136.144.164.80 ssh-ed25519 AAAA...'
+```
+
+The host key is public, so it is a repository variable, visible under
+Settings → Secrets and variables → Actions → Variables. If the server's host
+key ever changes, the deploy fails until this variable is updated.
+
 ### 3. Deploy user and web root (on vps-RGF)
 
 Replace `<public key>` with the single line from `anna_site_deploy_key.pub`.

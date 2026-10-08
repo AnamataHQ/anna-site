@@ -51,6 +51,14 @@ test('rsyncs the tested export to vps-RGF with a dedicated key', () => {
   assert.match(workflow, /path: dist\/client\//);
 });
 
+test('pins the vps-RGF host key instead of scanning it per run', () => {
+  const deploy = job('deploy');
+  assert.match(deploy, /DEPLOY_KNOWN_HOSTS: \$\{\{ vars\.DEPLOY_KNOWN_HOSTS \}\}/);
+  assert.match(deploy, /test -n "\$DEPLOY_KNOWN_HOSTS"/);
+  assert.match(deploy, /"\$DEPLOY_KNOWN_HOSTS" > ~\/\.ssh\/known_hosts/);
+  assert.doesNotMatch(workflow, /ssh-keyscan/);
+});
+
 test('serves the export on anna-site.anamata.ai behind Caddy', () => {
   assert.match(caddyfile, /^anna-site\.anamata\.ai \{$/m);
   assert.match(caddyfile, /root \* \/var\/www\/anna-site/);
@@ -64,6 +72,8 @@ test('lists the server steps for the human', () => {
   for (const step of [
     'ssh-keygen',
     'gh secret set DEPLOY_SSH_KEY',
+    'gh variable set DEPLOY_KNOWN_HOSTS',
+    '/etc/ssh/ssh_host_ed25519_key.pub',
     'useradd -m -s /bin/bash anna-site-deploy',
     '/var/www/anna-site',
     'caddy validate',

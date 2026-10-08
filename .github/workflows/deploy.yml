@@ -57,12 +57,15 @@ jobs:
       - name: Deploy over rsync
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          # vps-RGF's own host key line, pinned as a repo variable (public data).
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
         run: |
           test -f export/index.html
+          test -n "$DEPLOY_KNOWN_HOSTS"
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
           rsync -rltz --delete --chmod=D755,F644 --exclude '.vite/' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
             export/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
