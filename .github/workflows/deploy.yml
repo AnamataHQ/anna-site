@@ -1,0 +1,68 @@
+name: Build, test and deploy
+
+# Every push builds the static export and runs the tests. Deploying is a
+# separate, manual step: a person starts this workflow from the Actions tab
+# ("Run workflow" on main). The repo is private on GitHub Free, so environment
+# reviewers are not enforced; that manual run is the human gate.
+# Modelled on EzraAnamata/anamata-ai-website's deploy workflow.
+
+on:
+  push:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.event_name == 'workflow_dispatch' && 'anna-site-deploy' || format('build-{0}', github.ref) }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DEPLOY_HOST: 136.144.164.80 # vps-RGF
+  DEPLOY_USER: anna-site-deploy
+  DEPLOY_PATH: /var/www/anna-site
+
+jobs:
+  test:
+    name: Build & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+      # Hidden files (dist/client/.vite build metadata) are left out by default.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: anna-site-export
+          path: dist/client/
+          retention-days: 7
+
+  deploy:
+    name: Deploy to anna-site.anamata.ai (manual run)
+    needs: test
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      # Deploy the exact files the test job built and checked.
+      - uses: actions/download-artifact@v4
+        with:
+          name: anna-site-export
+          path: export/
+
+      - name: Deploy over rsync
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          test -f export/index.html
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          rsync -rltz --delete --chmod=D755,F644 --exclude '.vite/' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
+            export/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
