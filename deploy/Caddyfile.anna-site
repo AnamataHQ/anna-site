@@ -6,11 +6,11 @@
 # certificate itself once DNS for anna-site.anamata.ai points at vps-RGF.
 
 anna-site.anamata.ai {
-	# Project H lead endpoint. Uncomment once the lead service listens on
-	# 127.0.0.1:8787; until then /api/lead falls through to a 404.
-	# handle /api/lead {
-	# 	reverse_proxy 127.0.0.1:8787
-	# }
+	# Lead form endpoint: the anamata-leads service (AnamataHQ/anamata-leads).
+	# Until it runs, the form gets a 502 and shows its mailto fallback.
+	handle /api/lead {
+		reverse_proxy 127.0.0.1:8787
+	}
 
 	handle {
 		root * /var/www/anna-site

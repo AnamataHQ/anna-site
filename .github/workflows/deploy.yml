@@ -34,6 +34,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+        env:
+          # Public site key of the Turnstile widget (repo variable, not a secret).
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
       - run: npm test
       # Hidden files (dist/client/.vite build metadata) are left out by default.
       - uses: actions/upload-artifact@v4
@@ -62,6 +65,12 @@ jobs:
         run: |
           test -f export/index.html
           test -n "$DEPLOY_KNOWN_HOSTS"
+          # Cloudflare's test site key in a production build would make the
+          # lead service drop every real request as spam.
+          if grep -rq '1x00000000000000000000AA' export/; then
+            echo "Build uses the Turnstile test key; set the TURNSTILE_SITE_KEY repo variable." >&2
+            exit 1
+          fi
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
