@@ -47,7 +47,8 @@ export function readSource(location: LocationLike, referrer: string): LeadSource
     utm_campaign: utm('utm_campaign'),
     utm_term: utm('utm_term'),
     utm_content: utm('utm_content'),
-    landing_path: location.pathname + location.search,
+    // The path only: other query values (click IDs, tokens) are not ours to send.
+    landing_path: location.pathname,
   };
   for (const key of Object.keys(SOURCE_LIMITS) as (keyof LeadSource)[]) {
     source[key] = source[key].slice(0, SOURCE_LIMITS[key]);
@@ -107,15 +108,18 @@ export function buildPayload(input: {
   };
 }
 
+// A server that never answers must still end in the mail fallback.
 export async function submitLead(
   payload: unknown,
   fetchImpl: typeof fetch = fetch,
+  { timeoutMs = 20_000 } = {},
 ): Promise<SubmitOutcome> {
   try {
     const response = await fetchImpl(LEAD_ENDPOINT, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     return response.status === 200 ? 'success' : 'failure';
   } catch {
@@ -137,4 +141,22 @@ export async function waitForToken(
     if (Date.now() >= deadline) return null;
     await new Promise((resolve) => setTimeout(resolve, intervalMs));
   }
+}
+
+// Numbers each opening of the dialog, so a submission that finishes after the
+// dialog was closed (or reopened) can tell its result is no longer wanted.
+export function createOpenings() {
+  let current = 0;
+  let open = false;
+  return {
+    next() {
+      current += 1;
+      open = true;
+      return current;
+    },
+    close() {
+      open = false;
+    },
+    isCurrent: (id: number) => open && id === current,
+  };
 }

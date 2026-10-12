@@ -4,6 +4,7 @@ import test from 'node:test';
 // Node strips the TypeScript types; lib/lead-capture.ts has no runtime imports.
 import {
   buildPayload,
+  createOpenings,
   LEAD_ENDPOINT,
   readSource,
   rememberFirstSource,
@@ -36,8 +37,18 @@ test('reads referrer, UTM codes and the landing path', () => {
     utm_campaign: 'launch-2026',
     utm_term: 'hr',
     utm_content: 'post-1',
-    landing_path: landing.pathname + landing.search,
+    landing_path: '/',
   });
+});
+
+test('the landing page is the path only; other query values never leave the browser', () => {
+  const source = readSource(
+    { pathname: '/', search: '?utm_source=x&email=fenna@example.org&invite=secret&gclid=abc' },
+    '',
+  );
+  assert.equal(source.landing_path, '/');
+  assert.equal(JSON.stringify(source).includes('fenna@example.org'), false);
+  assert.equal(JSON.stringify(source).includes('abc'), false);
 });
 
 test('only the known UTM codes are kept', () => {
@@ -138,4 +149,23 @@ test('waits for the Turnstile token, and gives up so a blocked widget shows the 
   }, 30);
   assert.equal(await waitForToken(() => token, { timeoutMs: 500, intervalMs: 10 }), 'late-token');
   assert.equal(await waitForToken(() => '', { timeoutMs: 40, intervalMs: 10 }), null);
+});
+
+test('a request that never answers counts as a failure after the timeout', async () => {
+  const hanging = (url, init) =>
+    new Promise((resolve, reject) => {
+      init.signal.addEventListener('abort', () => reject(init.signal.reason));
+    });
+  assert.equal(await submitLead({}, hanging, { timeoutMs: 30 }), 'failure');
+});
+
+test('a result from an earlier opening of the dialog is recognised as stale', () => {
+  const openings = createOpenings();
+  const first = openings.next();
+  assert.equal(openings.isCurrent(first), true);
+  openings.close();
+  assert.equal(openings.isCurrent(first), false);
+  const second = openings.next();
+  assert.equal(openings.isCurrent(first), false);
+  assert.equal(openings.isCurrent(second), true);
 });

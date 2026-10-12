@@ -5,6 +5,7 @@ import { type SyntheticEvent, useEffect, useId, useRef, useState } from 'react';
 
 import {
   buildPayload,
+  createOpenings,
   type LeadKind,
   type LeadLanguage,
   rememberFirstSource,
@@ -121,6 +122,8 @@ export function LeadFormDialog({
   const widgetIdRef = useRef<string | undefined>(undefined);
   const tokenRef = useRef('');
   const openedAtRef = useRef(0);
+  const openingsRef = useRef(createOpenings());
+  const openingRef = useRef(0);
   const [status, setStatus] = useState<Status>('idle');
   // The kind stays visible while the dialog animates closed.
   const [shownKind, setShownKind] = useState<LeadKind>('demo');
@@ -131,6 +134,7 @@ export function LeadFormDialog({
     if (!dialog || !kind) return;
     setShownKind(kind);
     setStatus('idle');
+    openingRef.current = openingsRef.current.next();
     openedAtRef.current = performance.now();
     if (!dialog.open) dialog.showModal();
   }, [kind]);
@@ -148,7 +152,8 @@ export function LeadFormDialog({
           action: 'lead',
           language,
           theme: 'light',
-          size: 'flexible',
+          // 'flexible' needs at least 300px; narrow phones get the compact widget.
+          size: widgetRef.current.clientWidth >= 300 ? 'flexible' : 'compact',
           callback: (token: string) => {
             tokenRef.current = token;
           },
@@ -180,6 +185,7 @@ export function LeadFormDialog({
   async function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
     if (status === 'sending' || !kind) return;
+    const opening = openingRef.current;
     const data = new FormData(event.currentTarget);
     const field = (name: string) => {
       const value = data.get(name);
@@ -188,6 +194,8 @@ export function LeadFormDialog({
     setStatus('sending');
 
     const token = await waitForToken(() => tokenRef.current);
+    // Closed while waiting: do not send, and never take a later opening's token.
+    if (!openingsRef.current.isCurrent(opening)) return;
     const outcome = token
       ? await submitLead(
           buildPayload({
@@ -206,6 +214,9 @@ export function LeadFormDialog({
           }),
         )
       : 'failure';
+
+    // Closed or reopened while sending: this result belongs to an old form.
+    if (!openingsRef.current.isCurrent(opening)) return;
 
     // A Turnstile token is single-use: get a fresh one for a retry, or drop
     // the widget before the success text replaces the form.
@@ -228,7 +239,10 @@ export function LeadFormDialog({
       ref={dialogRef}
       className="lead-dialog"
       aria-labelledby={headingId}
-      onClose={onClose}
+      onClose={() => {
+        openingsRef.current.close();
+        onClose();
+      }}
     >
       <div className="lead-dialog-head">
         <h2 id={headingId}>{t.heading[shownKind]}</h2>

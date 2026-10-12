@@ -128,3 +128,12 @@ test('the built page itself loads no third-party script', () => {
   const html = readFileSync(index, 'utf8');
   assert.doesNotMatch(html, /<script[^>]+src="https?:\/\/(?!anna-site\.anamata\.ai)/);
 });
+
+test('a result from a closed or reopened dialog is ignored', () => {
+  assert.equal((form.match(/isCurrent\(opening\)/g) ?? []).length, 2);
+  assert.match(form, /openingsRef\.current\.close\(\)/);
+});
+
+test('narrow phones get the compact Turnstile widget', () => {
+  assert.match(form, /clientWidth >= 300 \? 'flexible' : 'compact'/);
+});
