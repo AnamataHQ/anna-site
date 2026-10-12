@@ -1,0 +1,40 @@
+# anna-site.anamata.ai on vps-RGF: serves the static export that
+# .github/workflows/deploy.yml rsyncs to /var/www/anna-site.
+#
+# Append this block to /etc/caddy/Caddyfile next to the existing anamata.ai
+# block, then validate and reload (see deploy/README.md). Caddy obtains the
+# certificate itself once DNS for anna-site.anamata.ai points at vps-RGF.
+
+anna-site.anamata.ai {
+	# Project H lead endpoint. Uncomment once the lead service listens on
+	# 127.0.0.1:8787; until then /api/lead falls through to a 404.
+	# handle /api/lead {
+	# 	reverse_proxy 127.0.0.1:8787
+	# }
+
+	handle {
+		root * /var/www/anna-site
+		# Build metadata is not part of the site.
+		@buildMetadata path /.vite/*
+		respond @buildMetadata 404
+		# Content-hashed bundles never change under the same name.
+		@hashedAssets path /_next/static/*
+		header @hashedAssets Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} {path}.html {path}/index.html
+		file_server
+	}
+
+	handle_errors 404 {
+		root * /var/www/anna-site
+		rewrite * /404.html
+		file_server
+	}
+
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
