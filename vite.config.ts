@@ -9,6 +9,8 @@ export default defineConfig({
   css: { postcss: { plugins: [tailwindcss()] } },
   server: {
     allowedHosts: ['w11.at-skate.ts.net'],
+    // The lead service (AnamataHQ/anamata-leads, `npm run dev`) runs here locally.
+    proxy: { '/api/lead': 'http://127.0.0.1:8787' },
     ...(isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : {}),

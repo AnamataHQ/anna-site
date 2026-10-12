@@ -21,7 +21,10 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
+
+import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
+import type { LeadKind } from '@/lib/lead-capture';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -630,6 +633,7 @@ const ecosystemExamples = [
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>('en');
+  const [leadKind, setLeadKind] = useState<LeadKind | null>(null);
   const [scenarioId, setScenarioId] = useState('leave');
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -652,6 +656,17 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    captureLandingSource();
+  }, []);
+
+  // The mailto href stays as the fallback; with JavaScript the form opens.
+  const leadOpener =
+    (kind: LeadKind) => (event: MouseEvent<HTMLAnchorElement>) => {
+      event.preventDefault();
+      setLeadKind(kind);
+    };
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -812,6 +827,8 @@ export default function Home() {
           <a
             className="header-cta"
             href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+            onClick={leadOpener('demo')}
+            aria-haspopup="dialog"
           >
             {t.nav.demo}
             <ArrowRight size={16} aria-hidden="true" />
@@ -831,11 +848,18 @@ export default function Home() {
               <a
                 className="button button-primary"
                 href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+                onClick={leadOpener('demo')}
+                aria-haspopup="dialog"
               >
                 {t.bookDemo}
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
-              <a className="button button-ghost" href="mailto:info@anamata.ai">
+              <a
+                className="button button-ghost"
+                href="mailto:info@anamata.ai"
+                onClick={leadOpener('contact')}
+                aria-haspopup="dialog"
+              >
                 {t.contact}
               </a>
             </div>
@@ -1290,11 +1314,18 @@ export default function Home() {
             <a
               className="button button-primary"
               href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+              onClick={leadOpener('demo')}
+              aria-haspopup="dialog"
             >
               {t.ctaPrimary}
               <ArrowRight size={18} aria-hidden="true" />
             </a>
-            <a className="text-link" href="mailto:info@anamata.ai">
+            <a
+              className="text-link"
+              href="mailto:info@anamata.ai"
+              onClick={leadOpener('contact')}
+              aria-haspopup="dialog"
+            >
               {t.ctaSecondary}
               <ArrowRight size={17} aria-hidden="true" />
             </a>
@@ -1322,6 +1353,12 @@ export default function Home() {
           anamata.ai <ArrowRight size={15} aria-hidden="true" />
         </a>
       </footer>
+
+      <LeadFormDialog
+        kind={leadKind}
+        language={language}
+        onClose={() => setLeadKind(null)}
+      />
     </main>
   );
 }

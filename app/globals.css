@@ -2005,3 +2005,136 @@ footer > a:last-child {
     transform: rotate(90deg);
   }
 }
+
+/* Lead form dialog (demo and contact requests) */
+.lead-dialog {
+  /* The reset removes the browser's auto margins that centre a modal dialog. */
+  margin: auto;
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  border: 0;
+  border-radius: var(--radius-xl);
+  padding: 1.6rem;
+  background: var(--paper-light);
+  color: var(--ink);
+  box-shadow: 0 24px 80px rgba(8, 21, 46, 0.35);
+}
+.lead-dialog::backdrop {
+  background: rgba(8, 21, 46, 0.62);
+}
+.lead-dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+.lead-dialog-head h2 {
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.lead-dialog-close {
+  display: inline-flex;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.lead-dialog-close:hover {
+  background: var(--muted);
+}
+.lead-form {
+  display: grid;
+  gap: 0.35rem;
+}
+.lead-form label {
+  margin-top: 0.55rem;
+  font-size: 0.86rem;
+  font-weight: 650;
+}
+.lead-form input,
+.lead-form textarea {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.85rem;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+}
+.lead-form textarea {
+  resize: vertical;
+}
+.lead-form input:focus-visible,
+.lead-form textarea:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 1px;
+  border-color: var(--ring);
+}
+.lead-form-trap {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+.lead-form-turnstile {
+  margin-top: 0.9rem;
+}
+.lead-form-turnstile:empty {
+  margin-top: 0;
+}
+.lead-form-privacy {
+  margin: 0.8rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+}
+.lead-form-privacy a,
+.lead-form-failure a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.lead-form-status,
+.lead-form-success {
+  display: block;
+}
+.lead-form-failure {
+  display: block;
+  margin: 0.6rem 0 0;
+  border-left: 3px solid var(--coral);
+  padding-left: 0.7rem;
+  font-size: 0.92rem;
+}
+.lead-form-submit {
+  margin-top: 1rem;
+  justify-self: start;
+  cursor: pointer;
+}
+.lead-form-submit:disabled {
+  cursor: progress;
+  opacity: 0.7;
+  transform: none;
+}
+.lead-form-success {
+  margin: 0;
+  font-size: 1.05rem;
+}
+@media (max-width: 500px) {
+  .lead-dialog {
+    padding: 1.2rem;
+  }
+  .lead-form-submit {
+    justify-self: stretch;
+  }
+}
