@@ -63,9 +63,29 @@ test('serves the export on anna-site.anamata.ai behind Caddy', () => {
   assert.match(caddyfile, /^anna-site\.anamata\.ai \{$/m);
   assert.match(caddyfile, /root \* \/var\/www\/anna-site/);
   assert.match(caddyfile, /file_server/);
-  assert.match(caddyfile, /^\s*# handle \/api\/lead \{$/m);
-  assert.match(caddyfile, /^\s*# \treverse_proxy 127\.0\.0\.1:8787$/m);
-  assert.doesNotMatch(caddyfile, /^\s*reverse_proxy/m);
+});
+
+test('routes /api/lead to the lead service on localhost only', () => {
+  assert.match(caddyfile, /^\thandle \/api\/lead \{$/m);
+  assert.match(caddyfile, /^\t\treverse_proxy 127\.0\.0\.1:8787$/m);
+  const proxies = caddyfile.match(/^\s*reverse_proxy .*$/gm) ?? [];
+  assert.deepEqual(proxies.map((line) => line.trim()), ['reverse_proxy 127.0.0.1:8787']);
+});
+
+test('builds with the Turnstile site key and refuses to deploy the test key', () => {
+  const build = job('test');
+  assert.match(
+    build,
+    /NEXT_PUBLIC_TURNSTILE_SITE_KEY: \$\{\{ vars\.TURNSTILE_SITE_KEY \}\}/,
+  );
+  const deploy = job('deploy');
+  // Cloudflare's always-pass test key in a production build would make the
+  // service drop every real request as spam.
+  assert.match(deploy, /grep -rq '1x00000000000000000000AA' export\//);
+  assert.ok(
+    deploy.indexOf("1x00000000000000000000AA") < deploy.indexOf('rsync -rltz'),
+    'the test-key check must run before rsync',
+  );
 });
 
 test('lists the server steps for the human', () => {
@@ -79,6 +99,7 @@ test('lists the server steps for the human', () => {
     'caddy validate',
     'systemctl reload caddy',
     'Run workflow',
+    'gh variable set TURNSTILE_SITE_KEY',
   ]) {
     assert.ok(readme.includes(step), `missing server step: ${step}`);
   }

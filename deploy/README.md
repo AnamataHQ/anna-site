@@ -76,9 +76,23 @@ sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 sudo systemctl reload caddy
 ```
 
-If `caddy validate` fails, restore the backup instead of reloading. The
-`/api/lead` proxy stays commented out until project H's service listens on
-`127.0.0.1:8787`; enabling it is the same edit plus validate and reload.
+If `caddy validate` fails, restore the backup instead of reloading. The block
+routes `/api/lead` to the lead service on `127.0.0.1:8787`
+(AnamataHQ/anamata-leads, set up with its own `deploy/README.md`). Until that
+service runs, the form answers with its mailto fallback.
+
+### 5. Turnstile site key (GitHub)
+
+The lead form's spam check needs the site key of the Turnstile widget in
+Cloudflare. It is public, so it is a repository variable:
+
+```sh
+gh variable set TURNSTILE_SITE_KEY -R AnamataHQ/anna-site --body '<site key>'
+```
+
+Without it the build falls back to Cloudflare's test key, and the deploy job
+refuses to ship that build. The matching secret key goes only on the server,
+in the lead service's environment file.
 
 ## Deploying
 
