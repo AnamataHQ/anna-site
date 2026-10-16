@@ -19,9 +19,6 @@ import {
 const SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
 
-// Where the privacy statement (Taiga #418) is published.
-const PRIVACY_URL = 'https://anamata.ai/privacy';
-
 // Approved form text (Taiga #344, 2026-10-07). Change only with approval.
 const TEXT = {
   en: {
@@ -315,9 +312,10 @@ export function LeadFormDialog({
 
           <div ref={widgetRef} className="lead-form-turnstile" />
 
+          {/* The statement opens in a new tab, so the form keeps what was typed. */}
           <p className="lead-form-privacy">
             {t.privacy}{' '}
-            <a href={PRIVACY_URL} target="_blank" rel="noopener">
+            <a href={`/privacy#${language}`} target="_blank" rel="noopener">
               {t.privacyLink}
             </a>
           </p>
