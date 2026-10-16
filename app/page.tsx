@@ -1348,6 +1348,11 @@ export default function Home() {
         <div className="footer-copy">
           <strong>{t.footerLine}</strong>
           <p>{t.transparency}</p>
+          <p>
+            <a className="footer-privacy" href={`/privacy#${language}`}>
+              {language === 'en' ? 'Privacy statement' : 'Privacyverklaring'}
+            </a>
+          </p>
         </div>
         <a href="https://anamata.ai">
           anamata.ai <ArrowRight size={15} aria-hidden="true" />
