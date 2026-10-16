@@ -50,6 +50,9 @@ test('the statement covers what the site and the form actually do, in both langu
     'Deze verklaring geldt voor anamata.ai en de ANNA-site',
     'open a new mail in your own mail program',
     'openen een nieuwe mail in je eigen mailprogramma',
+    // Cloudflare's own role for Turnstile data (its privacy addendum).
+    'its own controller',
+    'zelf verwerkingsverantwoordelijke',
   ]) {
     assert.ok(statement.includes(fact), `statement is missing "${fact}"`);
   }

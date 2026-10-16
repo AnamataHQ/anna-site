@@ -100,6 +100,12 @@ const STATEMENT: Record<Language, ReactNode> = {
         you are human. Turnstile sets no tracking cookies. The legal basis is
         our legitimate interest in keeping the site secure. Cloudflare is a US
         company; the transfer is covered by the EU-US Data Privacy Framework.
+        Cloudflare also uses this data to improve its bot detection, and for
+        that it is its own controller; see its{' '}
+        <a href="https://www.cloudflare.com/turnstile-privacy-policy/">
+          Turnstile privacy addendum
+        </a>
+        .
       </p>
 
       <h2>Who processes your data</h2>
@@ -154,8 +160,8 @@ const STATEMENT: Record<Language, ReactNode> = {
       <p>
         Op de ANNA-site onthoudt je browser zolang het tabblad open is hoe je
         bij ons kwam: de pagina waar je vandaan kwam, campagnecodes in de link
-        (UTM) en de pagina waarop je binnenkwam. Dat blijft in je
-        browser; wij ontvangen het alleen als je het formulier verstuurt.
+        (UTM) en de pagina waarop je binnenkwam. Dat blijft in je browser; wij
+        ontvangen het alleen als je het formulier verstuurt.
       </p>
 
       <h2>Als je een aanvraag doet</h2>
@@ -199,7 +205,13 @@ const STATEMENT: Record<Language, ReactNode> = {
         bepalen of je een mens bent. Turnstile plaatst geen trackingcookies. De
         grondslag is ons gerechtvaardigd belang om de site veilig te houden.
         Cloudflare is een Amerikaans bedrijf; doorgifte valt onder het
-        EU-VS-gegevensprivacykader.
+        EU-VS-gegevensprivacykader. Cloudflare gebruikt deze gegevens ook om
+        zijn botdetectie te verbeteren, en is daarvoor zelf
+        verwerkingsverantwoordelijke; zie het{' '}
+        <a href="https://www.cloudflare.com/turnstile-privacy-policy/">
+          Turnstile-privacyaddendum
+        </a>{' '}
+        (Engels).
       </p>
 
       <h2>Wie je gegevens verwerkt</h2>
