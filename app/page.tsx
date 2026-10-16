@@ -1349,6 +1349,7 @@ export default function Home() {
           <strong>{t.footerLine}</strong>
           <p>{t.transparency}</p>
           <p>
+            Anamata BV · KvK 78520185 ·{' '}
             <a className="footer-privacy" href={`/privacy#${language}`}>
               {language === 'en' ? 'Privacy statement' : 'Privacyverklaring'}
             </a>
