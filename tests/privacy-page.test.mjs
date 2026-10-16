@@ -45,6 +45,14 @@ test('the statement covers what the site and the form actually do, in both langu
     'zolang het tabblad open is',
     'Last updated: 16 October 2026',
     'Laatst bijgewerkt: 16 oktober 2026',
+    // anamata.ai is covered too: its forms only open the visitor's mail program.
+    'This statement covers anamata.ai and the ANNA site',
+    'Deze verklaring geldt voor anamata.ai en de ANNA-site',
+    'open a new mail in your own mail program',
+    'openen een nieuwe mail in je eigen mailprogramma',
+    // Cloudflare's own role for Turnstile data (its privacy addendum).
+    'its own controller',
+    'zelf verwerkingsverantwoordelijke',
   ]) {
     assert.ok(statement.includes(fact), `statement is missing "${fact}"`);
   }
@@ -82,4 +90,8 @@ test('the exported privacy page loads nothing from other parties', () => {
     ].map((match) => match[1]);
     assert.deepEqual(external, [], `${name} loads ${external.join(', ')}`);
   }
+});
+
+test('the homepage footer names the owner with its KvK number', () => {
+  assert.match(page, /Anamata BV · KvK 78520185/);
 });

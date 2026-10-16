@@ -4,8 +4,9 @@ import { ArrowLeft, Languages } from 'lucide-react';
 import Image from 'next/image';
 import { type ReactNode, useEffect, useState } from 'react';
 
-// Privacy statement for the ANNA site (Taiga #418). First version: this site
-// only. When anamata.ai gets a form, the statement moves there and covers both.
+// Privacy statement for anamata.ai and the ANNA site (Taiga #418). It lives
+// here because only this site handles form data itself; anamata.ai links to it.
+// When anamata.ai gets a form of its own, the statement moves there.
 // The language comes from the link (#en or #nl), so the form and the footer
 // open it in the language the visitor was reading.
 
@@ -37,12 +38,12 @@ const STATEMENT: Record<Language, ReactNode> = {
 
       <h2>Who we are</h2>
       <p>
-        The ANNA site (anna-site.anamata.ai) is a website of Anamata BV,
-        registered at Gang 2, 4031 JH Ingen, the Netherlands, with its visiting
-        address at Europalaan 93, 3526 KP Utrecht (Chamber of Commerce
-        78520185). Anamata is responsible for processing your personal data on
-        this site. You can read more about Anamata at{' '}
-        <a href="https://anamata.eu">anamata.eu</a>.
+        This statement covers anamata.ai and the ANNA site
+        (anna-site.anamata.ai), websites of Anamata BV, registered at Gang 2,
+        4031 JH Ingen, the Netherlands, with its visiting address at Europalaan
+        93, 3526 KP Utrecht (Chamber of Commerce 78520185). Anamata is
+        responsible for processing your personal data on these sites. You can
+        read more about Anamata at <a href="https://anamata.eu">anamata.eu</a>.
       </p>
 
       <h2>When you visit</h2>
@@ -52,14 +53,17 @@ const STATEMENT: Record<Language, ReactNode> = {
         log of visits.
       </p>
       <p>
-        To know how you reached us, your browser remembers the page you came
-        from, any campaign codes in the link (UTM) and the page you landed on,
-        for as long as the tab is open. This stays in your browser; we only
-        receive it if you send the form.
+        On the ANNA site, to know how you reached us, your browser remembers the
+        page you came from, any campaign codes in the link (UTM) and the page
+        you landed on, for as long as the tab is open. This stays in your
+        browser; we only receive it if you send the form.
       </p>
 
       <h2>When you send a request</h2>
-      <p>If you book a demo or contact us through the form, we process:</p>
+      <p>
+        If you book a demo or contact us through the form on the ANNA site, we
+        process:
+      </p>
       <ul>
         <li>your name, work email address, organisation and message;</li>
         <li>
@@ -82,21 +86,34 @@ const STATEMENT: Record<Language, ReactNode> = {
         the request for up to 12 months after our last contact, unless it leads
         to a customer relationship.
       </p>
+      <p>
+        The request and quote forms on anamata.ai send nothing themselves: they
+        open a new mail in your own mail program. If you send it, we receive it
+        like any other mail and keep it in our mailbox for the same 12 months.
+      </p>
 
       <h2>Spam protection</h2>
       <p>
-        To protect the form from spam we use Cloudflare Turnstile. It loads only
-        when you open the form, and looks at your IP address and technical
-        characteristics of your browser to tell whether you are human. Turnstile
-        sets no tracking cookies. The legal basis is our legitimate interest in
-        keeping the site secure. Cloudflare is a US company; the transfer is
-        covered by the EU-US Data Privacy Framework.
+        To protect the form on the ANNA site from spam we use Cloudflare
+        Turnstile. It loads only when you open the form, and looks at your IP
+        address and technical characteristics of your browser to tell whether
+        you are human. Turnstile sets no tracking cookies. The legal basis is
+        our legitimate interest in keeping the site secure. Cloudflare is a US
+        company; the transfer is covered by the EU-US Data Privacy Framework.
+        Cloudflare also uses this data to improve its bot detection, and for
+        that it is its own controller; see its{' '}
+        <a href="https://www.cloudflare.com/turnstile-privacy-policy/">
+          Turnstile privacy addendum
+        </a>
+        .
       </p>
 
       <h2>Who processes your data</h2>
       <p>We do not sell your data. These parties process it on our behalf:</p>
       <ul>
-        <li>TransIP (Netherlands): the server the site and the form run on;</li>
+        <li>
+          TransIP (Netherlands): the server the sites and the form run on;
+        </li>
         <li>mijndomein (Netherlands): email for anamata.ai;</li>
         <li>Cloudflare: spam protection for the form.</li>
       </ul>
@@ -126,11 +143,11 @@ const STATEMENT: Record<Language, ReactNode> = {
 
       <h2>Wie we zijn</h2>
       <p>
-        De ANNA-site (anna-site.anamata.ai) is een website van Anamata BV,
-        statutair gevestigd aan Gang 2, 4031 JH Ingen, met bezoekadres
-        Europalaan 93, 3526 KP Utrecht (KvK 78520185). Anamata is
-        verantwoordelijk voor de verwerking van je persoonsgegevens op deze
-        site. Meer over Anamata lees je op{' '}
+        Deze verklaring geldt voor anamata.ai en de ANNA-site
+        (anna-site.anamata.ai), websites van Anamata BV, statutair gevestigd aan
+        Gang 2, 4031 JH Ingen, met bezoekadres Europalaan 93, 3526 KP Utrecht
+        (KvK 78520185). Anamata is verantwoordelijk voor de verwerking van je
+        persoonsgegevens op deze sites. Meer over Anamata lees je op{' '}
         <a href="https://anamata.eu">anamata.eu</a>.
       </p>
 
@@ -141,16 +158,16 @@ const STATEMENT: Record<Language, ReactNode> = {
         Onze server houdt geen logboek bij van bezoeken.
       </p>
       <p>
-        Om te weten hoe je bij ons kwam, onthoudt je browser zolang het tabblad
-        open is de pagina waar je vandaan kwam, campagnecodes in de link (UTM)
-        en de pagina waarop je binnenkwam. Dat blijft in je browser; wij
+        Op de ANNA-site onthoudt je browser zolang het tabblad open is hoe je
+        bij ons kwam: de pagina waar je vandaan kwam, campagnecodes in de link
+        (UTM) en de pagina waarop je binnenkwam. Dat blijft in je browser; wij
         ontvangen het alleen als je het formulier verstuurt.
       </p>
 
       <h2>Als je een aanvraag doet</h2>
       <p>
-        Vraag je via het formulier een demo aan of neem je contact op, dan
-        verwerken we:
+        Vraag je via het formulier op de ANNA-site een demo aan of neem je
+        contact op, dan verwerken we:
       </p>
       <ul>
         <li>je naam, zakelijk e-mailadres, organisatie en je bericht;</li>
@@ -173,16 +190,28 @@ const STATEMENT: Record<Language, ReactNode> = {
         mailbox bewaren we de aanvraag tot 12 maanden na het laatste contact,
         tenzij er een klantrelatie uit voortkomt.
       </p>
+      <p>
+        De aanvraag- en offerteformulieren op anamata.ai versturen zelf niets:
+        ze openen een nieuwe mail in je eigen mailprogramma. Verstuur je die,
+        dan ontvangen we hem als gewone mail en bewaren we hem even lang in onze
+        mailbox, tot 12 maanden.
+      </p>
 
       <h2>Spambescherming</h2>
       <p>
-        Om het formulier te beschermen tegen spam gebruiken we Cloudflare
-        Turnstile. Dat laadt pas als je het formulier opent, en kijkt daarbij
-        naar je IP-adres en technische kenmerken van je browser om te bepalen of
-        je een mens bent. Turnstile plaatst geen trackingcookies. De grondslag
-        is ons gerechtvaardigd belang om de site veilig te houden. Cloudflare is
-        een Amerikaans bedrijf; doorgifte valt onder het
-        EU-VS-gegevensprivacykader.
+        Om het formulier op de ANNA-site te beschermen tegen spam gebruiken we
+        Cloudflare Turnstile. Dat laadt pas als je het formulier opent, en kijkt
+        daarbij naar je IP-adres en technische kenmerken van je browser om te
+        bepalen of je een mens bent. Turnstile plaatst geen trackingcookies. De
+        grondslag is ons gerechtvaardigd belang om de site veilig te houden.
+        Cloudflare is een Amerikaans bedrijf; doorgifte valt onder het
+        EU-VS-gegevensprivacykader. Cloudflare gebruikt deze gegevens ook om
+        zijn botdetectie te verbeteren, en is daarvoor zelf
+        verwerkingsverantwoordelijke; zie het{' '}
+        <a href="https://www.cloudflare.com/turnstile-privacy-policy/">
+          Turnstile-privacyaddendum
+        </a>{' '}
+        (Engels).
       </p>
 
       <h2>Wie je gegevens verwerkt</h2>
@@ -192,7 +221,7 @@ const STATEMENT: Record<Language, ReactNode> = {
       </p>
       <ul>
         <li>
-          TransIP (Nederland): de server waarop de site en het formulier
+          TransIP (Nederland): de server waarop de sites en het formulier
           draaien;
         </li>
         <li>mijndomein (Nederland): de mail van anamata.ai;</li>

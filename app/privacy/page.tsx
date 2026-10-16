@@ -4,8 +4,7 @@ import { PrivacyStatement } from '@/components/privacy-statement';
 
 export const metadata: Metadata = {
   title: 'Privacy | Anna | Anamata',
-  description:
-    'How the ANNA site and its demo and contact form handle your personal data.',
+  description: 'How anamata.ai and the ANNA site handle your personal data.',
 };
 
 export default function PrivacyPage() {
