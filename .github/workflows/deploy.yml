@@ -1,17 +1,16 @@
 name: Build, test and deploy
 
-# Every push builds the static export and runs the tests. Deploying is a
-# separate, manual step: a person starts this workflow from the Actions tab
-# ("Run workflow" on main). The repo is private on GitHub Free, so environment
-# reviewers are not enforced; that manual run is the human gate.
-# Modelled on EzraAnamata/anamata-ai-website's deploy workflow.
+# Every push builds the static export and runs the tests. Every change on main
+# (a merge, or "Run workflow" from the Actions tab) then waits for a person to
+# approve the deploy: the production environment has a required reviewer and
+# only accepts main. Modelled on AnamataHQ/anamata-ai-website's deploy workflow.
 
 on:
   push:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.event_name == 'workflow_dispatch' && 'anna-site-deploy' || format('build-{0}', github.ref) }}
+  group: ${{ github.ref == 'refs/heads/main' && 'anna-site-deploy' || format('build-{0}', github.ref) }}
   cancel-in-progress: false
 
 permissions:
@@ -46,10 +45,13 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy to anna-site.anamata.ai (manual run)
+    name: Deploy to anna-site.anamata.ai (human-approved)
     needs: test
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://anna-site.anamata.ai
     steps:
       # Deploy the exact files the test job built and checked.
       - uses: actions/download-artifact@v4

@@ -94,10 +94,29 @@ Without it the build falls back to Cloudflare's test key, and the deploy job
 refuses to ship that build. The matching secret key goes only on the server,
 in the lead service's environment file.
 
+### 6. Approval gate (GitHub)
+
+The `production` environment holds the approval: a required reviewer, and only
+`main` may deploy. Reviewers are enforced because the repo is public; on a
+private repo GitHub Free would silently skip them.
+
+```sh
+gh api -X PUT repos/AnamataHQ/anna-site/environments/production --input - <<'JSON'
+{"reviewers":[{"type":"User","id":149796980}],"prevent_self_review":false,"deployment_branch_policy":{"protected_branches":false,"custom_branch_policies":true}}
+JSON
+gh api -X POST repos/AnamataHQ/anna-site/environments/production/deployment-branch-policies -f name=main -f type=branch
+```
+
+`149796980` is EzraAnamata; look up another reviewer's id with
+`gh api users/<login> --jq .id`.
+
 ## Deploying
 
-1. Merge to `main`.
-2. GitHub → Actions → "Build, test and deploy" → "Run workflow" on `main`.
+1. Merge to `main`. The workflow builds, tests, then waits for approval.
+2. Approve it: open the run (GitHub → Actions → "Build, test and deploy"),
+   click "Review deployments", tick `production` and "Approve and deploy".
+   Only listed reviewers can approve, and only `main` can deploy. To redeploy
+   without a new merge, use "Run workflow" on `main`; it waits for approval too.
 3. Check the result:
 
 ```sh

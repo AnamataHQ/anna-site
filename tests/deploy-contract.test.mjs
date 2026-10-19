@@ -31,13 +31,25 @@ test('builds and tests on every push', () => {
   assert.match(build, /run: npm test/);
 });
 
-test('deploys only from a manual run on main', () => {
+test('deploys every change on main, once a person approves it', () => {
   const deploy = job('deploy');
   assert.match(deploy, /needs: test/);
+  // A merge (push) or a manual run, but only on main; never another branch.
+  assert.match(deploy, /if: github\.ref == 'refs\/heads\/main'\n/);
+  assert.doesNotMatch(deploy, /workflow_dispatch/);
+  // The approval gate: the production environment requires a reviewer.
   assert.match(
     deploy,
-    /if: github\.event_name == 'workflow_dispatch' && github\.ref == 'refs\/heads\/main'/,
+    /environment:\n      name: production\n      url: https:\/\/anna-site\.anamata\.ai/,
   );
+});
+
+test('deploys on main queue instead of cancelling each other', () => {
+  assert.match(
+    workflow,
+    /group: \$\{\{ github\.ref == 'refs\/heads\/main' && 'anna-site-deploy' \|\| format\('build-\{0\}', github\.ref\) \}\}/,
+  );
+  assert.match(workflow, /cancel-in-progress: false/);
 });
 
 test('rsyncs the tested export to vps-RGF with a dedicated key', () => {
