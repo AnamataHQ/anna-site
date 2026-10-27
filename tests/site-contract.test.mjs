@@ -208,7 +208,7 @@ test('the connectors: twelve marks tied to Anna, thousands available, no tested-
   const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
     (match) => match[1],
   );
-  assert.deepEqual(sections.slice(0, 2), ['top', 'use-cases']);
+  assert.deepEqual(sections.slice(0, 2), ['top', 'demo']);
   assert.match(page, /OAuth/);
   assert.match(page, /MCP/);
   assert.match(
@@ -285,8 +285,8 @@ test("the connectors are a still paper string map tied to Anna's knot, fading at
 test('tells the story in the agreed order', () => {
   const order = [
     'hero',
-    'use-case-section',
     'workflow-section',
+    'use-case-section',
     'capability-section',
     'connectors',
     'control-section',
@@ -323,9 +323,17 @@ test('tells the story in the agreed order', () => {
     "title: 'Opvolging in je CRM'",
     'Log my hours',
     'Boek mijn uren',
+    "examplesKicker: 'Where to start'",
+    "examplesTitle: 'Three things to hand to Anna first.'",
+    "examplesKicker: 'Om mee te beginnen'",
+    "examplesTitle: 'Drie taken om meteen aan Anna te geven.'",
   ]) {
     assert.ok(page.includes(useCase), `missing use case: ${useCase}`);
   }
+  assert.doesNotMatch(
+    page,
+    /Work your team recognises|Werk dat je team herkent|Three things to start with/,
+  );
   // The navigation follows the page.
   assert.match(
     page,

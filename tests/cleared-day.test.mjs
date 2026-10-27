@@ -45,10 +45,10 @@ test('only the tray sprites remain served, well under the image budget', () => {
 
 test('headline, sub and actions are verbatim in English and Dutch', () => {
   for (const phrase of [
-    "'The work still needs doing. It does not need to take your time.'",
-    "'Het werk moet nog steeds gebeuren. Het hoeft niet jouw tijd te kosten.'",
-    "'Ask her in Teams or Slack. She connects to the systems your work lives in, asks before she acts, and reports back.'",
-    "'Vraag het haar in Teams of Slack. Ze verbindt met de systemen waar jouw werk in staat, vraagt voordat ze handelt en koppelt terug.'",
+    "heroTitle: 'Your agenda. Finally decluttered.'",
+    "heroTitle: 'Jouw agenda. Eindelijk opgeruimd.'",
+    "'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.'",
+    "'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.'",
     "earlyAccess: 'Request early access'",
     "earlyAccess: 'Vraag vroege toegang aan'",
     "contact: 'Contact Anamata'",
@@ -57,7 +57,12 @@ test('headline, sub and actions are verbatim in English and Dutch', () => {
     assert.ok(page.includes(phrase), `missing hero copy: ${phrase}`);
   }
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
-  assert.doesNotMatch(page, /heroTitle: 'Anna does the work nobody/);
+  assert.doesNotMatch(
+    page,
+    /heroTitle: 'Anna does the work nobody|The work still needs doing/,
+  );
+  // Short enough to hold two lines; balanced so no line is left with one word.
+  assert.match(styles, /\.hero h1 \{[^}]*text-wrap: balance/);
 });
 
 test('three true facts under the actions, no hours, prices or certifications anywhere', () => {
@@ -178,12 +183,41 @@ test('the calendar plays only once the hero is in view, and shows the end state 
   assert.match(page, /after: 'After · 08:00–17:00 for work that needs you'/);
 });
 
-test('the hero is navy with the logo colours; the demo sits on the blue band', () => {
+test('the hero is navy with the logo colours; the demo sits on a soft blue band, never the bright link blue', () => {
   assert.match(styles, /\.hero \{[^}]*var\(--navy\)/);
   assert.match(styles, /\.hero \{[^}]*color: white/);
   assert.match(styles, /\.hero::after \{[^}]*var\(--coral\)/);
-  assert.match(styles, /\.workflow-section \{[^}]*background: var\(--blue\)/);
+  assert.match(
+    styles,
+    /\.workflow-section \{[^}]*background: var\(--secondary\)/,
+  );
+  assert.match(styles, /\.workflow-section \{[^}]*color: var\(--ink\)/);
+  assert.doesNotMatch(styles, /\.workflow-section \{[^}]*var\(--blue\)/);
   assert.match(styles, /\.cleared-day \{[^}]*background: #fbfaf7/);
+});
+
+test('the day plays once and stays cleared; a replay link in the tray starts it again', () => {
+  // No loop: every calendar animation runs once and holds its end state.
+  for (const name of [
+    'clear-admin',
+    'fill-open-slots',
+    'merge-focus',
+    'expand-anchor-day',
+    'reveal-summary',
+    'tick-in',
+  ]) {
+    assert.doesNotMatch(styles, new RegExp(`animation: ${name} [^;]*infinite`));
+  }
+  assert.match(hero, /className="tray-replay"[\s\S]{0,200}onClick=\{replay\}/);
+  assert.match(hero, /key=\{run\}/);
+  assert.match(page, /replay: 'Replay',/);
+  assert.match(page, /replay: 'Opnieuw afspelen',/);
+  // Switching language restarts the whole picture, tray included.
+  assert.match(page, /<ClearedDay[\s\S]{0,80}key=\{language\}/);
+});
+
+test('the control section title no longer sticks and slides over the boundary boxes', () => {
+  assert.doesNotMatch(styles, /\.control-statement \{[^}]*position: sticky/);
 });
 
 test('lower sections render lazily and the shell stays small', () => {

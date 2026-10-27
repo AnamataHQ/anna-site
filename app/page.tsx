@@ -42,10 +42,9 @@ const content = {
     earlyAccess: 'Request early access',
     contact: 'Contact Anamata',
     eyebrow: 'Your digital AI assistant',
-    heroTitle:
-      'The work still needs doing. It does not need to take your time.',
+    heroTitle: 'Your agenda. Finally decluttered.',
     heroBody:
-      'Ask her in Teams or Slack. She connects to the systems your work lives in, asks before she acts, and reports back.',
+      'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.',
     trust: 'Early access, 2026',
     facts: [
       'Works inside Microsoft Teams and Slack',
@@ -62,6 +61,7 @@ const content = {
       focusDetail: 'Strategy · decisions · people',
       handled: 'Handled by Anna',
       handledCount: '7 routine tasks completed',
+      replay: 'Replay',
       before: 'Before · 7 routine tasks split up the day',
       after: 'After · 08:00–17:00 for work that needs you',
       tasks: [
@@ -147,8 +147,8 @@ const content = {
         body: 'Completes approved actions in connected systems and reports what happened.',
       },
     ],
-    examplesKicker: 'Three things to start with',
-    examplesTitle: 'Work your team recognises.',
+    examplesKicker: 'Where to start',
+    examplesTitle: 'Three things to hand to Anna first.',
     examples: [
       {
         tray: 1,
@@ -365,10 +365,9 @@ const content = {
     earlyAccess: 'Vraag vroege toegang aan',
     contact: 'Neem contact op',
     eyebrow: 'Jouw digitale AI-assistent',
-    heroTitle:
-      'Het werk moet nog steeds gebeuren. Het hoeft niet jouw tijd te kosten.',
+    heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
-      'Vraag het haar in Teams of Slack. Ze verbindt met de systemen waar jouw werk in staat, vraagt voordat ze handelt en koppelt terug.',
+      'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.',
     trust: 'Vroege toegang, 2026',
     facts: [
       'Werkt in Microsoft Teams en Slack',
@@ -385,6 +384,7 @@ const content = {
       focusDetail: 'Strategie · besluiten · mensen',
       handled: 'Afgehandeld door Anna',
       handledCount: '7 routinetaken afgerond',
+      replay: 'Opnieuw afspelen',
       before: 'Voor · 7 routinetaken versnipperen de dag',
       after: 'Na · 08:00–17:00 voor werk dat jou nodig heeft',
       tasks: [
@@ -470,8 +470,8 @@ const content = {
         body: 'Rondt goedgekeurde acties af in gekoppelde systemen en rapporteert wat er is gebeurd.',
       },
     ],
-    examplesKicker: 'Drie dingen om mee te beginnen',
-    examplesTitle: 'Werk dat je team herkent.',
+    examplesKicker: 'Om mee te beginnen',
+    examplesTitle: 'Drie taken om meteen aan Anna te geven.',
     examples: [
       {
         tray: 1,
@@ -935,6 +935,7 @@ export default function Home() {
             data-in-view={heroHasEntered}
           >
             <ClearedDay
+              key={language}
               copy={t.day}
               language={language}
               inView={heroHasEntered}
@@ -944,35 +945,8 @@ export default function Home() {
         </section>
 
         <section
-          className="use-case-section"
-          id="use-cases"
-          aria-labelledby="use-case-title"
-        >
-          <div className="use-case-heading">
-            <p className="eyebrow">{t.examplesKicker}</p>
-            <h2 id="use-case-title">{t.examplesTitle}</h2>
-          </div>
-          <div className="use-case-grid">
-            {t.examples.map((example) => (
-              <article className="use-case" key={example.title}>
-                <Image
-                  className="use-case-tray"
-                  src={`/hero/tray-${example.tray}.webp`}
-                  width={traySizes[example.tray].width}
-                  height={traySizes[example.tray].height}
-                  alt=""
-                  loading="lazy"
-                />
-                <h3>{example.title}</h3>
-                <p className="use-case-ask">“{example.ask}”</p>
-                <p>{example.outcome}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section
           className="workflow-section"
+          id="demo"
           aria-labelledby="workflow-title"
           ref={workflowRef}
           data-in-view={workflowHasEntered}
@@ -1150,6 +1124,34 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <section
+          className="use-case-section"
+          id="use-cases"
+          aria-labelledby="use-case-title"
+        >
+          <div className="use-case-heading">
+            <p className="eyebrow">{t.examplesKicker}</p>
+            <h2 id="use-case-title">{t.examplesTitle}</h2>
+          </div>
+          <div className="use-case-grid">
+            {t.examples.map((example) => (
+              <article className="use-case" key={example.title}>
+                <Image
+                  className="use-case-tray"
+                  src={`/hero/tray-${example.tray}.webp`}
+                  width={traySizes[example.tray].width}
+                  height={traySizes[example.tray].height}
+                  alt=""
+                  loading="lazy"
+                />
+                <h3>{example.title}</h3>
+                <p className="use-case-ask">“{example.ask}”</p>
+                <p>{example.outcome}</p>
+              </article>
+            ))}
           </div>
         </section>
 

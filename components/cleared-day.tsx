@@ -1,6 +1,6 @@
 'use client';
 
-import { CalendarDays, Check, ChevronRight } from 'lucide-react';
+import { CalendarDays, Check, ChevronRight, RotateCcw } from 'lucide-react';
 import Image from 'next/image';
 import { type CSSProperties, useEffect, useState } from 'react';
 
@@ -26,6 +26,7 @@ export type DayCopy = {
   readonly focusDetail: string;
   readonly handled: string;
   readonly handledCount: string;
+  readonly replay: string;
   readonly before: string;
   readonly after: string;
   readonly tasks: readonly DayTask[];
@@ -132,6 +133,9 @@ export function ClearedDay({
     start: number;
     end: number;
   }>(INITIAL_FOCUS_WINDOW);
+  // The day plays once and stays cleared; replay remounts the picture.
+  const [run, setRun] = useState(0);
+  const replay = () => setRun((count) => count + 1);
   const focusTime = `${formatCalendarTime(focusWindow.start)}–${formatCalendarTime(focusWindow.end)}`;
 
   // The anchor's timeframe counts outward while the CSS expands the block.
@@ -181,10 +185,10 @@ export function ClearedDay({
       window.clearTimeout(mergeTimer);
       window.cancelAnimationFrame(animationFrame);
     };
-  }, [inView, reduceMotion]);
+  }, [inView, reduceMotion, run]);
 
   return (
-    <figure className="cleared-day" aria-label={copy.aria}>
+    <figure className="cleared-day" aria-label={copy.aria} key={run}>
       <figcaption className="day-header">
         <div className="calendar-controls">
           <span className="today-chip">{copy.today}</span>
@@ -271,6 +275,10 @@ export function ClearedDay({
             {copy.handledCount}
           </strong>
         </div>
+        <button className="tray-replay" type="button" onClick={replay}>
+          <RotateCcw size={12} aria-hidden="true" />
+          {copy.replay}
+        </button>
         <ul className="handled-list" aria-hidden="true">
           {copy.tasks.map((task, index) => (
             <li

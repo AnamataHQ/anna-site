@@ -235,6 +235,7 @@ footer > a:last-child:hover {
   font-weight: 560;
   letter-spacing: -0.065em;
   line-height: 0.94;
+  text-wrap: balance;
 }
 .hero-body {
   max-width: 590px;
@@ -608,7 +609,7 @@ footer > a:last-child:hover {
 .anna-tray {
   position: static;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 0.55rem 0.8rem;
   align-items: center;
   min-height: 62px;
@@ -672,6 +673,30 @@ footer > a:last-child:hover {
 }
 .anna-tray strong svg {
   color: #269766;
+}
+.tray-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  align-self: start;
+  border: 1px solid #dfe5ef;
+  border-radius: 999px;
+  background: transparent;
+  padding: 0.3rem 0.6rem;
+  color: #66728a;
+  cursor: pointer;
+  font-size: 0.6rem;
+  font-weight: 680;
+  opacity: 0;
+  animation: reveal-summary 10.4s ease forwards;
+  animation-play-state: paused;
+}
+.tray-replay:hover {
+  background: #f4f7fc;
+  color: var(--ink);
+}
+.hero-visual[data-in-view='true'] .tray-replay {
+  animation-play-state: running;
 }
 /* The cleared tasks, ticked one by one as they leave the day. */
 .handled-list {
@@ -1165,8 +1190,8 @@ footer {
 
 .workflow-section {
   padding: clamp(5.5rem, 10vw, 9rem) max(4vw, calc((100vw - 1440px) / 2));
-  background: var(--blue);
-  color: white;
+  background: var(--secondary);
+  color: var(--ink);
 }
 .workflow-heading {
   display: grid;
@@ -1177,12 +1202,11 @@ footer {
 .workflow-heading .eyebrow {
   grid-column: 1 / -1;
   margin-bottom: 0;
-  color: #cbd8ff;
 }
 .workflow-heading > p:last-child {
   max-width: 560px;
   margin: 0;
-  color: #d9e1ff;
+  color: #4b5670;
   font-size: 1.08rem;
 }
 .scenario-shell {
@@ -1247,7 +1271,7 @@ footer {
 }
 .demo-window {
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--line);
   border-radius: 1.3rem;
   background: #f4f5fa;
   color: var(--ink);
@@ -1581,8 +1605,6 @@ footer {
   color: white;
 }
 .control-statement {
-  position: sticky;
-  top: 120px;
   align-self: start;
 }
 .control-statement h2 {
@@ -1775,9 +1797,6 @@ footer > a:last-child {
   }
   .control-section {
     grid-template-columns: 1fr;
-  }
-  .control-statement {
-    position: static;
   }
 }
 
@@ -2011,6 +2030,10 @@ footer > a:last-child {
   .handled-task {
     opacity: 1;
     transform: none;
+    animation: none;
+  }
+  .tray-replay {
+    opacity: 1;
     animation: none;
   }
   .reduced-motion-story {
