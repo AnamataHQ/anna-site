@@ -7,9 +7,9 @@ import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 
 import {
+  dominantPlate,
   HERO_LOCATION,
   type PlateWeights,
-  plateOpacities,
   plateWeights,
 } from '@/lib/sun';
 
@@ -28,7 +28,9 @@ const SLING = { x: 79, top: 0, threadBottom: 24, width: 17.7 } as const;
 const STACK_TOP = { x: 79, y: 37 } as const;
 const KNOT = { x: 61, y: 17 } as const;
 const DESK = { x: 70, y: 78 } as const;
-const FIGURE = { x: 71, bottom: 93, width: 6.4 } as const;
+// `width` is the chair's footprint (its legs); each pose scales to that, so the
+// chair stays the same size while the figure changes pose.
+const FIGURE = { x: 71, bottom: 93, width: 4.4 } as const;
 
 // Trays: clock, calendar, envelope, ID card, folder. `t` is the second of the
 // loop at which this tray's sheet leaves the stack; its flight takes 1.2 s.
@@ -40,18 +42,23 @@ const TRAYS = [
   { n: 5, x: 69, y: 43, w: 7.8, iw: 320, ih: 219, t: 5.6, tilt: -1 },
 ] as const;
 
+// Sheets are small and land at the front-left lip of their tray, so the
+// object in the tray (the system) stays visible.
 const SHEETS = [
-  { n: 1, w: 3.4, iw: 170, ih: 195, rot: -14 },
-  { n: 2, w: 3.2, iw: 170, ih: 164, rot: 9 },
-  { n: 3, w: 4.6, iw: 250, ih: 149, rot: -6 },
-  { n: 4, w: 3.2, iw: 170, ih: 160, rot: 12 },
-  { n: 5, w: 3.1, iw: 170, ih: 141, rot: -9 },
+  { n: 1, w: 2.4, iw: 170, ih: 195, rot: -22 },
+  { n: 2, w: 2.3, iw: 170, ih: 164, rot: 14 },
+  { n: 3, w: 3.2, iw: 250, ih: 149, rot: -10 },
+  { n: 4, w: 2.3, iw: 170, ih: 160, rot: 18 },
+  { n: 5, w: 2.2, iw: 170, ih: 141, rot: -14 },
 ] as const;
+const LANDING = { dx: -2.2, dy: 1.6 } as const;
 
+// Measured on the full-resolution sprites: the chair legs' span and left edge,
+// so every pose is scaled and shifted to the same chair footprint.
 const POSES = [
-  { pose: 1, iw: 300, ih: 530 },
-  { pose: 2, iw: 300, ih: 611 },
-  { pose: 3, iw: 300, ih: 501 },
+  { pose: 1, iw: 300, ih: 530, legs: 352, legsLeft: 81, native: 516 },
+  { pose: 2, iw: 300, ih: 611, legs: 346, legsLeft: 94, native: 561 },
+  { pose: 3, iw: 300, ih: 501, legs: 358, legsLeft: 145, native: 551 },
 ] as const;
 
 const PLATE_RATIO = PLATE.width / PLATE.height;
@@ -115,10 +122,13 @@ export function PaperHero({
     return () => window.clearInterval(timer);
   }, [painted]);
 
-  const opacities = plateOpacities(weights);
+  // One plate shows at a time: a blend would double-expose the desk and the
+  // mug, which differ slightly between plates. The sun picks the plate and the
+  // switch is a short cross-fade (globals.css).
+  const plate = dominantPlate(weights);
   const plateStyle = {
-    '--o-midday': loaded.midday ? opacities.midday : 0,
-    '--o-afternoon': loaded.afternoon ? opacities.afternoon : 0,
+    '--o-midday': plate !== 'morning' && loaded.midday ? 1 : 0,
+    '--o-afternoon': plate === 'afternoon' && loaded.afternoon ? 1 : 0,
   } as CSSProperties;
 
   return (
@@ -272,8 +282,8 @@ export function PaperHero({
                 left: `${STACK_TOP.x}%`,
                 top: `${STACK_TOP.y}%`,
                 width: `${sheet.w}%`,
-                '--dx': tray.x - STACK_TOP.x,
-                '--dy': tray.y - 2.5 - STACK_TOP.y,
+                '--dx': tray.x + LANDING.dx - STACK_TOP.x,
+                '--dy': tray.y + LANDING.dy - STACK_TOP.y,
                 '--rot': `${sheet.rot}deg`,
                 '--t': `${tray.t}s`,
               } as CSSProperties
@@ -321,6 +331,10 @@ export function PaperHero({
             alt=""
             loading={pose.pose === 2 ? 'eager' : 'lazy'}
             decoding="async"
+            style={{
+              width: `${(100 * pose.native) / pose.legs}%`,
+              left: `${(-100 * pose.legsLeft) / pose.legs}%`,
+            }}
           />
         ))}
       </div>

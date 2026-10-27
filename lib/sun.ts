@@ -88,3 +88,10 @@ export function plateOpacities(weights: PlateWeights) {
     afternoon >= 1 ? 1 : Math.min(1, weights.midday / (1 - afternoon));
   return { morning: 1, midday, afternoon };
 }
+
+// The plate the sun favours right now; the hero shows exactly one.
+export function dominantPlate(weights: PlateWeights): keyof PlateWeights {
+  return (Object.keys(weights) as (keyof PlateWeights)[]).reduce((best, key) =>
+    weights[key] > weights[best] ? key : best,
+  );
+}

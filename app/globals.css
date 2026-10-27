@@ -247,10 +247,10 @@ footer > a:last-child:hover {
 }
 .hero-plate {
   object-fit: cover;
-  transition: opacity 2.5s ease;
+  transition: opacity 1.2s ease;
 }
-/* Morning is the opaque base; the plates above carry derived opacities
-   (lib/sun.ts plateOpacities), so the blend never shows the wall through. */
+/* Morning is the opaque base; the plate the sun favours sits on top at full
+   opacity (lib/sun.ts dominantPlate), so the room is never a double exposure. */
 .hero-plate[data-plate='morning'] {
   opacity: 1;
 }
@@ -259,7 +259,7 @@ footer > a:last-child:hover {
 }
 .hero-plate[data-plate='afternoon'] {
   /* The low-sun plate is the darkest; it never takes the room fully. */
-  opacity: calc(var(--o-afternoon, 0) * 0.8);
+  opacity: calc(var(--o-afternoon, 0) * 0.82);
 }
 
 /* The mobile: thread, knot and arms in SVG, trays as sprites. */
@@ -383,8 +383,6 @@ footer > a:last-child:hover {
 .hero-figure img {
   position: absolute;
   bottom: 0;
-  left: 0;
-  width: 100%;
   height: auto;
   opacity: 0;
   filter: drop-shadow(0 1cqh 1.2cqh rgba(11, 22, 48, 0.22));

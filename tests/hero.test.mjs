@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import test from 'node:test';
 
 import {
+  dominantPlate,
   HERO_LOCATION,
   plateOpacities,
   plateWeights,
@@ -244,8 +245,33 @@ test('the plates stay opaque while they cross-fade: the room never goes transluc
   assert.ok(Math.abs(dusk.afternoon - 0.7) < 1e-9);
   const night = plateOpacities({ morning: 0, midday: 0, afternoon: 1 });
   assert.deepEqual(night, { morning: 1, midday: 1, afternoon: 1 });
-  assert.match(hero, /plateOpacities\(/);
   assert.match(styles, /\.hero-plate\[data-plate='morning'\]\s*\{[^}]*opacity:\s*1;/s);
+});
+
+test('exactly one plate shows at a time, so the desk and mug never double-expose', () => {
+  assert.equal(dominantPlate({ morning: 0.6, midday: 0.4, afternoon: 0 }), 'morning');
+  assert.equal(dominantPlate({ morning: 0, midday: 0.55, afternoon: 0.45 }), 'midday');
+  assert.equal(dominantPlate({ morning: 0, midday: 0.2, afternoon: 0.8 }), 'afternoon');
+  assert.match(hero, /dominantPlate\(weights\)/);
+  assert.doesNotMatch(hero, /'--o-midday':\s*(loaded\.midday \? )?opacities/);
+});
+
+test('every pose is scaled to the same chair footprint', () => {
+  const poses = [...hero.matchAll(/\{ pose: (\d), iw: \d+, ih: \d+, legs: (\d+), legsLeft: (\d+), native: (\d+) \}/g)];
+  assert.equal(poses.length, 3);
+  for (const [, , legs] of poses) {
+    // The chairs were generated separately; their leg spans agree within 4 %.
+    assert.ok(Math.abs(Number(legs) - 352) / 352 < 0.04, `legs ${legs}`);
+  }
+  assert.match(hero, /width: `\$\{\(100 \* pose\.native\) \/ pose\.legs\}%`/);
+  assert.match(hero, /left: `\$\{\(-100 \* pose\.legsLeft\) \/ pose\.legs\}%`/);
+});
+
+test('landed sheets sit at the lip of the tray and stay small, so the tray object stays visible', () => {
+  assert.match(hero, /const LANDING = \{ dx: -[0-9.]+, dy: [0-9.]+ \}/);
+  for (const [, width] of hero.matchAll(/\{ n: \d, w: ([0-9.]+), iw: \d+, ih: \d+, rot:/g)) {
+    assert.ok(Number(width) <= 3.2, `sheet width ${width}% of the stage`);
+  }
 });
 
 test('the generation record keeps the served and source assets apart', () => {
