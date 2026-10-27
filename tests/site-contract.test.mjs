@@ -350,6 +350,7 @@ test('on phones the situations are one scrollable row of chips and the playback 
   // One row that scrolls sideways, never a stack of five tall rows.
   assert.match(phone, /\.scenario-tabs \{[^}]*overflow-x: auto/);
   assert.match(phone, /\.scenario-tabs \{[^}]*flex-wrap: nowrap/);
+  assert.match(phone, /\.scenario-tabs \{[^}]*justify-content: flex-start/);
   assert.doesNotMatch(phone, /\.scenario-tabs \{[^}]*flex-direction: column/);
   assert.match(
     phone,

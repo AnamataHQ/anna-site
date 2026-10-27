@@ -1956,6 +1956,8 @@ footer > a:last-child {
     min-width: 0;
     flex: 1 1 auto;
     flex-wrap: nowrap;
+    /* Centred content would overflow to the left, out of reach of the scroll. */
+    justify-content: flex-start;
     overflow-x: auto;
     scrollbar-width: none;
     scroll-snap-type: x proximity;
