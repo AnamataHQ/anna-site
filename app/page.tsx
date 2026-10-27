@@ -16,13 +16,7 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import Image from 'next/image';
-import {
-  type CSSProperties,
-  type MouseEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
 import { PaperHero } from '@/components/paper-hero';
@@ -64,7 +58,7 @@ const content = {
       'Anna works through MCP connectors that sign in with OAuth. You grant the rights, she works within them.',
     ringLabel: 'Among thousands of connectors',
     ringAria:
-      "A paper disc with Anna's mark, with a slow stream of paper discs passing beneath it, each with the mark and name of one system. As each disc passes, a thread drops from Anna's disc to it and lights up.",
+      "A paper disc with Anna's mark, with twelve smaller paper discs pinned around it, each with the mark and name of one system, and a paper thread from Anna's disc to every one of them. A few threads run on past the edge of the picture.",
     customBody:
       'If it has a workable API, Anamata can build a connector for it during onboarding.',
     requestConnector: 'Request a connector',
@@ -227,7 +221,7 @@ const content = {
       'Anna werkt via MCP-koppelingen die inloggen met OAuth. Jij geeft de rechten, zij werkt daarbinnen.',
     ringLabel: 'Een greep uit duizenden koppelingen',
     ringAria:
-      "Een papieren schijf met het merk van Anna, met daaronder een langzame stroom papieren schijfjes, elk met het merk en de naam van één systeem. Bij elk schijfje dat passeert, zakt er een draad van Anna's schijf naar beneden en licht op.",
+      "Een papieren schijf met het merk van Anna, met daaromheen twaalf kleinere papieren schijfjes, elk met het merk en de naam van één systeem, en een papieren draad van Anna's schijf naar elk schijfje. Een paar draden lopen door tot voorbij de rand van het beeld.",
     customBody:
       'Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen.',
     requestConnector: 'Vraag een koppeling aan',
@@ -362,22 +356,43 @@ const content = {
   },
 } as const;
 
-// Twelve of the thousands of connectors, in the order they drift past
-// Anna's knot. Teams is not among them: the hero already names it as the
-// place you ask Anna.
+// Twelve of the thousands of connectors, pinned around Anna's knot like
+// string on a corkboard: `x`/`y` in percent of the stage, `depth` 1 (near,
+// large) to 3 (far, small and faint). Teams is not among them: the hero
+// already names it as the place you ask Anna.
+const KNOT = { x: 44, y: 46 } as const;
 const connectors = [
-  { name: 'Microsoft 365', icon: '/brands/microsoft-365.svg' },
-  { name: 'Jira', icon: '/brands/jira.svg' },
-  { name: 'Slack', icon: '/brands/slack.svg' },
-  { name: 'Loket', icon: '/brands/loket.png' },
-  { name: 'Notion', icon: '/brands/notion.svg' },
-  { name: 'GitHub', icon: '/brands/github.svg' },
-  { name: 'HubSpot', icon: '/brands/hubspot.svg' },
-  { name: 'ClockWise', icon: '/brands/clockwise.png' },
-  { name: 'Google Drive', icon: '/brands/google-drive.svg' },
-  { name: 'Confluence', icon: '/brands/confluence.svg' },
-  { name: 'Azure', icon: '/brands/azure.svg' },
-  { name: 'Asana', icon: '/brands/asana.svg' },
+  {
+    name: 'Microsoft 365',
+    icon: '/brands/microsoft-365.svg',
+    x: 23,
+    y: 28,
+    depth: 1,
+  },
+  { name: 'Jira', icon: '/brands/jira.svg', x: 61, y: 20, depth: 1 },
+  { name: 'Slack', icon: '/brands/slack.svg', x: 70, y: 60, depth: 1 },
+  { name: 'Loket', icon: '/brands/loket.png', x: 31, y: 72, depth: 1 },
+  { name: 'Notion', icon: '/brands/notion.svg', x: 52, y: 80, depth: 2 },
+  { name: 'GitHub', icon: '/brands/github.svg', x: 85, y: 30, depth: 2 },
+  { name: 'HubSpot', icon: '/brands/hubspot.svg', x: 11, y: 54, depth: 2 },
+  { name: 'ClockWise', icon: '/brands/clockwise.png', x: 40, y: 12, depth: 2 },
+  {
+    name: 'Google Drive',
+    icon: '/brands/google-drive.svg',
+    x: 91,
+    y: 74,
+    depth: 3,
+  },
+  { name: 'Confluence', icon: '/brands/confluence.svg', x: 7, y: 20, depth: 3 },
+  { name: 'Azure', icon: '/brands/azure.svg', x: 77, y: 7, depth: 3 },
+  { name: 'Asana', icon: '/brands/asana.svg', x: 18, y: 90, depth: 3 },
+] as const;
+// Threads that run on past the edge, to systems we never show.
+const LOOSE_THREADS = [
+  { x: 105, y: 48 },
+  { x: -5, y: 84 },
+  { x: 97, y: 106 },
+  { x: 56, y: -8 },
 ] as const;
 
 // The tray sprites of the hero double as the use-case pictograms, so they
@@ -605,40 +620,43 @@ export default function Home() {
           </div>
           <div className="connector-panel">
             <p className="integration-panel-label">{t.ringLabel}</p>
-            <div
-              className="connector-stage"
-              aria-hidden="true"
-              style={{ '--n': connectors.length } as CSSProperties}
-            >
-              {/* Anna: the knot from the hero, her mark on it. A thread drops
-                  from it to each disc that passes underneath and lights up. */}
-              <div className="connector-knot">
+            <div className="connector-stage" aria-hidden="true">
+              <svg className="connector-threads">
+                {[...connectors, ...LOOSE_THREADS].map((end, index) => (
+                  <line
+                    key={index}
+                    x1={`${KNOT.x}%`}
+                    y1={`${KNOT.y}%`}
+                    x2={`${end.x}%`}
+                    y2={`${end.y}%`}
+                    data-depth={'depth' in end ? end.depth : 3}
+                  />
+                ))}
+              </svg>
+              {connectors.map((connector) => (
+                <span
+                  className="connector-disc"
+                  key={connector.name}
+                  data-depth={connector.depth}
+                  style={{ left: `${connector.x}%`, top: `${connector.y}%` }}
+                >
+                  <span className="connector-disc-face">
+                    <Image src={connector.icon} alt="" width={28} height={28} />
+                  </span>
+                  <small>{connector.name}</small>
+                </span>
+              ))}
+              {/* Anna: the knot from the hero, her mark on it, a thread to every system. */}
+              <div
+                className="connector-knot"
+                style={{ left: `${KNOT.x}%`, top: `${KNOT.y}%` }}
+              >
                 <Image
                   src="/brands/anna-mono-dark.svg"
                   width={12}
                   height={12}
                   alt=""
                 />
-              </div>
-              <span className="connector-thread" />
-              <div className="connector-stream">
-                {connectors.map((connector, index) => (
-                  <span
-                    className="connector-disc"
-                    key={connector.name}
-                    style={{ '--i': index } as CSSProperties}
-                  >
-                    <span className="connector-disc-face">
-                      <Image
-                        src={connector.icon}
-                        alt=""
-                        width={28}
-                        height={28}
-                      />
-                    </span>
-                    <small>{connector.name}</small>
-                  </span>
-                ))}
               </div>
             </div>
             <p className="sr-only">{t.ringAria}</p>

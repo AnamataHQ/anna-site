@@ -723,36 +723,45 @@ footer > a:last-child:hover {
   box-shadow: 0 30px 80px rgba(11, 22, 48, 0.08);
 }
 
-/* The connector stream: Anna's knot (the hero's paper disc with her mark)
-   with paper discs drifting past beneath it, each with one system's mark.
-   One CSS loop (`--stream-loop`) drives the drift; every `--stream-period`
-   a disc passes under the knot, a thread drops from the knot to it, lights
-   coral, and lets go. Nothing here is JavaScript. */
+/* The connectors: a still paper string map. Anna's knot (the hero's paper
+   disc with her mark) with twelve discs pinned around it, one thread from the
+   knot to each, a few threads running on past the edge. Nothing moves. */
 .connector-stage {
-  --stream-loop: 60s;
-  --stream-period: calc(var(--stream-loop) / var(--n, 12));
-  --stream-travel: 150cqw;
-  --stream-rise: 3cqw;
-  --lane: 60cqh;
-  --knot: 7cqw;
-  --knot-y: 12cqh;
-  --disc: 8cqw;
-  /* From the knot's underside to the top of a disc at the centre. */
-  --thread: calc(
-    var(--lane) - var(--stream-rise) - var(--knot-y) - var(--knot) * 0.9
-  );
+  --knot: 6.4cqw;
+  --disc: 6cqw;
   position: relative;
-  container-type: size;
-  aspect-ratio: 16 / 5;
-  margin: -0.5rem 0 1.5rem;
+  container-type: inline-size;
+  aspect-ratio: 16 / 6;
+  margin: -0.5rem 0 1.25rem;
   overflow: hidden;
   border-radius: 1rem;
   background: linear-gradient(180deg, var(--paper-light), var(--paper));
+  mask-image: radial-gradient(
+    ellipse 58% 70% at 44% 46%,
+    black 55%,
+    transparent 100%
+  );
+}
+.connector-threads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.connector-threads line {
+  stroke: rgba(11, 22, 48, 0.42);
+  stroke-width: 1.5;
+}
+.connector-threads line[data-depth='2'] {
+  stroke: rgba(11, 22, 48, 0.3);
+}
+.connector-threads line[data-depth='3'] {
+  stroke: rgba(11, 22, 48, 0.2);
+  stroke-width: 1;
 }
 .connector-knot {
   position: absolute;
-  left: 50%;
-  top: var(--knot-y);
   z-index: 2;
   display: flex;
   align-items: center;
@@ -762,60 +771,30 @@ footer > a:last-child:hover {
   border: 1px solid rgba(11, 22, 48, 0.22);
   border-radius: 50%;
   background: var(--paper-light);
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   box-shadow: 0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.16);
-  animation: connector-knot var(--stream-period) ease-out infinite;
-  animation-delay: calc(-1.2 * var(--stream-period));
 }
 .connector-knot img {
   width: 56%;
   height: auto;
 }
-/* The thread hangs from the knot's underside down to the lane. It drops as a
-   disc nears the centre, swings with it while attached, and retracts. */
-.connector-thread {
-  position: absolute;
-  left: 50%;
-  top: calc(var(--knot-y) + var(--knot) * 0.9);
-  z-index: 1;
-  width: 2px;
-  height: var(--thread);
-  margin-left: -1px;
-  background: rgba(11, 22, 48, 0.5);
-  transform-origin: 50% 0;
-  transform: scaleY(0);
-  animation: connector-thread var(--stream-period) linear infinite;
-  animation-delay: calc(-1.2 * var(--stream-period));
-}
-.connector-stream {
-  position: absolute;
-  inset: 0;
-  mask-image: linear-gradient(
-    90deg,
-    transparent,
-    black 14%,
-    black 86%,
-    transparent
-  );
-}
 .connector-disc {
   position: absolute;
-  left: 50%;
-  top: var(--lane);
+  z-index: 1;
   display: flex;
   width: var(--disc);
   flex-direction: column;
   align-items: center;
-  gap: 0.5cqw;
-  margin-left: calc(var(--disc) / -2);
-  /* Spread out when still (reduced motion); the drift overrides this. */
-  transform: translateX(
-    calc(
-      (var(--i) - (var(--n, 12) - 1) / 2) * var(--stream-travel) / var(--n, 12)
-    )
-  );
-  animation: connector-drift var(--stream-loop) linear infinite;
-  animation-delay: calc(-1 * var(--i) * var(--stream-period));
+  gap: 0.4cqw;
+  transform: translate(-50%, -50%);
+}
+.connector-disc[data-depth='2'] {
+  width: calc(var(--disc) * 0.84);
+  opacity: 0.9;
+}
+.connector-disc[data-depth='3'] {
+  width: calc(var(--disc) * 0.68);
+  opacity: 0.72;
 }
 .connector-disc small {
   color: #626a78;
@@ -826,9 +805,11 @@ footer > a:last-child:hover {
   text-transform: uppercase;
   white-space: nowrap;
 }
+.connector-disc[data-depth='3'] small {
+  font-size: 0.48rem;
+}
 /* A paper disc like the knot, carrying one mark. */
 .connector-disc-face {
-  position: relative;
   display: flex;
   width: 100%;
   aspect-ratio: 1;
@@ -837,106 +818,12 @@ footer > a:last-child:hover {
   border: 1px solid rgba(11, 22, 48, 0.22);
   border-radius: 50%;
   background: var(--paper-light);
-  box-shadow: 0 0.6cqw 1.4cqw rgba(11, 22, 48, 0.16);
-}
-.connector-disc-face::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border: 2px solid var(--coral);
-  border-radius: 50%;
-  opacity: 0;
-  animation: connector-pulse var(--stream-loop) ease-out infinite;
-  animation-delay: calc(-1 * var(--i) * var(--stream-period));
+  box-shadow: 0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.14);
 }
 .connector-disc-face img {
   width: 54%;
   height: 54%;
   object-fit: contain;
-}
-/* Right to left across the stage, rising a little under the knot. */
-@keyframes connector-drift {
-  0% {
-    transform: translate(calc(var(--stream-travel) / 2), 0);
-  }
-  25% {
-    transform: translate(
-      calc(var(--stream-travel) / 4),
-      calc(var(--stream-rise) * -0.7)
-    );
-  }
-  50% {
-    transform: translate(0, calc(-1 * var(--stream-rise)));
-  }
-  75% {
-    transform: translate(
-      calc(var(--stream-travel) / -4),
-      calc(var(--stream-rise) * -0.7)
-    );
-  }
-  100% {
-    transform: translate(calc(var(--stream-travel) / -2), 0);
-  }
-}
-/* One period is one passage; the delay puts 0% a fifth of a period before
-   the disc reaches the centre, so the disc is under the knot at 20%. */
-@keyframes connector-thread {
-  0% {
-    transform: rotate(-3deg) scaleY(0);
-    background: rgba(11, 22, 48, 0.5);
-  }
-  16% {
-    transform: rotate(-3deg) scaleY(1);
-    background: rgba(11, 22, 48, 0.5);
-  }
-  19% {
-    background: var(--coral);
-  }
-  27% {
-    transform: rotate(3deg) scaleY(1);
-    background: var(--coral);
-  }
-  30% {
-    background: rgba(11, 22, 48, 0.5);
-  }
-  40%,
-  100% {
-    transform: rotate(3deg) scaleY(0);
-    background: rgba(11, 22, 48, 0.5);
-  }
-}
-@keyframes connector-knot {
-  0%,
-  18% {
-    box-shadow: 0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.16);
-  }
-  21% {
-    box-shadow:
-      0 0 0 0.25cqw rgba(255, 92, 66, 0.9),
-      0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.16);
-  }
-  36%,
-  100% {
-    box-shadow:
-      0 0 0 1.6cqw rgba(255, 92, 66, 0),
-      0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.16);
-  }
-}
-@keyframes connector-pulse {
-  0%,
-  49% {
-    opacity: 0;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1);
-  }
-  54%,
-  100% {
-    opacity: 0;
-    transform: scale(1.5);
-  }
 }
 .use-case-section {
   background: var(--paper-light);
@@ -1049,17 +936,21 @@ footer {
     transform: translateX(max(-66%, calc(50cqw - 100%)));
   }
   .connector-stage {
-    --stream-travel: 260cqw;
-    --stream-rise: 4cqw;
-    --stream-travel: 300cqw;
-    --lane: 56cqh;
-    --knot: 12cqw;
-    --knot-y: 8cqh;
-    --disc: 15cqw;
-    aspect-ratio: 16 / 10;
+    --knot: 13cqw;
+    --disc: 12cqw;
+    aspect-ratio: 4 / 3;
+    mask-image: radial-gradient(
+      ellipse 62% 62% at 44% 46%,
+      black 55%,
+      transparent 100%
+    );
   }
   .connector-disc small {
     font-size: 0.5rem;
+  }
+  /* The far discs sit in the fade; their names would be clipped. */
+  .connector-disc[data-depth='3'] small {
+    display: none;
   }
 }
 
@@ -1935,13 +1826,6 @@ footer > a:last-child {
   }
   .hero-plate {
     transition: none;
-  }
-  /* The stream stands still: discs spread out, no thread, the knot at rest. */
-  .connector-disc,
-  .connector-disc-face::after,
-  .connector-knot,
-  .connector-thread {
-    animation: none;
   }
 }
 

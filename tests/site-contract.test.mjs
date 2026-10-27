@@ -204,7 +204,7 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
 });
 
-test('sells the connectors first: a stream of twelve marks, thousands available, no tested-with list', () => {
+test('sells the connectors first: twelve marks tied to Anna, thousands available, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
     'Jira',
@@ -234,7 +234,7 @@ test('sells the connectors first: a stream of twelve marks, thousands available,
   }
   assert.equal([...block.matchAll(/icon: '/g)].length, stream.length);
   for (const gone of ['Microsoft Teams', 'Mendix']) {
-    assert.ok(!block.includes(gone), `${gone} is not a stream connector`);
+    assert.ok(!block.includes(gone), `${gone} is not a map connector`);
   }
   const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
     (match) => match[1],
@@ -274,23 +274,25 @@ test('sells the connectors first: a stream of twelve marks, thousands available,
   }
 });
 
-test('the connector stream passes under Anna\'s knot in CSS and stands still under reduced motion', () => {
-  // The stage is decoration; every disc carries its own name, nothing is listed below.
+test('the connectors are a still paper string map tied to Anna\'s knot, fading at the edges', () => {
+  // The map is decoration; every disc carries its own name, nothing is listed below.
   assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
   assert.match(page, /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/);
-  assert.match(page, /className="connector-thread"/);
-  assert.match(page, /className="connector-stream"/);
-  assert.match(page, /className="connector-disc"[\s\S]{0,600}<small>\{connector\.name\}<\/small>/);
-  assert.doesNotMatch(page, /connector-names/);
-  assert.doesNotMatch(page, /connector-figure|\/hero\/seated-/);
+  assert.match(page, /<svg className="connector-threads"/);
+  assert.match(page, /className="connector-disc"[\s\S]{0,700}<small>\{connector\.name\}<\/small>/);
+  assert.doesNotMatch(page, /connector-names|connector-stream|connector-figure|\/hero\/seated-/);
   assert.doesNotMatch(hero, /export const POSES/);
-  // One CSS loop drives the drift, the thread and the knot; no JavaScript timers.
-  assert.match(styles, /--stream-loop/);
-  assert.match(styles, /@keyframes connector-drift/);
-  assert.match(styles, /@keyframes connector-thread/);
-  assert.match(styles, /@keyframes connector-knot/);
-  const reduced = styles.slice(styles.indexOf('@media (prefers-reduced-motion: reduce)'));
-  assert.match(reduced, /\.connector-disc,[\s\S]*animation: none/);
+  // One thread from the knot to every disc, and a few that leave the frame.
+  const block = page.slice(
+    page.indexOf('const connectors = ['),
+    page.indexOf('] as const;', page.indexOf('const connectors = [')),
+  );
+  assert.equal([...block.matchAll(/x: \d+,\s*y: \d+/g)].length, 12);
+  assert.match(page, /const LOOSE_THREADS = \[/);
+  // Nothing moves: no animation, nothing for reduced motion to switch off.
+  assert.doesNotMatch(styles, /@keyframes connector-/);
+  assert.doesNotMatch(styles, /\.connector-[a-z-]+ \{[^}]*animation/);
+  assert.match(styles, /\.connector-stage \{[^}]*mask-image/);
 });
 
 test('tells the story in the agreed order', () => {

@@ -82,15 +82,15 @@ colour stay exact.
 Ambient, always: the mobile sways, window light patch follows the real sun (plates), grain
 over everything. Reduced motion: one static frame with the folder on the desk.
 
-## Connector stream (2026-10-27)
-The connectors section reuses only the knot: Anna's paper disc with her mark hangs at the
-top of a stage, and twelve paper discs, each with one system's mark and name
-(`public/brands`), drift right to left beneath it in CSS (`.connector-stage` in
-globals.css, one 60 s loop, edges masked so the stream reads as endless). Every 5 s a disc
-passes under the knot: a thread drops from the knot to it, turns coral, swings with the disc
-for half a second and retracts; the knot and the disc flash coral. Reduced motion: discs
-spread out, no thread. A first version put the hero's seated figure in a ring of orbiting
-discs; Ezra rejected it the same day (the figure is the visitor, not Anna).
+## Connector string map (2026-10-27)
+The connectors section reuses only the knot: Anna's paper disc with her mark, with twelve
+paper discs pinned around it at three depths (near, mid, far: smaller and fainter), one
+thread from the knot to each, drawn as SVG lines in percent coordinates, and four loose
+threads running on past the edge. The stage fades out radially so the map never reads as
+the full list. Nothing moves (`.connector-stage` in globals.css; positions in
+`app/page.tsx`). Two earlier versions the same day were rejected by Ezra: the hero figure in
+a ring of orbiting discs (the figure is the visitor, not Anna) and a stream of discs under
+the knot with a thread reaching for each (too much interaction, too cliché).
 
 ## Generation record (Higgsfield, 2026-10-27)
 Sketch: seedream_v5_pro, 16:9, image reference = round-five paper sketch (job
