@@ -976,7 +976,7 @@ export default function Home() {
                     aria-label={t.replay}
                   >
                     <RotateCcw size={15} aria-hidden="true" />
-                    {t.replay}
+                    <span>{t.replay}</span>
                   </button>
                   {!reduceMotion && demoStep < questionStep && (
                     <button
@@ -989,7 +989,7 @@ export default function Home() {
                       ) : (
                         <Pause size={15} aria-hidden="true" />
                       )}
-                      {isPaused ? t.resume : t.pause}
+                      <span>{isPaused ? t.resume : t.pause}</span>
                     </button>
                   )}
                 </div>

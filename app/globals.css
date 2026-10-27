@@ -1940,17 +1940,57 @@ footer > a:last-child {
   .anna-tray strong {
     white-space: normal;
   }
+  /* The situations: one row of chips that scrolls sideways; replay and
+     pause as icons beside it. The chat gets the width of the phone. */
+  .scenario-shell.paper-panel {
+    padding: 0.75rem;
+    border-radius: 1.2rem;
+  }
+  .scenario-controls {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
   .scenario-tabs {
-    align-items: stretch;
-    flex-direction: column;
-    border-radius: 1rem;
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    border-radius: 999px;
+  }
+  .scenario-tabs::-webkit-scrollbar {
+    display: none;
   }
   .scenario-tabs [data-slot='tabs-trigger'] {
-    justify-content: flex-start;
+    flex: 0 0 auto;
+    min-height: 36px;
+    scroll-snap-align: start;
     padding: 0 0.8rem;
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+  .playback-controls {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    gap: 0.35rem;
+  }
+  .playback-controls button {
+    width: 40px;
+    min-height: 40px;
+    justify-content: center;
+    padding: 0;
+  }
+  .playback-controls button span {
+    display: none;
+  }
+  .demo-hint {
+    margin: 0.6rem 0.25rem 0.9rem;
   }
   .demo-thread {
-    min-height: 680px;
+    min-height: 420px;
   }
   .message-row {
     gap: 0.5rem;

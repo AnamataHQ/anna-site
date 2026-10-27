@@ -343,6 +343,32 @@ test('tells the story in the agreed order', () => {
   assert.match(styles, /\.connectors,[\s\S]{0,120}content-visibility: auto/);
 });
 
+test('on phones the situations are one scrollable row of chips and the playback buttons are icon-only', () => {
+  // The first 500px block styles the page; a later one styles the lead dialog.
+  const start = styles.indexOf('@media (max-width: 500px)');
+  const phone = styles.slice(start, styles.indexOf('@media', start + 1));
+  // One row that scrolls sideways, never a stack of five tall rows.
+  assert.match(phone, /\.scenario-tabs \{[^}]*overflow-x: auto/);
+  assert.match(phone, /\.scenario-tabs \{[^}]*flex-wrap: nowrap/);
+  assert.doesNotMatch(phone, /\.scenario-tabs \{[^}]*flex-direction: column/);
+  assert.match(
+    phone,
+    /\.scenario-tabs \[data-slot='tabs-trigger'\] \{[^}]*white-space: nowrap/,
+  );
+  // Replay and pause keep their accessible names but show only the icon.
+  assert.match(
+    page,
+    /<RotateCcw size=\{15\} aria-hidden="true" \/>\s*<span>\{t\.replay\}<\/span>/,
+  );
+  assert.match(phone, /\.playback-controls button span \{[^}]*display: none/);
+  assert.match(phone, /\.playback-controls button \{[^}]*width: 40px/);
+  // The chat window is not padded out to a fixed tall block.
+  assert.match(phone, /\.demo-thread \{[^}]*min-height: 420px/);
+  assert.doesNotMatch(phone, /\.demo-thread \{[^}]*min-height: 680px/);
+  // The panel gives the chat the width of the phone.
+  assert.match(phone, /\.scenario-shell\.paper-panel \{[^}]*padding: 0\.75rem/);
+});
+
 test('includes transparency and accessibility essentials', () => {
   assert.match(page, /EXAMPLE · NOT A LIVE RECORD/);
   assert.match(page, /aria-label=/);
