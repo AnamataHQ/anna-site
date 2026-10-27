@@ -52,7 +52,7 @@ const content = {
       'Asks before she acts, within the rights you grant',
     ],
     heroAria:
-      'A paper-craft room. A small figure at a desk raises one card. Sheets peel off a hanging stack of paper into five paper trays, one with a clock, a calendar, an envelope, an ID card and a folder. The folder comes back down to the desk.',
+      'A paper-craft room. A small figure at a desk raises one card. Sheets peel off a hanging stack of paper into five paper trays, each holding one object: a clock, a calendar, an envelope, an ID card or a folder. The folder comes back down to the desk.',
     slingTag: 'for Anna',
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
@@ -103,7 +103,7 @@ const content = {
           'Anna checks your balance and the policy, prepares the request and files it after your approval.',
       },
       {
-        tray: 4,
+        tray: 3,
         title: 'Follow-up in HubSpot',
         ask: 'Who did we promise a follow-up this week?',
         outcome:
@@ -215,7 +215,7 @@ const content = {
       'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
     ],
     heroAria:
-      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog. Vellen papier glijden van een hangende stapel in vijf papieren bakjes, met een klok, een kalender, een envelop, een pasje en een map. De map komt terug op het bureau.',
+      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog. Vellen papier glijden van een hangende stapel in vijf papieren bakjes, elk met één voorwerp: een klok, een kalender, een envelop, een pasje of een map. De map komt terug op het bureau.',
     slingTag: 'voor Anna',
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
@@ -267,7 +267,7 @@ const content = {
           'Anna controleert je saldo en het beleid, bereidt de aanvraag voor en dient hem in na jouw goedkeuring.',
       },
       {
-        tray: 4,
+        tray: 3,
         title: 'Opvolging in HubSpot',
         ask: 'Wie hebben we deze week een opvolging beloofd?',
         outcome:
@@ -278,7 +278,7 @@ const content = {
     workflowTitle: 'Bekijk hoe het werk gebeurt.',
     workflowIntro:
       'Een collega vraagt iets in Microsoft Teams of Slack. Anna haalt de juiste context op, pauzeert voor goedkeuring als dat nodig is en meldt het afgeronde resultaat in hetzelfde gesprek.',
-    demoLabel: 'DEMO · NOT THE LIVE RECORD',
+    demoLabel: 'DEMO · GEEN ECHT DOSSIER',
     demoChannel: 'Microsoft Teams · Anna',
     retrieving: 'Context ophalen',
     ready: 'Context gereed',
@@ -374,7 +374,7 @@ const connectors = [
 const traySizes = {
   1: { width: 320, height: 217 },
   2: { width: 320, height: 206 },
-  4: { width: 320, height: 172 },
+  3: { width: 320, height: 172 },
 } as const;
 
 export default function Home() {
@@ -388,7 +388,7 @@ export default function Home() {
   const [reduceMotion, setReduceMotion] = useState(false);
   const executionTimerRef = useRef<number | null>(null);
   const [heroRef, heroVisible, heroHasEntered] =
-    useElementVisibility<HTMLDivElement>(0.1);
+    useElementVisibility<HTMLDivElement>(0.45);
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
   const t = content[language];

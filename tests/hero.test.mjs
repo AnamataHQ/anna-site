@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import test from 'node:test';
 
-import { HERO_LOCATION, plateWeights, solarAltitude } from '../lib/sun.ts';
+import {
+  HERO_LOCATION,
+  plateOpacities,
+  plateWeights,
+  solarAltitude,
+} from '../lib/sun.ts';
 
 // The paper-craft hero (design/hero/README.md): plates cross-faded by the real
 // sun, sprites on code-drawn threads, a 12 s loop, and a hard byte budget.
@@ -26,6 +31,16 @@ test('every hero image the component references is served from the export', () =
   for (const ref of heroImages) {
     assert.ok(referenced(ref), `served but unused: ${ref}`);
   }
+  // And the other way round: every literal or templated reference has files.
+  for (const [, name] of hero.matchAll(/\/hero\/([a-z0-9-]+\.webp)/g)) {
+    assert.ok(heroImages.includes(`/hero/${name}`), `referenced but missing: ${name}`);
+  }
+  for (const [, prefix] of hero.matchAll(/\/hero\/([a-z]+)-\$\{/g)) {
+    assert.ok(
+      heroImages.some((ref) => ref.startsWith(`/hero/${prefix}-`)),
+      `no files for template ${prefix}-`,
+    );
+  }
   if (!existsSync(exportDir)) return; // build-dependent; CI builds first
   for (const ref of heroImages) {
     assert.ok(
@@ -47,7 +62,7 @@ test('the hero payload stays small: plates under 40 KB each, all images under 30
   assert.ok(total <= 300_000, `hero images total ${total} bytes`);
 });
 
-test('only the morning plate loads eagerly; the other plates and the sprites wait', () => {
+test('only the morning plate is fetched with priority; the other plates mount after first paint and fade in once loaded', () => {
   // The first paint needs one plate. The others mount after the page has
   // painted and cross-fade in by sun altitude.
   const morning = hero.match(/<img[^>]*plate-morning[^>]*>/s)?.[0];
@@ -60,6 +75,8 @@ test('only the morning plate loads eagerly; the other plates and the sprites wai
     assert.match(tag, /loading="lazy"/);
   }
   assert.match(hero, /afterFirstPaint|requestIdleCallback/);
+  assert.match(hero, /onLoad=\{markLoaded\('midday'\)\}/);
+  assert.match(hero, /onLoad=\{markLoaded\('afternoon'\)\}/);
 });
 
 test('every hero image has explicit dimensions, so the hero never shifts layout', () => {
@@ -79,7 +96,7 @@ test('the loop is 12 s, first motion inside 2 s, defined once in CSS and once in
   // The figure raises the card at 0 % and the sling lifts before 2 s (16.7 %).
   const pose = styles.match(/@keyframes hero-pose-card\s*\{([\s\S]*?)\n\}/)?.[1];
   assert.ok(pose, 'missing hero-pose-card keyframes');
-  assert.match(pose, /0%[^}]*opacity:\s*1/);
+  assert.match(pose, /(^|\n)\s*0%[^}]*opacity:\s*1/);
   const lift = styles.match(/@keyframes hero-sling-lift\s*\{([\s\S]*?)\n\}/)?.[1];
   assert.ok(lift, 'missing hero-sling-lift keyframes');
   const liftStarts = [...lift.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => Number(m[1]));
@@ -127,7 +144,7 @@ test('headline, sub and actions are verbatim in English and Dutch', () => {
     assert.ok(page.includes(line), `missing hero line: ${line}`);
   }
   assert.doesNotMatch(page, /Book a demo|Plan een demo/);
-  assert.doesNotMatch(page, /hours? saved|uur bespaard|€/i);
+  assert.doesNotMatch(page, /hours? saved|uur bespaard|uren bespaard|€/i);
 });
 
 test('three true facts, no claims about hours, prices or certifications', () => {
@@ -144,6 +161,20 @@ test('three true facts, no claims about hours, prices or certifications', () => 
   assert.doesNotMatch(page, /ISO 27001|SOC ?2|EU-only|data isolation/i);
 });
 
+test('the stage always reaches the right edge on tablets and phones, and the copy sits on paper', () => {
+  // Box 820 px wide, 57vw tall: the height-fit stage must still cover the box.
+  const boxWidth = 820;
+  const boxHeight = Math.min(620, Math.max(320, 0.57 * boxWidth));
+  const stageWidth = boxHeight * (2400 / 1355);
+  const shift = Math.max(-0.64 * stageWidth, 0.5 * boxWidth - stageWidth);
+  assert.ok(0.5 * boxWidth + stageWidth + shift >= boxWidth, 'bare wall at the right edge');
+  assert.match(styles, /translateX\(max\(-64%, calc\(50cqw - 100%\)\)\)/);
+  assert.match(styles, /translateX\(max\(-66%, calc\(50cqw - 100%\)\)\)/);
+  assert.match(styles, /\.hero::before\s*\{[^}]*linear-gradient/s);
+  assert.match(styles, /\.hero-sling-tag\s*\{[^}]*rotate:\s*-8deg/s);
+  assert.doesNotMatch(styles, /\.hero-sling-tag\s*\{[^}]*transform:\s*rotate/s);
+});
+
 test('reduced motion shows one still frame with the folder on the desk', () => {
   const reduced = styles.match(
     /@media \(prefers-reduced-motion: reduce\)\s*\{([\s\S]*?)\n\}/,
@@ -157,6 +188,8 @@ test('reduced motion shows one still frame with the folder on the desk', () => {
 
 test('the hero plays only while in view and starts when it enters', () => {
   assert.match(page, /heroHasEntered/);
+  // Nearly half the stage must be on screen before the opening beat plays.
+  assert.match(page, /useElementVisibility<HTMLDivElement>\(0\.45\)/);
   assert.match(hero, /data-playing=/);
   assert.match(styles, /\.paper-hero-stage\[data-playing='false'\] \*\s*\{[^}]*animation-play-state:\s*paused/s);
 });
@@ -198,6 +231,21 @@ test('the sun drives the plates: high in June, low in December, dawn and dusk on
   assert.ok(plateWeights(new Date('2026-06-21T04:00:00Z'), latitude, longitude).morning > 0.8);
   assert.ok(plateWeights(new Date('2026-06-21T19:30:00Z'), latitude, longitude).afternoon > 0.8);
   assert.equal(plateWeights(new Date('2026-06-21T00:00:00Z'), latitude, longitude).midday, 0);
+});
+
+test('the plates stay opaque while they cross-fade: the room never goes translucent', () => {
+  // Stacked source-over: morning is the opaque base, the two above derive
+  // their opacity from the weights so the blend equals the weighted mix.
+  const half = plateOpacities({ morning: 0.5, midday: 0.5, afternoon: 0 });
+  assert.deepEqual(half, { morning: 1, midday: 0.5, afternoon: 0 });
+  const dusk = plateOpacities({ morning: 0, midday: 0.3, afternoon: 0.7 });
+  assert.equal(dusk.morning, 1);
+  assert.ok(Math.abs(dusk.midday - 1) < 1e-9, `midday ${dusk.midday}`);
+  assert.ok(Math.abs(dusk.afternoon - 0.7) < 1e-9);
+  const night = plateOpacities({ morning: 0, midday: 0, afternoon: 1 });
+  assert.deepEqual(night, { morning: 1, midday: 1, afternoon: 1 });
+  assert.match(hero, /plateOpacities\(/);
+  assert.match(styles, /\.hero-plate\[data-plate='morning'\]\s*\{[^}]*opacity:\s*1;/s);
 });
 
 test('the generation record keeps the served and source assets apart', () => {

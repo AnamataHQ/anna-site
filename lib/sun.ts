@@ -77,3 +77,14 @@ export function plateWeights(
     ? { morning: low, midday, afternoon: 0 }
     : { morning: 0, midday, afternoon: low };
 }
+
+// Plates are stacked morning, midday, afternoon and composited source-over, so
+// the two upper opacities are derived from the weights and the morning plate
+// stays opaque: the room never shows the wall colour through a half-faded
+// plate. With weights (m, d, a): afternoon = a, midday = d / (1 - a).
+export function plateOpacities(weights: PlateWeights) {
+  const afternoon = Math.min(1, weights.afternoon);
+  const midday =
+    afternoon >= 1 ? 1 : Math.min(1, weights.midday / (1 - afternoon));
+  return { morning: 1, midday, afternoon };
+}

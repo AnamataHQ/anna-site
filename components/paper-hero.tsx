@@ -6,7 +6,12 @@
 import type { CSSProperties } from 'react';
 import { useEffect, useState } from 'react';
 
-import { HERO_LOCATION, type PlateWeights, plateWeights } from '@/lib/sun';
+import {
+  HERO_LOCATION,
+  type PlateWeights,
+  plateOpacities,
+  plateWeights,
+} from '@/lib/sun';
 
 // The paper-craft diorama from design/hero/README.md. Every sprite sits at a
 // fixed point of the plate (percent of the stage); the stage keeps the plate's
@@ -88,6 +93,10 @@ export function PaperHero({
 }) {
   const [painted, setPainted] = useState(false);
   const [weights, setWeights] = useState<PlateWeights>(MORNING_ONLY);
+  // A plate fades in only once it has arrived, never while still loading.
+  const [loaded, setLoaded] = useState({ midday: false, afternoon: false });
+  const markLoaded = (plate: 'midday' | 'afternoon') => () =>
+    setLoaded((current) => ({ ...current, [plate]: true }));
 
   useEffect(() => afterFirstPaint(() => setPainted(true)), []);
 
@@ -106,10 +115,10 @@ export function PaperHero({
     return () => window.clearInterval(timer);
   }, [painted]);
 
+  const opacities = plateOpacities(weights);
   const plateStyle = {
-    '--w-morning': weights.morning,
-    '--w-midday': weights.midday,
-    '--w-afternoon': weights.afternoon,
+    '--o-midday': loaded.midday ? opacities.midday : 0,
+    '--o-afternoon': loaded.afternoon ? opacities.afternoon : 0,
   } as CSSProperties;
 
   return (
@@ -140,6 +149,7 @@ export function PaperHero({
             alt=""
             loading="lazy"
             decoding="async"
+            onLoad={markLoaded('midday')}
           />
         )}
         {painted && (
@@ -152,6 +162,7 @@ export function PaperHero({
             alt=""
             loading="lazy"
             decoding="async"
+            onLoad={markLoaded('afternoon')}
           />
         )}
       </div>

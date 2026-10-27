@@ -209,6 +209,21 @@ footer > a:last-child:hover {
   overflow: hidden;
   container-type: size;
 }
+/* Paper under the copy, so the headline reads on every plate, the afternoon one included. */
+.hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 60%;
+  background: linear-gradient(
+    90deg,
+    rgba(236, 238, 241, 0.96) 0%,
+    rgba(236, 238, 241, 0.9) 55%,
+    rgba(236, 238, 241, 0) 100%
+  );
+  content: '';
+  pointer-events: none;
+}
 .paper-hero-stage {
   position: absolute;
   bottom: 0;
@@ -216,7 +231,8 @@ footer > a:last-child:hover {
   width: max(100%, calc(100cqh * 2400 / 1355));
   aspect-ratio: 2400 / 1355;
   overflow: hidden;
-  transform: translateX(-50%);
+  /* Wider than the plate: crop 70 % of the extra height from the ceiling. */
+  transform: translate(-50%, max(0px, calc(30% - 30cqh)));
   container-type: size;
 }
 .paper-hero-stage[data-playing='false'] * {
@@ -233,14 +249,17 @@ footer > a:last-child:hover {
   object-fit: cover;
   transition: opacity 2.5s ease;
 }
+/* Morning is the opaque base; the plates above carry derived opacities
+   (lib/sun.ts plateOpacities), so the blend never shows the wall through. */
 .hero-plate[data-plate='morning'] {
-  opacity: var(--w-morning, 1);
+  opacity: 1;
 }
 .hero-plate[data-plate='midday'] {
-  opacity: var(--w-midday, 0);
+  opacity: var(--o-midday, 0);
 }
 .hero-plate[data-plate='afternoon'] {
-  opacity: var(--w-afternoon, 0);
+  /* The low-sun plate is the darkest; it never takes the room fully. */
+  opacity: calc(var(--o-afternoon, 0) * 0.8);
 }
 
 /* The mobile: thread, knot and arms in SVG, trays as sprites. */
@@ -327,7 +346,7 @@ footer > a:last-child:hover {
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
-  transform: rotate(-8deg);
+  rotate: -8deg;
   transform-origin: 100% 0;
   box-shadow: 0 2px 6px rgba(11, 22, 48, 0.14);
   animation: hero-sling-lift var(--hero-loop) ease-in-out infinite;
@@ -585,6 +604,7 @@ footer > a:last-child:hover {
   font-weight: 580;
   letter-spacing: -0.045em;
   line-height: 1.02;
+  text-wrap: balance;
 }
 .hero-body {
   max-width: 520px;
@@ -595,7 +615,7 @@ footer > a:last-child:hover {
 }
 .hero-trust {
   margin: 1.1rem 0 0;
-  color: #5b6372;
+  color: #4b5363;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.7rem;
   font-weight: 680;
@@ -608,7 +628,7 @@ footer > a:last-child:hover {
   margin: 1.7rem 0 0;
   padding: 0;
   list-style: none;
-  color: #3d4759;
+  color: #2f3949;
   font-size: 0.86rem;
   font-weight: 560;
 }
@@ -708,14 +728,18 @@ footer {
     align-items: stretch;
     min-height: 0;
   }
+  .hero::before {
+    display: none;
+  }
   .hero-stage-box {
     position: relative;
-    height: clamp(320px, 52vw, 620px);
+    height: clamp(320px, 57vw, 620px);
   }
   .paper-hero-stage {
     width: auto;
     height: 100%;
-    transform: translateX(-64%);
+    /* Centre on the desk, but never leave bare wall at the right edge. */
+    transform: translateX(max(-64%, calc(50cqw - 100%)));
   }
   .hero-copy {
     order: -1;
@@ -744,7 +768,7 @@ footer {
     height: clamp(280px, 82vw, 440px);
   }
   .paper-hero-stage {
-    transform: translateX(-66%);
+    transform: translateX(max(-66%, calc(50cqw - 100%)));
   }
   .connector-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1633,6 +1657,9 @@ footer > a:last-child {
   .hero-figure img[data-pose='1'],
   .hero-figure img[data-pose='2'] {
     opacity: 0;
+  }
+  .hero-sling-tag {
+    rotate: -8deg;
   }
   .hero-figure img,
   .hero-sling,
