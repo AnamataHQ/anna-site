@@ -4,7 +4,7 @@ import test from 'node:test';
 
 const page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
 const hero = readFileSync(
-  new URL('../components/paper-hero.tsx', import.meta.url),
+  new URL('../components/cleared-day.tsx', import.meta.url),
   'utf8',
 );
 const layout = readFileSync(
@@ -171,7 +171,7 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
 });
 
-test('sells the connectors first: twelve marks tied to Anna, thousands available, no tested-with list', () => {
+test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
     'Jira',
@@ -208,7 +208,7 @@ test('sells the connectors first: twelve marks tied to Anna, thousands available
   const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
     (match) => match[1],
   );
-  assert.deepEqual(sections.slice(0, 2), ['top', 'connectors']);
+  assert.deepEqual(sections.slice(0, 2), ['top', 'use-cases']);
   assert.match(page, /OAuth/);
   assert.match(page, /MCP/);
   assert.match(
@@ -285,10 +285,10 @@ test("the connectors are a still paper string map tied to Anna's knot, fading at
 test('tells the story in the agreed order', () => {
   const order = [
     'hero',
-    'connectors',
-    'capability-section',
     'use-case-section',
     'workflow-section',
+    'capability-section',
+    'connectors',
     'control-section',
     'cta-section',
   ];
@@ -301,15 +301,38 @@ test('tells the story in the agreed order', () => {
         `${order[index]} is out of order`,
       );
   }
+  // Three use cases as generic endpoints, each with a paper tray; vendors
+  // appear only as marks in the string map.
+  const examples = [...page.matchAll(/examples: \[([\s\S]*?)\n\s{4}\],/g)];
+  assert.equal(examples.length, 2, 'one use-case list per language');
+  for (const [, block] of examples) {
+    assert.equal([...block.matchAll(/tray: [123]/g)].length, 3);
+    for (const vendor of ['ClockWise', 'Loket', 'HubSpot', 'Notion', 'Jira']) {
+      assert.ok(
+        !block.includes(vendor),
+        `vendor named in a use case: ${vendor}`,
+      );
+    }
+  }
   for (const useCase of [
-    'ClockWise',
-    'Loket',
-    'HubSpot',
+    "title: 'Hours in your time tracking'",
+    "title: 'Leave in your HR system'",
+    "title: 'Follow-ups in your CRM'",
+    "title: 'Uren in je urenregistratie'",
+    "title: 'Verlof in je HR-systeem'",
+    "title: 'Opvolging in je CRM'",
     'Log my hours',
-    'Uren boeken',
+    'Boek mijn uren',
   ]) {
     assert.ok(page.includes(useCase), `missing use case: ${useCase}`);
   }
+  // The navigation follows the page.
+  assert.match(
+    page,
+    /<a href="#how">[\s\S]*?<a href="#connectors">[\s\S]*?<a href="#control">/,
+  );
+  // Below-the-fold sections, the connectors included, render lazily.
+  assert.match(styles, /\.connectors,[\s\S]{0,120}content-visibility: auto/);
 });
 
 test('includes transparency and accessibility essentials', () => {

@@ -186,504 +186,565 @@ footer > a:last-child:hover {
   transform: translateY(-1px);
   background: var(--blue);
 }
-/* Paper hero (design/hero/README.md). The stage keeps the plate's aspect
-   ratio; every sprite sits at a percent of it, so the scene scales as one
-   picture. One 12 s loop in CSS, paused while the hero is out of view. */
-:root {
-  --hero-loop: 12s;
-  --wall: #eceef1;
-  --thread-colour: rgba(11, 22, 48, 0.42);
-}
+/* The hero: navy, copy left, the cleared day right. */
 .hero {
   position: relative;
-  display: flex;
-  align-items: center;
+  display: grid;
   min-height: min(880px, calc(100svh - 74px));
+  grid-template-columns: minmax(360px, 0.94fr) minmax(520px, 1.06fr);
   overflow: hidden;
-  background: var(--wall);
-  color: var(--ink);
+  background:
+    radial-gradient(
+      circle at 80% 35%,
+      rgba(47, 99, 255, 0.22),
+      transparent 34%
+    ),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    var(--navy);
+  background-size:
+    auto,
+    44px 44px,
+    44px 44px,
+    auto;
+  color: white;
 }
-.hero-stage-box {
+.hero::after {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  container-type: size;
-}
-/* Paper under the copy, so the headline reads on every plate, the afternoon one included. */
-.hero::before {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  width: 60%;
-  background: linear-gradient(
-    90deg,
-    rgba(236, 238, 241, 0.96) 0%,
-    rgba(236, 238, 241, 0.9) 55%,
-    rgba(236, 238, 241, 0) 100%
-  );
-  content: '';
-  pointer-events: none;
-}
-.paper-hero-stage {
-  position: absolute;
+  right: 0;
   bottom: 0;
-  left: 50%;
-  width: max(100%, calc(100cqh * 2400 / 1355));
-  aspect-ratio: 2400 / 1355;
-  overflow: hidden;
-  /* Wider than the plate: crop 70 % of the extra height from the ceiling. */
-  transform: translate(-50%, max(0px, calc(30% - 30cqh)));
-  container-type: size;
+  width: 38%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--coral));
+  content: '';
 }
-.paper-hero-stage[data-playing='false'] * {
-  animation-play-state: paused !important;
+.hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(3rem, 5vw, 5rem) 3vw clamp(3rem, 5vw, 5rem)
+    max(4vw, calc((100vw - 1440px) / 2));
 }
-.hero-plates,
-.hero-plate {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.hero h1 {
+  max-width: 710px;
+  margin: 0;
+  font-size: clamp(2.8rem, 4.5vw, 5.2rem);
+  font-weight: 560;
+  letter-spacing: -0.065em;
+  line-height: 0.94;
 }
-.hero-plate {
-  object-fit: cover;
-  transition: opacity 1.2s ease;
-}
-/* Morning is the opaque base; the plate the sun favours sits on top at full
-   opacity (lib/sun.ts dominantPlate), so the room is never a double exposure. */
-.hero-plate[data-plate='morning'] {
-  opacity: 1;
-}
-.hero-plate[data-plate='midday'] {
-  opacity: var(--o-midday, 0);
-}
-.hero-plate[data-plate='afternoon'] {
-  /* The low-sun plate is the darkest; it never takes the room fully. */
-  opacity: calc(var(--o-afternoon, 0) * 0.82);
+.hero-body {
+  max-width: 590px;
+  margin: 1.6rem 0 0;
+  color: #c7d0e2;
+  font-size: clamp(1.04rem, 1.35vw, 1.24rem);
+  line-height: 1.58;
 }
 
-/* The mobile: thread, knot and arms in SVG, trays as sprites. */
-.hero-mobile {
-  position: absolute;
-  inset: 0;
-  animation: hero-mobile-sway 9s ease-in-out infinite alternate;
-}
-.hero-threads {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-.hero-thread,
-.hero-arm {
-  fill: none;
-  stroke: var(--thread-colour);
-  stroke-width: 2.2;
-  vector-effect: non-scaling-stroke;
-}
-.hero-arm-pulse {
-  fill: none;
-  stroke: var(--coral);
-  stroke-width: 3;
-  stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
-  /* pathLength=100: a short dash runs from the knot (offset 18, dash just
-     before the start) to the tray (offset -100, dash just past the end). */
-  stroke-dasharray: 18 182;
-  stroke-dashoffset: 18;
-  opacity: 0;
-  animation: hero-arm-pulse var(--hero-loop) linear infinite;
-  animation-delay: calc(var(--t) - var(--hero-loop));
-}
-/* Anna: a paper disc with her mark where the threads meet. It flashes coral
-   when the card arrives. */
-.hero-knot {
-  position: absolute;
+.hero-visual {
+  position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.6%;
-  aspect-ratio: 1;
-  border: 1px solid rgba(11, 22, 48, 0.22);
-  border-radius: 50%;
-  background: var(--paper-light);
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
-  animation: hero-knot-receive var(--hero-loop) ease-out infinite;
+  min-width: 0;
+  padding: 3rem max(4vw, calc((100vw - 1440px) / 2)) 3rem 1vw;
 }
-.hero-knot img {
-  width: 60%;
-  height: auto;
-}
-.hero-tray {
-  position: absolute;
-  height: auto;
-  transform: translate(-50%, -50%);
-  transform-origin: 50% 0;
-  filter: drop-shadow(0 1.2cqh 1.4cqh rgba(11, 22, 48, 0.18));
-  animation: hero-tray-settle var(--hero-loop) ease-out infinite;
-  animation-delay: calc(var(--t) - var(--hero-loop));
-}
-.hero-tray[data-io='read'] {
-  animation: none;
-}
-
-/* Sheets: a read rises from its tray into the knot, a write comes down from
-   the knot onto the tray. The folder comes down from the knot to the desk. */
-.hero-sheet {
-  position: absolute;
-  height: auto;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0.6cqh 0.8cqh rgba(11, 22, 48, 0.16));
-  animation-duration: var(--hero-loop);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  animation-delay: calc(var(--t) - var(--hero-loop));
-}
-.hero-sheet[data-io='read'] {
-  animation-name: hero-sheet-read;
-}
-.hero-sheet[data-io='write'] {
-  animation-name: hero-sheet-write;
-}
-.hero-folder {
-  position: absolute;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  filter: drop-shadow(0 0.6cqh 0.8cqh rgba(11, 22, 48, 0.16));
-  animation: hero-folder-return var(--hero-loop) ease-in-out infinite;
-}
-.hero-folder img:first-child {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-/* Anna's mark, stamped on the returned folder. */
-.hero-folder-mark {
-  position: absolute;
-  top: 9%;
-  left: 50%;
-  width: 46%;
-  height: auto;
-  transform: translateX(-50%);
-  opacity: 0.85;
-}
-
-.hero-card {
-  position: absolute;
-  aspect-ratio: 7 / 8;
-  border-radius: 1px;
-  /* A paper card: the brand coral with a little light on one edge. */
-  background: linear-gradient(
-    135deg,
-    #ff7a62 0%,
-    var(--coral) 45%,
-    #e84f3e 100%
-  );
-  opacity: 1;
-  transform: translate(-50%, -50%) rotate(-3deg);
+.cleared-day {
+  position: relative;
+  width: min(100%, 710px);
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 1.45rem;
+  background: #fbfaf7;
+  color: var(--ink);
   box-shadow:
-    inset 0 0 0 1px rgba(11, 22, 48, 0.08),
-    0 0.4cqh 0.6cqh rgba(11, 22, 48, 0.18);
-  animation: hero-card-flight var(--hero-loop) ease-in-out infinite;
+    0 42px 100px rgba(0, 0, 0, 0.34),
+    0 0 0 12px rgba(255, 255, 255, 0.035);
 }
-
-/* The figure: three poses on the same chair, swapped like stop-motion. Each
-   image is placed so its chair back lands on the group's box. */
-.hero-figure {
-  position: absolute;
-  height: 0;
-  transform: translateX(-50%);
+.day-header {
+  display: flex;
+  min-height: 66px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.35rem;
+  border-bottom: 1px solid #dfe2e8;
+  background: white;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
-.hero-figure img {
-  position: absolute;
-  top: 0;
-  /* Wider than the group on purpose (the group is the chair back); the
-     preflight's max-width: 100% would squeeze every pose to the group. */
-  max-width: none;
-  height: auto;
-  opacity: 0;
-  filter: drop-shadow(0 1cqh 1.2cqh rgba(11, 22, 48, 0.22));
-  animation-duration: var(--hero-loop);
-  animation-timing-function: steps(1, end);
-  animation-iteration-count: infinite;
+.calendar-controls,
+.calendar-controls > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
 }
-.hero-figure img[data-pose='1'] {
-  animation-name: hero-pose-rest;
+.today-chip,
+.calendar-view {
+  border: 1px solid #dce0e8;
+  border-radius: 0.45rem;
+  background: #fafbfc;
+  padding: 0.34rem 0.58rem;
+  color: #596275;
+  font-size: 0.65rem;
+  font-weight: 700;
 }
-.hero-figure img[data-pose='2'] {
-  animation-name: hero-pose-card;
+.calendar-chevrons {
+  color: #778093;
+  font-size: 1.05rem;
+  font-weight: 500;
 }
-.hero-figure img[data-pose='3'] {
-  animation-name: hero-pose-folder;
+.day-column-header {
+  display: grid;
+  min-height: 48px;
+  grid-template-columns: 58px 1fr;
+  align-items: end;
+  border-bottom: 1px solid #dfe2e8;
+  background: white;
 }
-.hero-grain {
+.day-column-header > span {
+  grid-column: 2;
+  justify-self: center;
+  padding-bottom: 0.5rem;
+  color: var(--blue);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+  font-weight: 760;
+  letter-spacing: 0.05em;
+}
+.day-column-header i {
+  grid-column: 2;
+  justify-self: center;
+  width: 5px;
+  height: 5px;
+  margin-bottom: -3px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+.day-body {
+  display: grid;
+  grid-template-columns: 58px 1fr;
+  min-height: 500px;
+  padding: 0.7rem 1.2rem 1rem 0;
+}
+.time-rail {
+  display: grid;
+  grid-template-rows: repeat(9, 1fr);
+  color: #9399a6;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.57rem;
+  text-align: right;
+}
+.time-rail span {
+  padding: 0 0.7rem 0 0;
+  transform: translateY(-0.38rem);
+}
+.calendar-grid {
+  --anchor-start: 43.5185%;
+  --anchor-duration: 5.5556%;
+  position: relative;
+  min-width: 0;
+  border-left: 1px solid #dfe2e8;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(11.111% - 1px),
+    #e4e6eb calc(11.111% - 1px),
+    #e4e6eb 11.111%
+  );
+}
+.focus-layer,
+.events-layer {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  opacity: 0.16;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.95' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.47 0 0 0 0 0.52 0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 220px 220px;
 }
-
-@keyframes hero-pose-card {
-  0% {
-    opacity: 1;
-  }
-  10%,
-  100% {
-    opacity: 0;
-  }
+.calendar-event,
+.focus-fragment {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  top: calc(var(--event-start) + 1px);
+  right: 3%;
+  left: 3%;
+  height: calc(var(--event-duration) - 2px);
+  overflow: hidden;
+  border-radius: 0.38rem;
+  padding: 0.08rem 0.5rem;
+  box-shadow: 0 4px 12px rgba(11, 22, 48, 0.06);
+  font-size: 0.6rem;
+  font-weight: 670;
+  line-height: 1;
 }
-@keyframes hero-pose-rest {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  79.17% {
-    opacity: 0;
-  }
-  87.5%,
-  100% {
-    opacity: 1;
-  }
+.calendar-event {
+  border: 1px solid rgba(47, 99, 255, 0.17);
+  border-left: 3px solid var(--blue);
+  background: #eaf0ff;
+  color: #374665;
+  opacity: 1;
+  animation: clear-admin 10.4s cubic-bezier(0.62, 0, 0.34, 1) forwards;
+  animation-play-state: paused;
 }
-@keyframes hero-pose-folder {
-  0% {
-    opacity: 0;
-  }
-  79.17% {
-    opacity: 1;
-  }
-  87.5%,
-  100% {
-    opacity: 0;
-  }
+.calendar-event[data-incoming='true'] {
+  opacity: 0;
+  animation-name: fill-open-slots;
 }
-/* The ask: 0.8 s in the raised hand, then 1.2 s to the knot; the arm stays
-   up until 1.2 s, so the card is seen leaving the hand. */
-@keyframes hero-card-flight {
+.calendar-event:nth-child(6) {
+  animation-delay: 160ms;
+}
+.calendar-event small,
+.focus-fragment small {
+  flex: 0 0 auto;
+  color: #65718a;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.5rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.calendar-event span,
+.focus-fragment span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.calendar-event:nth-child(3n + 2) {
+  border-color: rgba(255, 92, 66, 0.18);
+  border-left-color: var(--coral);
+  background: #fff0ec;
+  color: #67433c;
+}
+.calendar-event:nth-child(3n) {
+  border-color: rgba(43, 151, 102, 0.18);
+  border-left-color: #269766;
+  background: #eaf7f0;
+  color: #315b47;
+}
+@keyframes clear-admin {
   0%,
-  6.67% {
+  45% {
     opacity: 1;
-    transform: translate(-50%, -50%) rotate(-3deg);
+    transform: translateX(0) scale(1);
   }
-  9% {
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 0.12cqw), calc(var(--dy) * 0.3cqh))
-      rotate(-8deg);
-  }
-  16.67% {
-    opacity: 1;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh)) rotate(0deg)
-      scale(0.55);
-  }
-  17.5%,
+  56%,
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh)) rotate(0deg)
-      scale(0.4);
+    transform: translateX(24px) scale(0.96);
   }
 }
-@keyframes hero-knot-receive {
+@keyframes fill-open-slots {
   0%,
-  16% {
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow: 0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
+  14% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
   }
-  18% {
-    transform: translate(-50%, -50%) scale(1.22);
-    box-shadow:
-      0 0 0 0.45cqw rgba(225, 88, 87, 0.55),
-      0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
-  }
-  25%,
-  61% {
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow:
-      0 0 0 0 rgba(225, 88, 87, 0),
-      0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
-  }
-  /* A smaller flash when the last write is in: done. */
-  63% {
-    transform: translate(-50%, -50%) scale(1.12);
-    box-shadow:
-      0 0 0 0.3cqw rgba(225, 88, 87, 0.45),
-      0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
-  }
-  69%,
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-    box-shadow:
-      0 0 0 0 rgba(225, 88, 87, 0),
-      0 0.3cqh 0.8cqh rgba(11, 22, 48, 0.18);
-  }
-}
-/* An arm lights from the knot to its tray in ARM_LEAD (0.5 s = 4.17 %). */
-@keyframes hero-arm-pulse {
-  0% {
+  24%,
+  45% {
     opacity: 1;
-    stroke-dashoffset: 18;
+    transform: translateY(0) scale(1);
   }
-  4.17% {
-    opacity: 1;
-    stroke-dashoffset: -100;
-  }
-  4.18%,
+  56%,
   100% {
     opacity: 0;
-    stroke-dashoffset: -100;
+    transform: translateX(24px) scale(0.96);
   }
 }
-/* A read: the sheet appears in its tray, rises into the knot in FLIGHT
-   (1 s = 8.33 %) and is absorbed there. */
-@keyframes hero-sheet-read {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-  8.33% {
-    opacity: 1;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
-      rotate(var(--rot)) scale(0.3);
-  }
-  9%,
-  94% {
-    opacity: 0;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
-      rotate(var(--rot)) scale(0.3);
-  }
-  95% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(0deg) scale(1);
-  }
+.focus-fragment {
+  border: 1px solid rgba(47, 99, 255, 0.22);
+  border-left: 3px solid var(--blue);
+  background: linear-gradient(145deg, #edf2ff, #e2eaff);
+  color: #31466f;
+  animation: merge-focus 10.4s cubic-bezier(0.62, 0, 0.34, 1) forwards;
+  animation-play-state: paused;
 }
-/* A write: the sheet comes out of the knot, lands on the tray's lip in FLIGHT
-   and stays until the loop is nearly over. */
-@keyframes hero-sheet-write {
-  0% {
-    opacity: 1;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
-      rotate(calc(var(--rot) * -0.5)) scale(0.3);
-  }
-  8.33%,
-  86% {
-    opacity: 1;
-    transform: translate(-50%, -50%) rotate(var(--rot)) scale(1);
-  }
-  90%,
-  99% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(var(--rot)) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
-      rotate(calc(var(--rot) * -0.5)) scale(0.3);
-  }
-}
-@keyframes hero-tray-settle {
+@keyframes merge-focus {
   0%,
-  9%,
+  66% {
+    top: calc(var(--event-start) + 1px);
+    height: calc(var(--event-duration) - 2px);
+    opacity: 1;
+    transform: scale(1);
+  }
+  84%,
   100% {
-    transform: translate(-50%, -50%) rotate(0deg);
-  }
-  1.5% {
-    transform: translate(-50%, -50%) rotate(calc(var(--tilt) * 4deg));
-  }
-  4% {
-    transform: translate(-50%, -50%) rotate(calc(var(--tilt) * -2deg));
-  }
-  6.5% {
-    transform: translate(-50%, -50%) rotate(calc(var(--tilt) * 0.8deg));
+    top: calc(var(--anchor-start) + 1px);
+    height: calc(var(--anchor-duration) - 2px);
+    opacity: 0;
+    transform: scale(0.98);
   }
 }
-@keyframes hero-folder-return {
+.focus-block {
+  position: absolute;
+  top: calc(var(--event-start) + 1px);
+  right: 3%;
+  left: 3%;
+  height: calc(var(--event-duration) - 2px);
+  overflow: hidden;
+  border: 1px solid rgba(47, 99, 255, 0.25);
+  border-left: 3px solid var(--blue);
+  border-radius: 0.38rem;
+  background: linear-gradient(145deg, #edf2ff, #dce7ff);
+  box-shadow: 0 4px 12px rgba(11, 22, 48, 0.06);
+  animation: expand-anchor-day 10.4s cubic-bezier(0.62, 0, 0.34, 1) forwards;
+  animation-play-state: paused;
+}
+@keyframes expand-anchor-day {
   0%,
-  65% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(0deg);
+  66% {
+    top: calc(var(--event-start) + 1px);
+    height: calc(var(--event-duration) - 2px);
+    border-radius: 0.38rem;
+    box-shadow: 0 4px 12px rgba(11, 22, 48, 0.06);
   }
-  66.67% {
+  94%,
+  100% {
+    top: 2px;
+    height: calc(100% - 4px);
+    border-radius: 1rem;
+    box-shadow: 0 18px 40px rgba(47, 99, 255, 0.11);
+  }
+}
+.anchor-compact {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.08rem 0.5rem;
+  color: #31466f;
+  font-size: 0.6rem;
+  font-weight: 670;
+  line-height: 1;
+  animation: hide-anchor-compact 10.4s ease forwards;
+  animation-play-state: paused;
+}
+.anchor-compact small,
+.anchor-time {
+  flex: 0 0 auto;
+  color: #65718a;
+  font-family: var(--font-geist-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.anchor-compact small {
+  font-size: 0.5rem;
+}
+.anchor-compact span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@keyframes hide-anchor-compact {
+  0%,
+  70% {
     opacity: 1;
-    transform: translate(-50%, -50%) rotate(0deg);
   }
-  79.17% {
-    opacity: 1;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh)) rotate(-72deg);
-  }
-  80%,
+  79%,
   100% {
     opacity: 0;
-    transform: translate(-50%, -50%)
-      translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh)) rotate(-72deg);
   }
 }
-@keyframes hero-mobile-sway {
-  from {
-    transform: rotate(-0.7deg);
+.anchor-expanded {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1.4rem;
+  opacity: 0;
+  animation: show-anchor-expanded 10.4s ease forwards;
+  animation-play-state: paused;
+}
+@keyframes show-anchor-expanded {
+  0%,
+  76% {
+    opacity: 0;
   }
-  to {
-    transform: rotate(0.7deg);
+  88%,
+  100% {
+    opacity: 1;
   }
 }
-
-/* Hero copy on the empty left wall. */
-.hero-copy {
-  position: relative;
-  z-index: 2;
-  max-width: 46%;
-  /* Short enough that the hero, checklist included, fits a Full HD window. */
-  padding: clamp(2.5rem, 4vw, 4.5rem) 2vw clamp(2.5rem, 4vw, 4.5rem)
-    max(4vw, calc((100vw - 1440px) / 2));
+.focus-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 5px rgba(47, 99, 255, 0.12);
 }
-.hero-eyebrow {
-  border: 1px solid rgba(11, 22, 48, 0.18);
+.anchor-expanded .focus-dot {
+  position: absolute;
+  top: 1.4rem;
+  left: 1.4rem;
+}
+.anchor-time {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.4rem;
+  margin: 0;
+  font-size: 0.69rem;
+  letter-spacing: 0.03em;
+}
+.anchor-expanded strong {
+  max-width: 300px;
+  font-size: clamp(1.35rem, 2.1vw, 2rem);
+  font-weight: 640;
+  letter-spacing: -0.045em;
+  line-height: 1.03;
+}
+.anchor-detail {
+  margin-top: 0.55rem;
+  color: #627194;
+  font-size: 0.69rem;
+  font-weight: 620;
+}
+.anna-tray {
+  position: static;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem 0.8rem;
+  align-items: center;
+  min-height: 62px;
+  margin: 0 1.2rem 1rem 58px;
+  border: 1px solid #dce1eb;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.97);
+  padding: 0.75rem;
+  box-shadow: 0 12px 30px rgba(11, 22, 48, 0.08);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: reveal-summary 10.4s ease forwards;
+  animation-play-state: paused;
+}
+@keyframes reveal-summary {
+  0%,
+  44% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  50%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.anna-tray-mark {
+  display: block;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 0;
+}
+.anna-tray-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.anna-tray > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.anna-tray small {
+  color: #737c8c;
+  font-size: 0.63rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.anna-tray strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.18rem;
+  color: #38445a;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+.anna-tray strong svg {
+  color: #269766;
+}
+/* The cleared tasks, ticked one by one as they leave the day. */
+.handled-list {
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.handled-task {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid #dfe5ef;
   border-radius: 999px;
-  background: rgba(251, 250, 246, 0.8);
+  background: #f4f7fc;
+  padding: 0.28rem 0.6rem 0.28rem 0.45rem;
+  color: #38445a;
+  font-size: 0.62rem;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  animation: tick-in 10.4s ease forwards;
+  animation-delay: calc(var(--tick-order) * 170ms);
+  animation-play-state: paused;
+}
+.handled-task svg {
+  color: #269766;
+}
+@keyframes tick-in {
+  0%,
+  47% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  52%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.reduced-motion-story {
+  display: none;
+}
+.hero-visual[data-in-view='true'] .calendar-event,
+.hero-visual[data-in-view='true'] .focus-fragment,
+.hero-visual[data-in-view='true'] .focus-block,
+.hero-visual[data-in-view='true'] .anchor-compact,
+.hero-visual[data-in-view='true'] .anchor-expanded,
+.hero-visual[data-in-view='true'] .anna-tray,
+.hero-visual[data-in-view='true'] .handled-task {
+  animation-play-state: running;
+}
+
+/* Eyebrow, trust line and facts on the navy. */
+.hero-eyebrow {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
   padding: 0.42rem 0.85rem 0.42rem 0.65rem;
-  color: var(--ink);
+  color: #dfe6f5;
 }
 .hero-eyebrow img {
   width: 14px;
   height: 14px;
 }
-.hero h1 {
-  max-width: 640px;
-  margin: 0;
-  font-size: clamp(2.6rem, 4.1vw, 4.4rem);
-  font-weight: 580;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
-  text-wrap: balance;
-}
-.hero-body {
-  max-width: 520px;
-  margin: 1.5rem 0 0;
-  color: #3d4759;
-  font-size: clamp(1.02rem, 1.25vw, 1.2rem);
-  line-height: 1.55;
-}
 .hero-trust {
   margin: 1.1rem 0 0;
-  color: #4b5363;
+  color: #96a5c2;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.7rem;
   font-weight: 680;
@@ -693,10 +754,10 @@ footer > a:last-child:hover {
 .hero-facts {
   display: grid;
   gap: 0.5rem;
-  margin: 1.7rem 0 0;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
-  color: #2f3949;
+  color: #c7d0e2;
   font-size: 0.86rem;
   font-weight: 560;
 }
@@ -884,6 +945,7 @@ footer > a:last-child:hover {
 .workflow-section,
 .control-section,
 .cta-section,
+.connectors,
 footer {
   content-visibility: auto;
   contain-intrinsic-size: auto 700px;
@@ -891,31 +953,21 @@ footer {
 
 @media (max-width: 1180px) {
   .hero {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-height: 0;
-  }
-  .hero::before {
-    display: none;
-  }
-  .hero-stage-box {
-    position: relative;
-    height: clamp(320px, 57vw, 620px);
-  }
-  .paper-hero-stage {
-    width: auto;
-    height: 100%;
-    /* Centre on the desk, but never leave bare wall at the right edge. */
-    transform: translateX(max(-64%, calc(50cqw - 100%)));
+    min-height: auto;
+    grid-template-columns: 1fr;
   }
   .hero-copy {
-    order: -1;
-    max-width: 100%;
-    padding: 4.5rem 9vw 2.5rem;
+    padding-right: 9vw;
+    padding-left: 9vw;
   }
   .hero h1 {
-    max-width: 760px;
+    max-width: 900px;
+  }
+  .hero-visual {
+    padding: 1rem 9vw 7rem;
+  }
+  .cleared-day {
+    width: min(100%, 760px);
   }
   .use-case-grid {
     grid-template-columns: 1fr;
@@ -924,16 +976,27 @@ footer {
 
 @media (max-width: 820px) {
   .hero-copy {
-    padding: 3.5rem 1.25rem 1.5rem;
+    padding: 5rem 1.25rem 2.5rem;
   }
   .hero h1 {
-    font-size: clamp(2.2rem, 9vw, 3.4rem);
+    font-size: clamp(2.6rem, 11vw, 4.4rem);
   }
-  .hero-stage-box {
-    height: clamp(280px, 82vw, 440px);
+  .hero-body {
+    font-size: 1rem;
   }
-  .paper-hero-stage {
-    transform: translateX(max(-66%, calc(50cqw - 100%)));
+  .hero-visual {
+    padding: 0 1rem 5rem;
+  }
+  .day-body {
+    grid-template-columns: 44px 1fr;
+    min-height: 430px;
+    padding-right: 0.65rem;
+  }
+  .day-column-header {
+    grid-template-columns: 44px 1fr;
+  }
+  .anna-tray {
+    margin-left: 44px;
   }
   .connector-stage {
     --knot: 13cqw;
@@ -1011,6 +1074,14 @@ footer {
 .button-ghost:hover {
   border-color: rgba(11, 22, 48, 0.65);
   background: rgba(11, 22, 48, 0.05);
+}
+.hero .button-ghost {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+.hero .button-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .capability-section,
@@ -1094,8 +1165,8 @@ footer {
 
 .workflow-section {
   padding: clamp(5.5rem, 10vw, 9rem) max(4vw, calc((100vw - 1440px) / 2));
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--blue);
+  color: white;
 }
 .workflow-heading {
   display: grid;
@@ -1106,11 +1177,12 @@ footer {
 .workflow-heading .eyebrow {
   grid-column: 1 / -1;
   margin-bottom: 0;
+  color: #cbd8ff;
 }
 .workflow-heading > p:last-child {
   max-width: 560px;
   margin: 0;
-  color: #596273;
+  color: #d9e1ff;
   font-size: 1.08rem;
 }
 .scenario-shell {
@@ -1175,7 +1247,7 @@ footer {
 }
 .demo-window {
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 1.3rem;
   background: #f4f5fa;
   color: var(--ink);
@@ -1815,6 +1887,40 @@ footer > a:last-child {
   .button {
     width: 100%;
   }
+  .day-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 0.9rem;
+  }
+  .day-body {
+    min-height: 410px;
+  }
+  .calendar-controls {
+    flex-wrap: wrap;
+  }
+  .calendar-event {
+    font-size: 0.56rem;
+  }
+  .anchor-expanded {
+    padding: 1rem;
+  }
+  .anchor-expanded .focus-dot {
+    top: 1rem;
+    left: 1rem;
+  }
+  .anchor-time {
+    top: 0.9rem;
+    right: 1rem;
+  }
+  .anchor-expanded strong {
+    font-size: 1.25rem;
+  }
+  .anna-tray {
+    padding: 0.65rem;
+  }
+  .anna-tray strong {
+    white-space: normal;
+  }
   .scenario-tabs {
     align-items: stretch;
     flex-direction: column;
@@ -1879,31 +1985,58 @@ footer > a:last-child {
     margin-bottom: 0.35rem;
     opacity: 1;
   }
-  /* The hero as one still frame: sheets gone, the folder on the desk, the
-     figure holding it, light settled. */
-  .hero-sheet {
+  /* The hero as one still: the routine gone, the day one block, the list full. */
+  .calendar-event,
+  .focus-fragment {
     display: none;
   }
-  .hero-folder,
-  .hero-card,
-  .hero-arm-pulse {
-    display: none;
-  }
-  .hero-figure img[data-pose='3'] {
+  .focus-block {
+    top: 2px;
+    height: calc(100% - 4px);
     opacity: 1;
-  }
-  .hero-figure img[data-pose='1'],
-  .hero-figure img[data-pose='2'] {
-    opacity: 0;
-  }
-  .hero-figure img,
-  .hero-mobile,
-  .hero-tray,
-  .hero-knot {
     animation: none;
   }
-  .hero-plate {
-    transition: none;
+  .anchor-compact {
+    display: none;
+  }
+  .anchor-expanded {
+    opacity: 1;
+    animation: none;
+  }
+  .anna-tray {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .handled-task {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .reduced-motion-story {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0.7rem;
+    align-items: center;
+    margin: 0 1.2rem 1rem 58px;
+    border-top: 1px solid #dfe2e8;
+    padding: 0.9rem 0.1rem 0;
+    color: #6b7382;
+    font-size: 0.68rem;
+  }
+  .reduced-motion-story strong {
+    color: #31466f;
+    font-weight: 700;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 820px) {
+  .reduced-motion-story {
+    grid-template-columns: 1fr;
+    margin-left: 44px;
+  }
+  .reduced-motion-story svg {
+    transform: rotate(90deg);
   }
 }
 

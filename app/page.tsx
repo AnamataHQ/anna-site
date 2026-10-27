@@ -20,7 +20,7 @@ import Image from 'next/image';
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
-import { PaperHero } from '@/components/paper-hero';
+import { ClearedDay, type DayCopy } from '@/components/cleared-day';
 import type { LeadKind } from '@/lib/lead-capture';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -42,7 +42,8 @@ const content = {
     earlyAccess: 'Request early access',
     contact: 'Contact Anamata',
     eyebrow: 'Your digital AI assistant',
-    heroTitle: 'Anna does the work nobody should waste time on.',
+    heroTitle:
+      'The work still needs doing. It does not need to take your time.',
     heroBody:
       'Ask her in Teams or Slack. She connects to the systems your work lives in, asks before she acts, and reports back.',
     trust: 'Early access, 2026',
@@ -51,8 +52,70 @@ const content = {
       'Connects over OAuth to the systems you already use',
       'Asks before she acts, within the rights you grant',
     ],
-    heroAria:
-      "A paper-craft room. A small figure at a desk raises one card, which floats up to the knot of a paper mobile marked with Anna's logo. From the knot, threads hold five paper trays, each with one object: a clock, a calendar, an envelope, an ID card or a folder. Sheets rise from three trays into the knot and come down from it into two. A folder with the same mark comes down to the desk.",
+    day: {
+      aria: 'A working day where Anna clears routine administration and gives focus time back.',
+      date: 'Tuesday · 18 June',
+      view: 'Work week',
+      today: 'Today',
+      weekday: 'TUE 18',
+      focus: 'Work that needs you',
+      focusDetail: 'Strategy · decisions · people',
+      handled: 'Handled by Anna',
+      handledCount: '7 routine tasks completed',
+      before: 'Before · 7 routine tasks split up the day',
+      after: 'After · 08:00–17:00 for work that needs you',
+      tasks: [
+        {
+          label: 'Inbox triage',
+          time: '09:00–09:25',
+          start: 60,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Follow-ups',
+          time: '10:25–10:45',
+          start: 145,
+          duration: 20,
+          incoming: false,
+        },
+        {
+          label: 'Leave request',
+          time: '11:30–11:55',
+          start: 210,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Meeting prep',
+          time: '12:25–12:55',
+          start: 265,
+          duration: 30,
+          incoming: false,
+        },
+        {
+          label: 'Update records',
+          time: '13:40–14:00',
+          start: 340,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Send reminders',
+          time: '15:00–15:20',
+          start: 420,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Status update',
+          time: '16:10–16:30',
+          start: 490,
+          duration: 20,
+          incoming: false,
+        },
+      ],
+    } satisfies DayCopy,
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
@@ -89,21 +152,21 @@ const content = {
     examples: [
       {
         tray: 1,
-        title: 'Hours in ClockWise',
+        title: 'Hours in your time tracking',
         ask: 'Log my hours for this week.',
         outcome:
           'Anna fills the week from your calendar and projects, shows you the sheet and submits it once you say so.',
       },
       {
         tray: 2,
-        title: 'Leave via Loket',
+        title: 'Leave in your HR system',
         ask: 'Can I take next Friday off?',
         outcome:
           'Anna checks your balance and the policy, prepares the request and files it after your approval.',
       },
       {
         tray: 3,
-        title: 'Follow-up in HubSpot',
+        title: 'Follow-ups in your CRM',
         ask: 'Who did we promise a follow-up this week?',
         outcome:
           'Anna lists the open promises on your deals, drafts the follow-ups and logs what was sent.',
@@ -303,7 +366,7 @@ const content = {
     contact: 'Neem contact op',
     eyebrow: 'Jouw digitale AI-assistent',
     heroTitle:
-      'Anna doet het werk waar niemand tijd aan zou moeten verspillen.',
+      'Het werk moet nog steeds gebeuren. Het hoeft niet jouw tijd te kosten.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze verbindt met de systemen waar jouw werk in staat, vraagt voordat ze handelt en koppelt terug.',
     trust: 'Vroege toegang, 2026',
@@ -312,8 +375,70 @@ const content = {
       'Koppelt via OAuth met de systemen die je al gebruikt',
       'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
     ],
-    heroAria:
-      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog, dat omhoog zweeft naar de knoop van een papieren mobiel met het logo van Anna. Aan de knoop hangen vijf papieren bakjes, elk met één voorwerp: een klok, een kalender, een envelop, een pasje of een map. Vellen papier stijgen uit drie bakjes op naar de knoop en dalen uit de knoop neer in twee andere. Een map met hetzelfde logo komt neer op het bureau.',
+    day: {
+      aria: 'Een werkdag waarin Anna routineadministratie afhandelt en focustijd teruggeeft.',
+      date: 'Dinsdag · 18 juni',
+      view: 'Werkweek',
+      today: 'Vandaag',
+      weekday: 'DI 18',
+      focus: 'Werk dat jou nodig heeft',
+      focusDetail: 'Strategie · besluiten · mensen',
+      handled: 'Afgehandeld door Anna',
+      handledCount: '7 routinetaken afgerond',
+      before: 'Voor · 7 routinetaken versnipperen de dag',
+      after: 'Na · 08:00–17:00 voor werk dat jou nodig heeft',
+      tasks: [
+        {
+          label: 'Inbox verwerken',
+          time: '09:00–09:25',
+          start: 60,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Opvolging',
+          time: '10:25–10:45',
+          start: 145,
+          duration: 20,
+          incoming: false,
+        },
+        {
+          label: 'Verlofaanvraag',
+          time: '11:30–11:55',
+          start: 210,
+          duration: 25,
+          incoming: false,
+        },
+        {
+          label: 'Overleg voorbereiden',
+          time: '12:25–12:55',
+          start: 265,
+          duration: 30,
+          incoming: false,
+        },
+        {
+          label: 'Dossiers bijwerken',
+          time: '13:40–14:00',
+          start: 340,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Herinneringen sturen',
+          time: '15:00–15:20',
+          start: 420,
+          duration: 20,
+          incoming: true,
+        },
+        {
+          label: 'Status bijwerken',
+          time: '16:10–16:30',
+          start: 490,
+          duration: 20,
+          incoming: false,
+        },
+      ],
+    } satisfies DayCopy,
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
@@ -350,21 +475,21 @@ const content = {
     examples: [
       {
         tray: 1,
-        title: 'Uren boeken in ClockWise',
+        title: 'Uren in je urenregistratie',
         ask: 'Boek mijn uren voor deze week.',
         outcome:
           'Anna vult de week vanuit je agenda en projecten, laat je het overzicht zien en dient het in zodra jij dat zegt.',
       },
       {
         tray: 2,
-        title: 'Verlof via Loket',
+        title: 'Verlof in je HR-systeem',
         ask: 'Kan ik volgende vrijdag vrij nemen?',
         outcome:
           'Anna controleert je saldo en het beleid, bereidt de aanvraag voor en dient hem in na jouw goedkeuring.',
       },
       {
         tray: 3,
-        title: 'Opvolging in HubSpot',
+        title: 'Opvolging in je CRM',
         ask: 'Wie hebben we deze week een opvolging beloofd?',
         outcome:
           'Anna zet de open beloftes uit je deals op een rij, schrijft de opvolgingen en legt vast wat is verstuurd.',
@@ -604,8 +729,7 @@ export default function Home() {
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const executionTimerRef = useRef<number | null>(null);
-  const [heroRef, heroVisible, heroHasEntered] =
-    useElementVisibility<HTMLDivElement>(0.45);
+  const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>(0.3);
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
   const t = content[language];
@@ -736,8 +860,8 @@ export default function Home() {
           className="desktop-nav"
           aria-label={language === 'en' ? 'Main navigation' : 'Hoofdnavigatie'}
         >
-          <a href="#connectors">{t.nav.connectors}</a>
           <a href="#how">{t.nav.how}</a>
+          <a href="#connectors">{t.nav.connectors}</a>
           <a href="#control">{t.nav.control}</a>
         </nav>
         <div className="header-actions">
@@ -764,16 +888,10 @@ export default function Home() {
 
       <div id="main-content">
         <section className="hero" id="top" aria-labelledby="hero-title">
-          <div className="hero-stage-box" ref={heroRef}>
-            <PaperHero
-              label={t.heroAria}
-              playing={heroHasEntered && heroVisible}
-            />
-          </div>
           <div className="hero-copy">
-            <p className="eyebrow hero-eyebrow">
+            <p className="eyebrow light hero-eyebrow">
               <Image
-                src="/brands/anna-color-black.svg"
+                src="/brands/anna-mono-light.svg"
                 alt=""
                 width={14}
                 height={14}
@@ -811,95 +929,17 @@ export default function Home() {
               ))}
             </ul>
           </div>
-        </section>
-
-        <section
-          className="connectors"
-          id="connectors"
-          aria-labelledby="connectors-title"
-        >
-          <div className="section-intro">
-            <div>
-              <p className="eyebrow">{t.connectorsKicker}</p>
-              <h2 id="connectors-title">{t.connectorsTitle}</h2>
-            </div>
-            <p>{t.connectorsBody}</p>
-          </div>
-          <div className="connector-panel">
-            <p className="integration-panel-label">{t.ringLabel}</p>
-            <div className="connector-stage" aria-hidden="true">
-              <svg className="connector-threads">
-                {[...connectors, ...LOOSE_THREADS].map((end, index) => (
-                  <line
-                    key={index}
-                    x1={`${KNOT.x}%`}
-                    y1={`${KNOT.y}%`}
-                    x2={`${end.x}%`}
-                    y2={`${end.y}%`}
-                    data-depth={'depth' in end ? end.depth : 3}
-                  />
-                ))}
-              </svg>
-              {connectors.map((connector) => (
-                <span
-                  className="connector-disc"
-                  key={connector.name}
-                  data-depth={connector.depth}
-                  style={{ left: `${connector.x}%`, top: `${connector.y}%` }}
-                >
-                  <span className="connector-disc-face">
-                    <Image src={connector.icon} alt="" width={28} height={28} />
-                  </span>
-                  <small>{connector.name}</small>
-                </span>
-              ))}
-              {/* Anna: the knot from the hero, her mark on it, a thread to every system. */}
-              <div
-                className="connector-knot"
-                style={{ left: `${KNOT.x}%`, top: `${KNOT.y}%` }}
-              >
-                <Image
-                  src="/brands/anna-mono-dark.svg"
-                  width={12}
-                  height={12}
-                  alt=""
-                />
-              </div>
-            </div>
-            <p className="sr-only">{t.ringAria}</p>
-            <div className="custom-connector">
-              <p>{t.customBody}</p>
-              <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
-                {t.requestConnector}
-                <ArrowRight size={15} aria-hidden="true" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="capability-section"
-          id="how"
-          aria-labelledby="capability-title"
-        >
-          <div className="section-intro">
-            <div>
-              <p className="eyebrow">{t.problemKicker}</p>
-              <h2 id="capability-title">{t.problemTitle}</h2>
-            </div>
-            <p>{t.problemBody}</p>
-          </div>
-          <div className="capability-grid">
-            {t.capabilities.map((capability) => (
-              <article className="capability-card" key={capability.number}>
-                <div className="capability-number">{capability.number}</div>
-                <div>
-                  <h3>{capability.title}</h3>
-                  <p>{capability.body}</p>
-                </div>
-                <ChevronRight aria-hidden="true" />
-              </article>
-            ))}
+          <div
+            className="hero-visual"
+            ref={heroRef}
+            data-in-view={heroHasEntered}
+          >
+            <ClearedDay
+              copy={t.day}
+              language={language}
+              inView={heroHasEntered}
+              reduceMotion={reduceMotion}
+            />
           </div>
         </section>
 
@@ -1109,6 +1149,96 @@ export default function Home() {
                   </ul>
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="capability-section"
+          id="how"
+          aria-labelledby="capability-title"
+        >
+          <div className="section-intro">
+            <div>
+              <p className="eyebrow">{t.problemKicker}</p>
+              <h2 id="capability-title">{t.problemTitle}</h2>
+            </div>
+            <p>{t.problemBody}</p>
+          </div>
+          <div className="capability-grid">
+            {t.capabilities.map((capability) => (
+              <article className="capability-card" key={capability.number}>
+                <div className="capability-number">{capability.number}</div>
+                <div>
+                  <h3>{capability.title}</h3>
+                  <p>{capability.body}</p>
+                </div>
+                <ChevronRight aria-hidden="true" />
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section
+          className="connectors"
+          id="connectors"
+          aria-labelledby="connectors-title"
+        >
+          <div className="section-intro">
+            <div>
+              <p className="eyebrow">{t.connectorsKicker}</p>
+              <h2 id="connectors-title">{t.connectorsTitle}</h2>
+            </div>
+            <p>{t.connectorsBody}</p>
+          </div>
+          <div className="connector-panel">
+            <p className="integration-panel-label">{t.ringLabel}</p>
+            <div className="connector-stage" aria-hidden="true">
+              <svg className="connector-threads">
+                {[...connectors, ...LOOSE_THREADS].map((end, index) => (
+                  <line
+                    key={index}
+                    x1={`${KNOT.x}%`}
+                    y1={`${KNOT.y}%`}
+                    x2={`${end.x}%`}
+                    y2={`${end.y}%`}
+                    data-depth={'depth' in end ? end.depth : 3}
+                  />
+                ))}
+              </svg>
+              {connectors.map((connector) => (
+                <span
+                  className="connector-disc"
+                  key={connector.name}
+                  data-depth={connector.depth}
+                  style={{ left: `${connector.x}%`, top: `${connector.y}%` }}
+                >
+                  <span className="connector-disc-face">
+                    <Image src={connector.icon} alt="" width={28} height={28} />
+                  </span>
+                  <small>{connector.name}</small>
+                </span>
+              ))}
+              {/* Anna: the knot from the hero, her mark on it, a thread to every system. */}
+              <div
+                className="connector-knot"
+                style={{ left: `${KNOT.x}%`, top: `${KNOT.y}%` }}
+              >
+                <Image
+                  src="/brands/anna-mono-dark.svg"
+                  width={12}
+                  height={12}
+                  alt=""
+                />
+              </div>
+            </div>
+            <p className="sr-only">{t.ringAria}</p>
+            <div className="custom-connector">
+              <p>{t.customBody}</p>
+              <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
+                {t.requestConnector}
+                <ArrowRight size={15} aria-hidden="true" />
+              </a>
             </div>
           </div>
         </section>
