@@ -377,7 +377,12 @@ footer > a:last-child:hover {
   aspect-ratio: 7 / 8;
   border-radius: 1px;
   /* A paper card: the brand coral with a little light on one edge. */
-  background: linear-gradient(135deg, #ff7a62 0%, var(--coral) 45%, #e84f3e 100%);
+  background: linear-gradient(
+    135deg,
+    #ff7a62 0%,
+    var(--coral) 45%,
+    #e84f3e 100%
+  );
   opacity: 1;
   transform: translate(-50%, -50%) rotate(-3deg);
   box-shadow:
@@ -717,8 +722,219 @@ footer > a:last-child:hover {
   padding: clamp(1.5rem, 3.5vw, 2.7rem);
   box-shadow: 0 30px 80px rgba(11, 22, 48, 0.08);
 }
-.connector-grid {
-  grid-template-columns: repeat(6, 1fr);
+
+/* The connector ring: the hero's seated figure with ten paper discs circling
+   it in 3D. One CSS loop (`--ring-loop`) drives the orbit, the discs' facing,
+   the coral pulse on the disc passing in front of the figure, and the arm the
+   figure raises towards it. Nothing here is JavaScript. */
+.connector-stage {
+  --ring-loop: 48s;
+  --ring-period: calc(var(--ring-loop) / var(--ring-count, 10));
+  --ring-tilt: -20deg;
+  --ring-radius: 31cqw;
+  --ring-centre: 56%;
+  --disc: 7cqw;
+  --figure-scale: 1;
+  --figure-x: 61cqw;
+  --figure-lift: 6.5cqw;
+  --floor-y: 84%;
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 16 / 7;
+  margin: -0.5rem 0 1.5rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  background:
+    radial-gradient(
+      ellipse at 50% 100%,
+      rgba(11, 22, 48, 0.06),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--paper-light), var(--paper));
+}
+.connector-scene {
+  position: absolute;
+  inset: 0;
+  perspective: 150cqw;
+  perspective-origin: 50% 40%;
+}
+.connector-floor {
+  position: absolute;
+  left: var(--figure-x);
+  top: var(--floor-y);
+  width: calc(var(--ring-radius) * 0.9);
+  aspect-ratio: 4 / 1;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(11, 22, 48, 0.2),
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+}
+.connector-ring {
+  position: absolute;
+  left: 50%;
+  top: var(--ring-centre);
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--ring-tilt));
+}
+.connector-orbit {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  animation: connector-orbit var(--ring-loop) linear infinite;
+}
+.connector-disc {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--disc);
+  aspect-ratio: 1;
+  margin: calc(var(--disc) / -2);
+  transform: rotateY(calc(var(--i) * 360deg / var(--ring-count, 10)))
+    translateZ(var(--ring-radius));
+  transform-style: preserve-3d;
+}
+/* A paper disc like the knot in the hero; it turns against the orbit so its
+   mark always faces the reader. */
+.connector-disc > span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(11, 22, 48, 0.22);
+  border-radius: 50%;
+  background: var(--paper-light);
+  box-shadow: 0 0.6cqw 1.4cqw rgba(11, 22, 48, 0.16);
+  transform: rotateY(calc(var(--i) * -360deg / var(--ring-count, 10)))
+    rotateX(calc(-1 * var(--ring-tilt)));
+  animation: connector-face var(--ring-loop) linear infinite;
+}
+.connector-disc > span::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 2px solid var(--coral);
+  border-radius: 50%;
+  opacity: 0;
+  animation: connector-pulse var(--ring-loop) ease-out infinite;
+  animation-delay: calc(var(--ring-loop) / -2 - var(--i) * var(--ring-period));
+}
+.connector-disc img {
+  width: 54%;
+  height: 54%;
+  object-fit: contain;
+}
+/* The figure stands upright at the ring's centre, a little to the right so
+   the disc passing in front of it shows beside the raised hand. */
+.connector-figure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 0;
+  transform: rotateX(calc(-1 * var(--ring-tilt)))
+    translate(
+      calc(var(--figure-x) - 50cqw - 50%),
+      calc(-1 * var(--figure-lift))
+    );
+}
+.connector-figure img {
+  position: absolute;
+  top: 0;
+  max-width: none;
+  height: auto;
+  opacity: 0;
+  filter: drop-shadow(0 0.8cqw 1cqw rgba(11, 22, 48, 0.2));
+  animation-duration: var(--ring-period);
+  animation-timing-function: steps(1, end);
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--ring-loop) / -2 - 0.4s);
+}
+.connector-figure img[data-pose='1'] {
+  animation-name: connector-rest;
+}
+.connector-figure img[data-pose='2'] {
+  animation-name: connector-arm;
+}
+.connector-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+  color: #626a78;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+.connector-names li::before {
+  content: '';
+  display: inline-block;
+  width: 0.35rem;
+  height: 0.35rem;
+  margin-right: 0.45rem;
+  border-radius: 50%;
+  background: var(--coral);
+  vertical-align: 0.1rem;
+}
+@keyframes connector-orbit {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+@keyframes connector-face {
+  from {
+    transform: rotateY(calc(var(--i) * -360deg / var(--ring-count, 10)))
+      rotateX(calc(-1 * var(--ring-tilt)));
+  }
+  to {
+    transform: rotateY(
+        calc(-360deg - var(--i) * 360deg / var(--ring-count, 10))
+      )
+      rotateX(calc(-1 * var(--ring-tilt)));
+  }
+}
+@keyframes connector-pulse {
+  0% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  4% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+@keyframes connector-arm {
+  0% {
+    opacity: 1;
+  }
+  20%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes connector-rest {
+  0% {
+    opacity: 0;
+  }
+  20%,
+  100% {
+    opacity: 1;
+  }
 }
 .use-case-section {
   background: var(--paper-light);
@@ -812,9 +1028,6 @@ footer {
   .hero h1 {
     max-width: 760px;
   }
-  .connector-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
   .use-case-grid {
     grid-template-columns: 1fr;
   }
@@ -833,8 +1046,16 @@ footer {
   .paper-hero-stage {
     transform: translateX(max(-66%, calc(50cqw - 100%)));
   }
-  .connector-grid {
-    grid-template-columns: repeat(2, 1fr);
+  .connector-stage {
+    --ring-tilt: -26deg;
+    --ring-radius: 36cqw;
+    --ring-centre: 56%;
+    --disc: 12cqw;
+    --figure-scale: 1.8;
+    --figure-x: 65cqw;
+    --figure-lift: 14cqw;
+    --floor-y: 74%;
+    aspect-ratio: 1 / 1;
   }
 }
 
@@ -1418,14 +1639,11 @@ footer {
 .custom-connector > svg {
   color: var(--blue);
 }
-.custom-connector > div strong {
-  font-size: 0.82rem;
-}
-.custom-connector > div p {
-  max-width: 500px;
-  margin: 0.25rem 0 0;
+.custom-connector > p {
+  max-width: 520px;
+  margin: 0;
   color: #626a78;
-  font-size: 0.7rem;
+  font-size: 0.74rem;
 }
 .custom-connector > a {
   position: relative;
@@ -1455,7 +1673,11 @@ footer {
 .cta-section {
   padding: clamp(6rem, 12vw, 11rem) max(4vw, calc((100vw - 1120px) / 2));
   background:
-    radial-gradient(circle at 80% 20%, rgba(255, 92, 66, 0.14), transparent 34%),
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 92, 66, 0.14),
+      transparent 34%
+    ),
     var(--paper-light);
   color: var(--ink);
 }
@@ -1731,6 +1953,16 @@ footer > a:last-child {
   }
   .hero-plate {
     transition: none;
+  }
+  /* The ring stands still: discs in place, the figure at rest. */
+  .connector-orbit,
+  .connector-disc > span,
+  .connector-disc > span::after,
+  .connector-figure img {
+    animation: none;
+  }
+  .connector-figure img[data-pose='1'] {
+    opacity: 1;
   }
 }
 

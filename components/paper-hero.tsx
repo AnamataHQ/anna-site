@@ -68,7 +68,7 @@ const LANDING = { dx: -2.2, dy: 1.6 } as const;
 // back's width, left edge and top edge in each sprite's own pixels. Poses 2
 // and 3 were generated from pose 1 as reference; pose 2 was cropped at the
 // bottom so the chair legs are the same length in all three.
-const POSES = [
+export const POSES = [
   { pose: 1, iw: 516, ih: 912, chair: { w: 274, left: 139, top: 317 } },
   { pose: 2, iw: 1182, ih: 2410, chair: { w: 610, left: 350, top: 1090 } },
   { pose: 3, iw: 1282, ih: 2376, chair: { w: 728, left: 315, top: 804 } },

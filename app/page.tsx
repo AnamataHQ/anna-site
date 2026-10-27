@@ -17,10 +17,16 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import Image from 'next/image';
-import { type MouseEvent, useEffect, useRef, useState } from 'react';
+import {
+  type CSSProperties,
+  type MouseEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
-import { PaperHero } from '@/components/paper-hero';
+import { PaperHero, POSES } from '@/components/paper-hero';
 import type { LeadKind } from '@/lib/lead-capture';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -52,15 +58,16 @@ const content = {
       'Asks before she acts, within the rights you grant',
     ],
     heroAria:
-      'A paper-craft room. A small figure at a desk raises one card, which floats up to the knot of a paper mobile marked with Anna\'s logo. From the knot, threads hold five paper trays, each with one object: a clock, a calendar, an envelope, an ID card or a folder. Sheets rise from three trays into the knot and come down from it into two. A folder with the same mark comes down to the desk.',
+      "A paper-craft room. A small figure at a desk raises one card, which floats up to the knot of a paper mobile marked with Anna's logo. From the knot, threads hold five paper trays, each with one object: a clock, a calendar, an envelope, an ID card or a folder. Sheets rise from three trays into the knot and come down from it into two. A folder with the same mark comes down to the desk.",
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
-      'Anna works through MCP connectors that sign in with OAuth, with the rights you grant and nothing more. These are the systems she has been tested with; thousands of connectors are available.',
-    testedWith: 'Tested with',
-    customTitle: 'If it has an API, it can join the workflow.',
+      'Anna works through MCP connectors that sign in with OAuth. You grant the rights, she works within them.',
+    ringLabel: 'Among thousands of connectors',
+    ringAria:
+      'The paper figure from the hero on its chair, with a ring of paper discs slowly circling it. Each disc carries the mark of one system.',
     customBody:
-      'For internal or specialist systems without their own connector, Anamata can build one during onboarding.',
+      'If it has a workable API, Anamata can build a connector for it during onboarding.',
     requestConnector: 'Request a connector',
     connectorNote: 'Tell us which system your team needs next.',
     problemKicker: 'Useful work. Wrong use of your time.',
@@ -204,7 +211,8 @@ const content = {
     earlyAccess: 'Vraag vroege toegang aan',
     contact: 'Neem contact op',
     eyebrow: 'Jouw digitale AI-assistent',
-    heroTitle: 'Anna doet het werk waar niemand tijd aan zou moeten verspillen.',
+    heroTitle:
+      'Anna doet het werk waar niemand tijd aan zou moeten verspillen.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze verbindt met de systemen waar jouw werk in staat, vraagt voordat ze handelt en koppelt terug.',
     trust: 'Vroege toegang, 2026',
@@ -218,11 +226,12 @@ const content = {
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
-      'Anna werkt via MCP-koppelingen die inloggen met OAuth, met de rechten die jij geeft en niets meer. Dit zijn de systemen waarmee ze is getest; er zijn duizenden koppelingen beschikbaar.',
-    testedWith: 'Getest met',
-    customTitle: 'Als het een API heeft, kan het meedoen in het werkproces.',
+      'Anna werkt via MCP-koppelingen die inloggen met OAuth. Jij geeft de rechten, zij werkt daarbinnen.',
+    ringLabel: 'Een greep uit duizenden koppelingen',
+    ringAria:
+      'Het papieren figuur uit de hero op zijn stoel, met een ring van papieren schijfjes die er langzaam omheen draait. Elk schijfje draagt het merk van één systeem.',
     customBody:
-      'Voor interne of specialistische systemen zonder eigen koppeling kan Anamata er tijdens de onboarding een bouwen.',
+      'Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen.',
     requestConnector: 'Vraag een koppeling aan',
     connectorNote:
       'Vertel ons welk systeem jouw team als volgende nodig heeft.',
@@ -357,15 +366,26 @@ const content = {
   },
 } as const;
 
-// The systems Anna has been tested with, in the order of the hero's trays.
+// Ten of the thousands of connectors, in orbit order. Teams is not among
+// them: the hero already names it as the place you ask Anna.
 const connectors = [
-  { name: 'Microsoft Teams', icon: '/brands/microsoft-teams.svg' },
+  { name: 'Microsoft 365', icon: '/brands/microsoft-365.svg' },
+  { name: 'Google Drive', icon: '/brands/google-drive.svg' },
   { name: 'Slack', icon: '/brands/slack.svg' },
   { name: 'Notion', icon: '/brands/notion.svg' },
   { name: 'HubSpot', icon: '/brands/hubspot.svg' },
-  { name: 'ClockWise', icon: '/brands/clockwise.png' },
-  { name: 'Loket', icon: '/brands/loket.png' },
+  { name: 'Jira', icon: '/brands/jira.svg' },
+  { name: 'Confluence', icon: '/brands/confluence.svg' },
+  { name: 'GitHub', icon: '/brands/github.svg' },
+  { name: 'Azure', icon: '/brands/azure.svg' },
+  { name: 'Asana', icon: '/brands/asana.svg' },
 ] as const;
+// The ring reuses the hero's seated figure: resting, and the arm raised
+// towards the disc passing in front of it. Placed by the chair back, as in
+// the hero, so the two poses sit on the same chair.
+const RING_POSES = POSES.filter((pose) => pose.pose !== 3);
+// The chair back's width in percent of the ring stage's width (cqw).
+const RING_FIGURE = { chairWidth: 9 } as const;
 
 // The tray sprites of the hero double as the use-case pictograms, so they
 // cost nothing extra to load.
@@ -591,26 +611,70 @@ export default function Home() {
             <p>{t.connectorsBody}</p>
           </div>
           <div className="connector-panel">
-            <p className="integration-panel-label">{t.testedWith}</p>
-            <div className="integration-grid connector-grid">
-              {connectors.map((connector) => (
-                <div className="integration-card" key={connector.name}>
-                  <Image
-                    src={connector.icon}
-                    alt=""
-                    width={28}
-                    height={28}
-                  />
-                  <span>{connector.name}</span>
+            <p className="integration-panel-label">{t.ringLabel}</p>
+            <div
+              className="connector-stage"
+              aria-hidden="true"
+              style={{ '--ring-count': connectors.length } as CSSProperties}
+            >
+              <div className="connector-scene">
+                <div className="connector-floor" />
+                <div className="connector-ring">
+                  <div
+                    className="connector-figure"
+                    style={{
+                      width: `calc(var(--figure-scale, 1) * ${RING_FIGURE.chairWidth}cqw)`,
+                    }}
+                  >
+                    {RING_POSES.map((pose) => (
+                      // eslint-disable-next-line @next/next/no-img-element -- the hero's own sprite, already loaded
+                      <img
+                        key={pose.pose}
+                        data-pose={pose.pose}
+                        src={`/hero/seated-${pose.pose}.webp`}
+                        width={pose.iw}
+                        height={pose.ih}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        style={{
+                          width: `${(100 * pose.iw) / pose.chair.w}%`,
+                          left: `${(-100 * pose.chair.left) / pose.chair.w}%`,
+                          transform: `translateY(${(-100 * pose.chair.top) / pose.ih}%)`,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <div className="connector-orbit">
+                    {connectors.map((connector, index) => (
+                      <span
+                        className="connector-disc"
+                        key={connector.name}
+                        style={{ '--i': index } as CSSProperties}
+                      >
+                        <span>
+                          <Image
+                            src={connector.icon}
+                            alt=""
+                            width={28}
+                            height={28}
+                          />
+                        </span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-            <div className="custom-connector">
-              <FileCheck2 size={21} aria-hidden="true" />
-              <div>
-                <strong>{t.customTitle}</strong>
-                <p>{t.customBody}</p>
               </div>
+            </div>
+            <p className="sr-only">{t.ringAria}</p>
+            <ul className="connector-names">
+              {connectors.map((connector) => (
+                <li key={connector.name}>{connector.name}</li>
+              ))}
+            </ul>
+            <div className="custom-connector">
+              <FileCheck2 size={18} aria-hidden="true" />
+              <p>{t.customBody}</p>
               <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
                 <span>{t.requestConnector}</span>
                 <small>{t.connectorNote}</small>

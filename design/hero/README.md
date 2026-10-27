@@ -82,6 +82,14 @@ colour stay exact.
 Ambient, always: the mobile sways, window light patch follows the real sun (plates), grain
 over everything. Reduced motion: one static frame with the folder on the desk.
 
+## Connector ring (2026-10-27)
+The connectors section reuses seated-1 and seated-2 (no new sprites): the figure sits at
+the centre of a ring of ten paper discs, each with one system's mark (`public/brands`),
+orbiting in CSS 3D (`.connector-stage` in globals.css, one 48 s loop). Every 4.8 s a disc
+passes the far point, in front of the figure: it pulses coral and the figure raises the arm
+(seated-2 without the card) towards it for about a second. Reduced motion: still ring, arm
+down. The figure is placed by its chair back, as in the hero (`POSES` is exported for it).
+
 ## Generation record (Higgsfield, 2026-10-27)
 Sketch: seedream_v5_pro, 16:9, image reference = round-five paper sketch (job
 a6b5eba8-bf96-44ce-b844-77d2a38c056a); chosen take job 2f17d9ae-4fe8-435a-9fc7-58fe34c726bd.

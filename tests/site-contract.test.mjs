@@ -204,19 +204,35 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
 });
 
-test('sells the connectors first: tested examples, thousands available, no roadmap logos', () => {
-  for (const integration of [
-    'Microsoft Teams',
+test('sells the connectors first: a ring of ten marks, thousands available, no tested-with list', () => {
+  const ring = [
+    'Microsoft 365',
+    'Google Drive',
     'Slack',
     'Notion',
     'HubSpot',
-    'ClockWise',
-    'Loket',
-  ]) {
+    'Jira',
+    'Confluence',
+    'GitHub',
+    'Azure',
+    'Asana',
+  ];
+  const block = page.slice(
+    page.indexOf('const connectors = ['),
+    page.indexOf('] as const;', page.indexOf('const connectors = [')),
+  );
+  for (const name of ring) {
+    assert.ok(block.includes(`name: '${name}'`), `missing connector: ${name}`);
+  }
+  for (const icon of block.matchAll(/icon: '\/brands\/([a-z0-9-]+\.svg)'/g)) {
     assert.ok(
-      page.includes(integration),
-      `missing connector: ${integration}`,
+      existsSync(new URL(`../public/brands/${icon[1]}`, import.meta.url)),
+      `missing mark: ${icon[1]}`,
     );
+  }
+  assert.equal([...block.matchAll(/icon: '/g)].length, ring.length);
+  for (const gone of ['ClockWise', 'Loket', 'Microsoft Teams', 'Mendix']) {
+    assert.ok(!block.includes(gone), `${gone} is not a ring connector`);
   }
   const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
     (match) => match[1],
@@ -224,26 +240,59 @@ test('sells the connectors first: tested examples, thousands available, no roadm
   assert.deepEqual(sections.slice(0, 2), ['top', 'connectors']);
   assert.match(page, /OAuth/);
   assert.match(page, /MCP/);
-  assert.match(page, /thousands/i);
-  assert.match(page, /duizenden/i);
-  assert.match(page, /If it has an API/);
-  assert.match(page, /Als het een API heeft/);
+  assert.match(
+    page,
+    /'Anna works through MCP connectors that sign in with OAuth\. You grant the rights, she works within them\.'/,
+  );
+  assert.match(
+    page,
+    /'Anna werkt via MCP-koppelingen die inloggen met OAuth\. Jij geeft de rechten, zij werkt daarbinnen\.'/,
+  );
+  assert.match(page, /Among thousands of connectors/);
+  assert.match(page, /Een greep uit duizenden koppelingen/);
+  assert.match(page, /If it has a workable API, Anamata can build a connector for it during onboarding\./);
+  assert.match(page, /Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen\./);
   assert.match(page, /Request a connector/);
   assert.match(page, /Vraag een koppeling aan/);
   for (const gone of [
+    'Tested with',
+    'Getest met',
+    'If one connector works',
+    'these are the systems she has been tested with',
     'Shipping with Anna',
     'Communication roadmap',
-    'Mendix',
     'on the cards',
     'op de planning',
     'Available now',
     '+∞',
-    'Atlassian',
-    'Jira',
-    'GitHub',
   ]) {
     assert.ok(!page.includes(gone), `old connector copy still present: ${gone}`);
   }
+});
+
+test('the connector ring orbits the hero figure in CSS and stands still under reduced motion', () => {
+  // The ring and the figure are decoration; the names stay readable as a list.
+  assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
+  assert.match(page, /className="connector-ring"/);
+  assert.match(page, /className="connector-disc"/);
+  assert.match(page, /className="connector-figure"/);
+  assert.match(page, /className="connector-names"/);
+  // The figure is the hero's own sprite, placed by its chair back like the hero does.
+  assert.match(page, /\/hero\/seated-\$\{pose\.pose\}\.webp/);
+  assert.match(hero, /export const POSES/);
+  const figure = page.slice(
+    page.indexOf('className="connector-figure"'),
+    page.indexOf('className="connector-orbit"'),
+  );
+  assert.doesNotMatch(figure, /brands\//);
+  // One CSS loop drives orbit, facing, pulse and the arm; no JavaScript timers.
+  assert.match(styles, /--ring-loop/);
+  assert.match(styles, /@keyframes connector-orbit/);
+  assert.match(styles, /@keyframes connector-face/);
+  assert.match(styles, /@keyframes connector-pulse/);
+  assert.match(styles, /@keyframes connector-arm/);
+  const reduced = styles.slice(styles.indexOf('@media (prefers-reduced-motion: reduce)'));
+  assert.match(reduced, /\.connector-orbit,[\s\S]*animation: none/);
 });
 
 test('tells the story in the agreed order', () => {
