@@ -3,25 +3,29 @@
 Direction chosen by Ezra on 2026-10-27 after five sketch rounds (reports and contact sheets
 in the session handoff). The hero is a paper-craft diorama: a pale off-white paper room with
 a window on the right; a small paper figure (the visitor, not Anna) seated at a desk, seen
-from behind, raises one coral card (the ask); a thick stack of paper, tagged "for Anna", lies
-on the desk; from one knot a thread mobile holds five paper trays, each with one work object
-(clock, calendar, envelope, ID card, folder: the systems); sheets lift off the desk stack into
-the trays; one slim folder, stamped with Anna's mark, drifts back down onto the stack (done,
-returned). The window is the light source, not an exit: the work never leaves the room, it
-comes back done.
+from behind, raises one coral card (the ask) that flies up to the knot of a thread mobile;
+the knot carries Anna's mark and holds five paper trays, each with one work object (clock,
+calendar, envelope, ID card, folder: the systems); Anna reads from three trays (a sheet
+rises from the tray into the knot) and writes to two (a sheet comes down from the knot into
+the tray); one slim folder, stamped with her mark, comes down from the knot onto the desk
+(done, handed back). The window is the light source, not an exit: the work never leaves the
+room, it comes back done.
 
-**Anna is the mobile** (Ezra, 2026-10-27, after the desk-stack round): the figure is the
-visitor, never Anna, so Anna needs a body that is not a person. The knot where the threads
-meet is a paper disc with her mark (HTML, so the #530 logo drops in). Every beat connects to
-it: the ask (the coral card flies from the hand to the knot, the knot flashes), the work
-(an arm lights from the knot outward, and only then does that tray's sheet lift off the
-desk), the return (the stamped folder comes down from the knot onto the stack). Her mark is
-on the knot, the tag and the folder, never on the figure.
+**Anna is the mobile** (Ezra, 2026-10-27): the figure is the visitor, never Anna, so Anna
+needs a body that is not a person. The knot where the threads meet is a paper disc with her
+mark (HTML, so the #530 logo drops in). Every beat starts or ends at it: the ask (the coral
+card flies from the hand to the knot, the knot flashes), the work (an arm lights from the
+knot outward, then Anna reads from that system, a sheet rising from the tray into the knot,
+or writes to it, a sheet coming down from the knot onto the tray, which settles), the return
+(a second, smaller flash, then the stamped folder comes down from the knot onto the desk and
+the figure holds it). Her mark is on the knot and the folder, never on the figure. Nothing is
+on the desk but the mug and what comes back.
 
-Until 2026-10-27 the stack hung in a navy sling above the desk (the pile handed to Anna).
-Ezra asked why the work came out of a pile instead of being lifted off the desk; the desk
-stack is the answer. A "asks before she acts" beat (a small card coming back down before
-the sheets move) was discussed and parked: add it only if the loop feels too automatic.
+Earlier the same day the work was a paper stack on the desk (before that, a stack in a navy
+sling above it); Ezra: with the ask going to the mobile, a pile "for Anna" on the desk no
+longer meant anything, and sheets flying to the baskets did not show Anna retrieving
+anything. A "asks before she acts" beat (a small card coming back down before the writes)
+was discussed and parked: add it only if the loop feels too automatic.
 
 `sketch-approved-2026-10-27.png` is the frame Ezra picked ("right one"). Everything in
 `public/hero/` was generated from it as style reference.
@@ -45,7 +49,7 @@ the sheets move) was discussed and parked: add it only if the loop feels too aut
 
 ## Files
 `public/hero/` holds the served versions: plates at 2400 px, sprites re-encoded at about twice
-their largest on-screen size (figure 360 px, trays 320 px, stack 300 px, sheets 170 px). The
+their largest on-screen size (figure 360 px, trays 320 px, sheets 170 px). The
 full-resolution originals, straight from generation, are in `design/hero/source/`; regenerate
 a served sprite from there with ImageMagick (`convert <src> -resize <w>x -quality 85
 -define webp:alpha-quality=90 <dst>`).
@@ -53,27 +57,28 @@ a served sprite from there with ImageMagick (`convert <src> -resize <w>x -qualit
 | file | what | role in the page |
 |---|---|---|
 | plate-morning / plate-midday / plate-afternoon.webp | the empty room with desk and cup, three lights | cross-faded by the real sun altitude (vlieger method) |
-| stack.webp | the stack of work on the desk | sits at the left end of the desk; thins while sheets are away; carries the tag |
 | tray-1..5.webp | clock, calendar, envelope, ID card, folder | hang from the mobile; tilt when a sheet lands |
-| seated-1..3.webp | figure on its chair, seen from behind at eye level: hands on desk; arm up with coral card; holding folder (2 and 3 generated from 1 as reference, so figure and chair match) | pose swap, stop-motion style; chair included, so no separate chair layer |
-| sheet-1..5.webp, sheet-6.webp | five loose sheets; sheet-6 is the slim folder | glide from stack to trays; the folder drifts down |
+| seated-1..3.webp | figure on its chair, seen from behind at eye level: hands on desk; arm up (the card is cut out of seated-2 and drawn in code, so the same card can leave the hand); holding folder. 2 and 3 generated from 1 as reference; 2 cropped at the bottom to the same leg length | pose swap, stop-motion style, every pose placed by its chair back; chair included, so no separate chair layer |
+| sheet-1..5.webp, sheet-6.webp | five loose sheets; sheet-6 is the slim folder | 1-3 rise from their tray into the knot (reads), 4-5 come down from the knot onto their tray (writes); the folder comes down to the desk |
 | chair.webp | spare: the empty chair seen from behind at eye level | only if a pose without the figure is ever needed |
 
-Layer order, back to front: plate, mobile (threads, arms, knot, trays), stack, sheets,
-folder, seated figure, card. The desk is in the plate. The thread, the arms, their coral
+Layer order, back to front: plate, mobile (threads, arms, knot, trays), sheets, folder,
+seated figure, card. The desk is in the plate. The thread, the arms, their coral
 pulses, the knot and the card are drawn in code so they can move and so the mark and the
 colour stay exact.
 
 ## Loop (about 12 s, first motion within 2 s of load)
-1. The ask: seated-2 (card up) for 0.8 s; the card leaves the hand and flies to the knot
-   over 1.2 s; seated-1. At 2.0 s the knot flashes a coral ring: Anna has it.
-2. The work: every 0.9 s from 2.0 s an arm pulses coral from the knot to its tray (0.6 s),
-   then that tray's sheet lifts off the desk stack and glides into it (1.2 s); the tray
-   tilts and settles. The stack thins as they go. Sheets fade out of the trays about 5 s
-   after they left the desk.
-3. The return: at 8.0 s the folder, stamped with Anna's mark, comes down from the knot onto
-   the stack (1.5 s); seated-3 (holding folder) for 1 s; back to seated-1. The stack is
-   whole again before the loop restarts.
+1. The ask: seated-2 (arm up, the drawn card in the hand) until 1.2 s; at 0.8 s the card
+   leaves the hand and flies to the knot over 1.2 s; seated-1 from 1.2 s. At 2.0 s the knot
+   flashes a coral ring: Anna has it.
+2. The work: every 0.9 s an arm pulses coral from the knot to its tray (0.5 s), then: reads
+   (clock 2.7 s, calendar 3.6 s, envelope 4.5 s): a sheet appears in the tray and rises into
+   the knot (1 s), absorbed; writes (ID card 5.4 s, folder 6.3 s): a sheet comes out of the
+   knot and lands on the tray's lip (1 s), the tray settles. Written sheets stay until the
+   loop is nearly over.
+3. The return: 7.6 s a smaller flash on the knot (done); 8.0 s the folder, stamped with
+   Anna's mark, comes down from the knot onto the desk (1.5 s); seated-3 (holding folder)
+   for 1 s; back to seated-1.
 Ambient, always: the mobile sways, window light patch follows the real sun (plates), grain
 over everything. Reduced motion: one static frame with the folder on the desk.
 
@@ -86,9 +91,11 @@ Plates and sprites: seedream_v5_pro with the chosen take as `image_references`:
   it) and spare chair f39c59bb (both from directly behind at eye level; the first chair
   take, 2289ef0b, was seen from above and rejected by Ezra); the sling (70599559) was
   retired on 2026-10-27
-- desk stack 80d75d87 (1:1, chosen take as reference); seated-2 7bb13c13 and seated-3
-  bd693a7e regenerated with seated-1 uploaded as `image_references` ("this exact figure on
-  this exact chair ... identical except the pose"), so the chair legs scale the same figure
+- seated-2 7bb13c13 and seated-3 bd693a7e regenerated with seated-1 uploaded as
+  `image_references` ("this exact figure on this exact chair ... identical except the pose");
+  seated-2 cropped to 1182x2410 (same leg length as the others) with its drawn card cut out
+  (polygon mask) so the code-drawn card can leave the hand; a desk stack (80d75d87) was
+  generated and retired the same day
 Backgrounds removed with `image_background_remover`; sheets split by alpha column runs
 (`cut-sprites.sh` in the session scratchpad; re-create: ImageMagick `-alpha extract`,
 column profile, crop runs, `-trim`). WebP at quality 82 (plates, 2400 px) and 85 (sprites).

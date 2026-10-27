@@ -23,38 +23,38 @@ export const HERO_LOOP_MS = 12000;
 const PLATE = { width: 2400, height: 1355 } as const;
 const SUN_REFRESH_MS = 5 * 60 * 1000;
 
-// The work is on the visitor's desk: a paper stack at the left end of the
-// desk (its top surface is at 79-80 % of the plate), the mug stays visible to
-// its right. `top` is where the sheets leave; `bottom` sits on the desk.
-const STACK = { x: 62.4, top: 74.4, bottom: 80.2, width: 4.6, iw: 300, ih: 231 } as const;
 // Anna is the mobile: one knot, her mark on it, a thread into every system.
 // Where it is tied, in percent of the plate.
 const KNOT = { x: 61, y: 17 } as const;
-// Where the raised coral card sits in the card-up pose (measured on the
-// sprite at the figure's size below); the card flies from here to the knot.
-const CARD = { x: 74.6, y: 55.8, width: 1.5 } as const;
-// An arm lights from the knot outward this long before its sheet lifts, and
-// a sheet's flight to its tray takes this long.
-const ARM_LEAD = 0.6;
-const FLIGHT = 1.2;
-// `width` is the chair's footprint (its legs); each pose scales to that, so the
-// chair stays the same size while the figure changes pose. A real chair is
-// about a third of the desk (which spans 61-76 % of the plate).
-const FIGURE = { x: 72, bottom: 93.5, width: 6.2 } as const;
+// Where the raised hand holds the coral card (measured on seated-2 at the
+// figure's size below; the sprite's own card is cut out, this one is drawn).
+const CARD = { x: 68.3, y: 61, width: 1.3 } as const;
+// Where the returned folder lands: on the desk, between the mug and the chair.
+const DESK = { x: 65.5, y: 78 } as const;
+// An arm lights from the knot outward this long before its sheet moves, and
+// a sheet's flight between a tray and the knot takes this long.
+const ARM_LEAD = 0.5;
+const FLIGHT = 1.0;
+// The figure is placed by its chair back: `chairWidth` is the back's width in
+// percent of the plate, `chairTop` where its top edge sits. Every pose is
+// scaled and shifted to that, so the chair never moves or changes size.
+const FIGURE = { x: 72, chairTop: 74.9, chairWidth: 4.83 } as const;
 
-// Trays: clock, calendar, envelope, ID card, folder. `t` is the second of the
-// loop at which this tray's sheet leaves the stack (the card reaches the knot
-// at 2.0 s; the arm lights ARM_LEAD earlier; the flight takes FLIGHT).
+// Trays: clock, calendar, envelope, ID card, folder. Anna reads from the
+// first three (a sheet rises from the tray into the knot) and writes to the
+// last two (a sheet comes down from the knot into the tray). `t` is the
+// second of the loop at which the sheet starts moving; the card reaches the
+// knot at 2.0 s and the arm lights ARM_LEAD before each sheet.
 const TRAYS = [
-  { n: 1, x: 53, y: 46, w: 7.8, iw: 320, ih: 217, t: 2.6, tilt: -1 },
-  { n: 2, x: 59, y: 39, w: 7.8, iw: 320, ih: 206, t: 3.5, tilt: 1 },
-  { n: 3, x: 55, y: 57, w: 7.8, iw: 320, ih: 172, t: 4.4, tilt: -1 },
-  { n: 4, x: 63, y: 51, w: 7.8, iw: 320, ih: 172, t: 5.3, tilt: 1 },
-  { n: 5, x: 69, y: 43, w: 7.8, iw: 320, ih: 219, t: 6.2, tilt: -1 },
+  { n: 1, x: 53, y: 46, w: 7.8, iw: 320, ih: 217, t: 2.7, tilt: -1, io: 'read' },
+  { n: 2, x: 59, y: 39, w: 7.8, iw: 320, ih: 206, t: 3.6, tilt: 1, io: 'read' },
+  { n: 3, x: 55, y: 57, w: 7.8, iw: 320, ih: 172, t: 4.5, tilt: -1, io: 'read' },
+  { n: 4, x: 63, y: 51, w: 7.8, iw: 320, ih: 172, t: 5.4, tilt: 1, io: 'write' },
+  { n: 5, x: 69, y: 43, w: 7.8, iw: 320, ih: 219, t: 6.3, tilt: -1, io: 'write' },
 ] as const;
 
-// Sheets are small and land at the front-left lip of their tray, so the
-// object in the tray (the system) stays visible.
+// Sheets are small; a written sheet lands at the front-left lip of its tray,
+// so the object in the tray (the system) stays visible.
 const SHEETS = [
   { n: 1, w: 2.4, iw: 170, ih: 195, rot: -22 },
   { n: 2, w: 2.3, iw: 170, ih: 164, rot: 14 },
@@ -65,13 +65,13 @@ const SHEETS = [
 const LANDING = { dx: -2.2, dy: 1.6 } as const;
 
 // Measured on the full-resolution sprites (design/hero/source): the chair
-// legs' span and left edge, so every pose is scaled and shifted to the same
-// chair footprint. Poses 2 and 3 were generated from pose 1 as reference, so
-// the figure itself is the same size in all three.
+// back's width, left edge and top edge in each sprite's own pixels. Poses 2
+// and 3 were generated from pose 1 as reference; pose 2 was cropped at the
+// bottom so the chair legs are the same length in all three.
 const POSES = [
-  { pose: 1, iw: 360, ih: 636, legs: 352, legsLeft: 81, native: 516 },
-  { pose: 2, iw: 360, ih: 785, legs: 699, legsLeft: 281, native: 1182 },
-  { pose: 3, iw: 360, ih: 667, legs: 870, legsLeft: 190, native: 1282 },
+  { pose: 1, iw: 516, ih: 912, chair: { w: 274, left: 139, top: 317 } },
+  { pose: 2, iw: 1182, ih: 2410, chair: { w: 610, left: 350, top: 1090 } },
+  { pose: 3, iw: 1282, ih: 2376, chair: { w: 728, left: 315, top: 804 } },
 ] as const;
 
 const PLATE_RATIO = PLATE.width / PLATE.height;
@@ -104,11 +104,9 @@ function afterFirstPaint(callback: () => void) {
 
 export function PaperHero({
   label,
-  tag,
   playing,
 }: {
   label: string;
-  tag: string;
   playing: boolean;
 }) {
   const [painted, setPainted] = useState(false);
@@ -246,6 +244,7 @@ export function PaperHero({
           <img
             key={tray.n}
             className="hero-tray"
+            data-io={tray.io}
             src={`/hero/tray-${tray.n}.webp`}
             width={tray.iw}
             height={tray.ih}
@@ -257,7 +256,8 @@ export function PaperHero({
                 left: `${tray.x}%`,
                 top: `${tray.y}%`,
                 width: `${tray.w}%`,
-                '--t': `${tray.t + FLIGHT}s`,
+                // Only a written-to tray settles, when its sheet lands.
+                '--t': tray.io === 'write' ? `${tray.t + FLIGHT}s` : 'none',
                 '--tilt': tray.tilt,
               } as CSSProperties
             }
@@ -265,43 +265,18 @@ export function PaperHero({
         ))}
       </div>
 
-      {/* The stack of work on the desk, tagged for Anna; it thins as sheets leave. */}
-      <div
-        className="hero-stack"
-        style={{
-          left: `${STACK.x}%`,
-          top: `${STACK.bottom}%`,
-          width: `${STACK.width}%`,
-        }}
-      >
-        <img
-          className="hero-stack-paper"
-          src="/hero/stack.webp"
-          width={STACK.iw}
-          height={STACK.ih}
-          alt=""
-          loading="lazy"
-          decoding="async"
-        />
-        <span className="hero-stack-tag">
-          <img
-            src="/brands/anna-mono-dark.svg"
-            width={12}
-            height={12}
-            alt=""
-            loading="lazy"
-          />
-          {tag}
-        </span>
-      </div>
-
-      {/* Sheets lift off the stack into the trays, one every 0.9 s. */}
+      {/* Sheets: a read rises from its tray into the knot, a write comes down
+          from the knot and lands on the tray's lip. Both travel between the
+          tray and the knot; the keyframes decide the direction. */}
       {SHEETS.map((sheet, index) => {
         const tray = TRAYS[index];
+        const left = tray.x + (tray.io === 'write' ? LANDING.dx : 0);
+        const top = tray.y + (tray.io === 'write' ? LANDING.dy : -1);
         return (
           <img
             key={sheet.n}
             className="hero-sheet"
+            data-io={tray.io}
             src={`/hero/sheet-${sheet.n}.webp`}
             width={sheet.iw}
             height={sheet.ih}
@@ -310,11 +285,11 @@ export function PaperHero({
             decoding="async"
             style={
               {
-                left: `${STACK.x}%`,
-                top: `${STACK.top}%`,
+                left: `${left}%`,
+                top: `${top}%`,
                 width: `${sheet.w}%`,
-                '--dx': tray.x + LANDING.dx - STACK.x,
-                '--dy': tray.y + LANDING.dy - STACK.top,
+                '--dx': KNOT.x - tray.x - (tray.io === 'write' ? LANDING.dx : 0),
+                '--dy': KNOT.y - tray.y - (tray.io === 'write' ? LANDING.dy : -1),
                 '--rot': `${sheet.rot}deg`,
                 '--t': `${tray.t}s`,
               } as CSSProperties
@@ -324,7 +299,7 @@ export function PaperHero({
       })}
 
       {/* The slim folder, stamped with Anna's mark, comes down from the knot
-          onto the stack: done, handed back. */}
+          onto the desk: done, handed back. */}
       <div
         className="hero-folder"
         style={
@@ -332,8 +307,8 @@ export function PaperHero({
             left: `${KNOT.x}%`,
             top: `${KNOT.y}%`,
             width: '2.4%',
-            '--dx': STACK.x - KNOT.x,
-            '--dy': STACK.top - 1.2 - KNOT.y,
+            '--dx': DESK.x - KNOT.x,
+            '--dy': DESK.y - KNOT.y,
           } as CSSProperties
         }
       >
@@ -360,8 +335,8 @@ export function PaperHero({
         className="hero-figure"
         style={{
           left: `${FIGURE.x}%`,
-          top: `${FIGURE.bottom}%`,
-          width: `${FIGURE.width}%`,
+          top: `${FIGURE.chairTop}%`,
+          width: `${FIGURE.chairWidth}%`,
         }}
       >
         {POSES.map((pose) => (
@@ -375,14 +350,16 @@ export function PaperHero({
             loading={pose.pose === 2 ? 'eager' : 'lazy'}
             decoding="async"
             style={{
-              width: `${(100 * pose.native) / pose.legs}%`,
-              left: `${(-100 * pose.legsLeft) / pose.legs}%`,
+              width: `${(100 * pose.iw) / pose.chair.w}%`,
+              left: `${(-100 * pose.chair.left) / pose.chair.w}%`,
+              transform: `translateY(${(-100 * pose.chair.top) / pose.ih}%)`,
             }}
           />
         ))}
       </div>
 
-      {/* The ask: the coral card leaves the raised hand and flies to the knot. */}
+      {/* The ask: the coral card, in the raised hand from the first frame,
+          leaves it while the arm is still up and flies to the knot. */}
       <span
         className="hero-card"
         aria-hidden="true"

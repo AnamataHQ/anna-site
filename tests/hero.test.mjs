@@ -28,7 +28,7 @@ const referenced = (ref) =>
   hero.includes(ref) || hero.includes(ref.replace(/-\d+\.webp$/, '-${'));
 
 test('every hero image the component references is served from the export', () => {
-  assert.ok(heroImages.length >= 18, `only ${heroImages.length} hero images`);
+  assert.ok(heroImages.length >= 17, `only ${heroImages.length} hero images`);
   for (const ref of heroImages) {
     assert.ok(referenced(ref), `served but unused: ${ref}`);
   }
@@ -109,46 +109,50 @@ test('the loop is 12 s, first motion inside 2 s, defined once in CSS and once in
   assert.match(styles, /\.hero-figure\s+img\s*\{[^}]*steps\(1/s);
 });
 
-test('sheets lift off the desk stack one at a time into the trays and the folder comes back onto it', () => {
+test('Anna reads from three systems (sheets rise into the knot) and writes to two (sheets come down)', () => {
   assert.ok(hero.includes('/hero/sheet-${sheet.n}.webp'));
   assert.ok(hero.includes('/hero/tray-${tray.n}.webp'));
-  // The work is on the visitor's desk: a paper stack sprite, no hanging sling.
-  assert.match(hero, /\/hero\/stack\.webp/);
-  assert.match(hero, /className="hero-stack"/);
-  assert.doesNotMatch(hero, /sling/i);
-  assert.doesNotMatch(styles, /sling/i);
-  // Sheets start at the top of the stack; the folder comes down from Anna
-  // (the knot) and returns to the stack.
-  assert.match(hero, /left: `\$\{STACK\.x\}%`,\s*top: `\$\{STACK\.top\}%`/);
-  assert.match(hero, /'--dx': STACK\.x - KNOT\.x/);
-  assert.match(hero, /'--dy': STACK\.top - [0-9.]+ - KNOT\.y/);
-  // Each arm lights from the knot outward before its sheet lifts: the arm
-  // pulse leads the sheet's departure, the tray settles after the landing.
-  assert.match(hero, /className="hero-arm-pulse"[^>]*pathLength=\{100\}/s);
-  assert.match(hero, /'--t': `\$\{tray\.t - ARM_LEAD\}s`/);
-  assert.match(hero, /'--t': `\$\{tray\.t \+ FLIGHT\}s`/);
-  assert.match(styles, /@keyframes hero-arm-pulse/);
-  assert.match(styles, /\.hero-arm-pulse\s*\{[^}]*stroke:\s*var\(--coral\)/s);
-  // The stack thins while the sheets are away.
-  assert.match(styles, /@keyframes hero-stack-thin/);
-  assert.match(styles, /\.hero-stack-paper\s*\{[^}]*animation:\s*hero-stack-thin/s);
   for (let i = 1; i <= 5; i += 1) {
     assert.match(hero, new RegExp(`\\{ n: ${i}, x: \\d+, y: \\d+`), `tray ${i}`);
   }
-  assert.match(hero, /\/hero\/sheet-6\.webp/);
-  assert.match(styles, /@keyframes hero-sheet-flight/);
+  // Nothing is on the desk but the mug and what comes back: no stack, no sling, no tag.
+  assert.doesNotMatch(hero, /stack|sling/i);
+  assert.doesNotMatch(styles, /hero-stack|hero-sling/);
+  // Three reads, two writes; each sheet travels between its tray and the knot.
+  const reads = [...hero.matchAll(/io: 'read'/g)].length;
+  const writes = [...hero.matchAll(/io: 'write'/g)].length;
+  assert.equal(reads, 3);
+  assert.equal(writes, 2);
+  assert.match(hero, /'--dx': KNOT\.x - tray\.x/);
+  assert.match(hero, /data-io=\{tray\.io\}/);
+  assert.match(styles, /@keyframes hero-sheet-read/);
+  assert.match(styles, /@keyframes hero-sheet-write/);
+  assert.match(styles, /\.hero-sheet\[data-io='read'\]\s*\{[^}]*hero-sheet-read/s);
+  assert.match(styles, /\.hero-sheet\[data-io='write'\]\s*\{[^}]*hero-sheet-write/s);
+  // A read sheet is absorbed at the knot: it ends small and invisible there.
+  const read = styles.match(/@keyframes hero-sheet-read\s*\{([\s\S]*?)\n\}/)?.[1];
+  assert.match(read, /scale\(0\.[0-9]+\)/);
+  // Only the written-to trays settle, after their sheet lands.
+  assert.match(hero, /tray\.io === 'write' \? `\$\{tray\.t \+ FLIGHT\}s` : 'none'/);
   assert.match(styles, /@keyframes hero-tray-settle/);
+  // Each arm lights from the knot outward before its sheet moves.
+  assert.match(hero, /className="hero-arm-pulse"[^>]*pathLength=\{100\}/s);
+  assert.match(hero, /'--t': `\$\{tray\.t - ARM_LEAD\}s`/);
+  assert.match(styles, /@keyframes hero-arm-pulse/);
+  assert.match(styles, /\.hero-arm-pulse\s*\{[^}]*stroke:\s*var\(--coral\)/s);
+  // The folder comes down from the knot to the desk.
+  assert.match(hero, /'--dx': DESK\.x - KNOT\.x/);
+  assert.match(hero, /'--dy': DESK\.y - KNOT\.y/);
   assert.match(styles, /@keyframes hero-folder-return/);
   // The thread, the knot and the arms are drawn in code, not in the images.
   assert.match(hero, /<svg[^>]*className="hero-threads"/s);
   assert.match(hero, /<line\b/);
 });
 
-test('the paper tag on the desk stack is real text in both languages', () => {
-  assert.match(hero, /className="hero-stack-tag"/);
-  assert.match(page, /stackTag:\s*'for Anna'/);
-  assert.match(page, /stackTag:\s*'voor Anna'/);
-  assert.match(hero, /\{tag\}/);
+test('the hero has no text in the picture: the only words are the label for assistive tech', () => {
+  assert.doesNotMatch(hero, /\{tag\}|stackTag|slingTag/);
+  assert.doesNotMatch(page, /stackTag|slingTag/);
+  assert.match(hero, /aria-label=\{label\}/);
 });
 
 test("Anna is the mobile: her mark is the knot, the card flies to it, it flashes when the ask arrives", () => {
@@ -157,26 +161,24 @@ test("Anna is the mobile: her mark is the knot, the card flies to it, it flashes
   assert.match(knot, /\/brands\/anna-mono-dark\.svg/);
   assert.match(knot, /left: `\$\{KNOT\.x\}%`/);
   assert.doesNotMatch(hero, /<circle\b/);
-  // The coral card leaves the hand and ends at the knot.
+  // The coral card is drawn in code, sits in the raised hand from the first
+  // frame (the sprite's own card is cut out), leaves it while the arm is
+  // still up, and ends at the knot.
   assert.match(hero, /className="hero-card"/);
   assert.match(hero, /'--dx': KNOT\.x - CARD\.x/);
   assert.match(hero, /'--dy': KNOT\.y - CARD\.y/);
+  assert.match(readme, /card (is )?cut out of seated-2|seated-2 .*card cut out/i);
   assert.match(styles, /@keyframes hero-knot-receive/);
   assert.match(styles, /\.hero-knot\s*\{[^}]*animation:\s*hero-knot-receive/s);
-  // The card only shows once the card-up pose has swapped away, so it is
-  // never drawn twice.
   const pose = styles.match(/@keyframes hero-pose-card\s*\{([\s\S]*?)\n\}/)?.[1];
   const poseEnd = Number(pose.match(/\n\s*(\d+(?:\.\d+)?)%,\s*\n\s*100%/)?.[1]);
   const card = styles.match(/@keyframes hero-card-flight\s*\{([\s\S]*?)\n\}/)?.[1];
-  assert.match(card, /(^|\n)\s*0%,?[^}]*opacity:\s*0/);
-  const cardShows = Number(card.match(/\n\s*(\d+(?:\.\d+)?)%\s*\{[^}]*opacity:\s*1/)?.[1]);
-  assert.ok(cardShows >= poseEnd, `card shows at ${cardShows}% before the pose swaps at ${poseEnd}%`);
+  assert.match(card, /(^|\n)\s*0%[^}]*opacity:\s*1/);
+  const cardLeaves = Number(card.match(/\n\s*(\d+(?:\.\d+)?)%\s*\{[^}]*translate\(calc\(var\(--dx\)/)?.[1]);
+  assert.ok(cardLeaves < poseEnd, `card leaves at ${cardLeaves}%, after the arm comes down at ${poseEnd}%`);
 });
 
-test("Anna's mark sits on the tag and on the returned folder, never on the figure", () => {
-  const tag = hero.match(/<span className="hero-stack-tag">([\s\S]*?)<\/span>/)?.[1];
-  assert.ok(tag, 'missing stack tag');
-  assert.match(tag, /\/brands\/anna-mono-dark\.svg/);
+test("Anna's mark sits on the knot and on the returned folder, never on the figure", () => {
   const folder = hero.match(/<div\s+className="hero-folder"[\s\S]*?<\/div>/)?.[0];
   assert.ok(folder, 'the folder is not a group');
   assert.match(folder, /\/hero\/sheet-6\.webp/);
@@ -229,8 +231,18 @@ test('the stage always reaches the right edge on tablets and phones, and the cop
   assert.match(styles, /translateX\(max\(-64%, calc\(50cqw - 100%\)\)\)/);
   assert.match(styles, /translateX\(max\(-66%, calc\(50cqw - 100%\)\)\)/);
   assert.match(styles, /\.hero::before\s*\{[^}]*linear-gradient/s);
-  assert.match(styles, /\.hero-stack-tag\s*\{[^}]*rotate:\s*-?\d+deg/s);
-  assert.doesNotMatch(styles, /\.hero-stack-tag\s*\{[^}]*transform:\s*rotate/s);
+});
+
+test('the hero fits a Full HD browser window: copy padding never pushes it past the viewport', () => {
+  // 1920 x 945 (Full HD minus browser chrome): the hero is the viewport minus
+  // the header, and the copy block must fit inside that with its padding.
+  const copy = styles.match(/\.hero-copy\s*\{[^}]*padding:\s*([^;]+);/s)?.[1];
+  assert.ok(copy, 'missing hero-copy padding');
+  const vertical = copy.match(/clamp\(([\d.]+)rem,\s*([\d.]+)vw,\s*([\d.]+)rem\)/);
+  assert.ok(vertical, `hero-copy vertical padding is not a clamp: ${copy}`);
+  const atFullHd = Math.min(Number(vertical[3]) * 16, Math.max(Number(vertical[1]) * 16, (Number(vertical[2]) / 100) * 1920));
+  assert.ok(atFullHd <= 80, `vertical padding ${atFullHd}px at 1920 wide`);
+  assert.match(styles, /\.hero\s*\{[^}]*min-height:\s*min\(880px,\s*calc\(100svh - 74px\)\)/s);
 });
 
 test('reduced motion shows one still frame with the folder on the desk', () => {
@@ -244,6 +256,7 @@ test('reduced motion shows one still frame with the folder on the desk', () => {
     assert.match(reduced, new RegExp(`\\.${hidden}[^{]*\\{[^}]*(display:\\s*none|opacity:\\s*0)`, 's'), hidden);
   }
   assert.match(reduced, /\.hero-figure img\[data-pose='3'\]\s*\{[^}]*opacity:\s*1/s);
+  assert.match(reduced, /\.hero-knot[^{]*\{[^}]*animation:\s*none/s);
   assert.match(reduced, /\.hero-figure img\[data-pose='1'\],\s*\.hero-figure img\[data-pose='2'\]\s*\{[^}]*opacity:\s*0/s);
 });
 
@@ -316,19 +329,28 @@ test('exactly one plate shows at a time, so the desk and mug never double-expose
   assert.doesNotMatch(hero, /'--o-midday':\s*(loaded\.midday \? )?opacities/);
 });
 
-test('every pose is scaled to the same chair footprint', () => {
-  const poses = [...hero.matchAll(/\{ pose: (\d), iw: \d+, ih: \d+, legs: (\d+), legsLeft: (\d+), native: (\d+) \}/g)];
+test('every pose is scaled and placed by the chair back, so the chair never moves or changes size', () => {
+  const poses = [...hero.matchAll(/\{ pose: (\d), iw: (\d+), ih: (\d+), chair: \{ w: (\d+), left: (\d+), top: (\d+) \} \}/g)];
   assert.equal(poses.length, 3);
-  for (const [, pose, legs, legsLeft, native] of poses) {
-    // Legs are measured in each sprite's own pixels; the span and its left
-    // edge must fit inside the sprite, or the scaling formula is off.
-    assert.ok(Number(legs) > 0 && Number(legsLeft) + Number(legs) <= Number(native), `pose ${pose}`);
+  for (const [, pose, iw, ih, w, left, top] of poses) {
+    // The chair back is measured in the sprite's own pixels and must fit in it.
+    assert.ok(Number(left) + Number(w) <= Number(iw), `pose ${pose} chair wider than sprite`);
+    assert.ok(Number(top) < Number(ih), `pose ${pose} chair top below sprite`);
+    // Chair back height is 1.33x its width in every sprite (same chair); the
+    // seat-to-floor part was cropped on pose 2 to match. Check the proportion
+    // of the sprite below the chair top is the same within 3 % for all poses.
+    const below = (Number(ih) - Number(top)) / Number(w);
+    assert.ok(Math.abs(below - 2.17) < 0.07, `pose ${pose}: ${below.toFixed(2)} sprite below chair top per chair width`);
   }
-  // Poses 2 and 3 are generated from pose 1 as reference (README), so the
-  // chair-footprint scaling also equalises the figure itself.
+  // Poses 2 and 3 are generated from pose 1 as reference (README).
   assert.match(readme, /seated-2 .* and seated-3\s.*regenerated with seated-1/s);
-  assert.match(hero, /width: `\$\{\(100 \* pose\.native\) \/ pose\.legs\}%`/);
-  assert.match(hero, /left: `\$\{\(-100 \* pose\.legsLeft\) \/ pose\.legs\}%`/);
+  assert.match(hero, /width: `\$\{\(100 \* pose\.iw\) \/ pose\.chair\.w\}%`/);
+  assert.match(hero, /left: `\$\{\(-100 \* pose\.chair\.left\) \/ pose\.chair\.w\}%`/);
+  assert.match(hero, /translateY\(\$\{\(-100 \* pose\.chair\.top\) \/ pose\.ih\}%\)/);
+  // The pose images are wider than the chair-back group; Tailwind's preflight
+  // (img { max-width: 100% }) must not cap them, or every pose shrinks to
+  // the group and the chairs differ (what Ezra saw on 2026-10-27).
+  assert.match(styles, /\.hero-figure img\s*\{[^}]*max-width:\s*none/s);
 });
 
 test('landed sheets sit at the lip of the tray and stay small, so the tray object stays visible', () => {
@@ -340,6 +362,5 @@ test('landed sheets sit at the lip of the tray and stay small, so the tray objec
 
 test('the generation record keeps the served and source assets apart', () => {
   assert.match(readme, /design\/hero\/source/);
-  assert.ok(existsSync(new URL('../design/hero/source/stack.webp', import.meta.url)));
-  assert.match(readme, /stack\.webp/);
+  assert.ok(existsSync(new URL('../design/hero/source/seated-2.webp', import.meta.url)));
 });

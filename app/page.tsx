@@ -52,8 +52,7 @@ const content = {
       'Asks before she acts, within the rights you grant',
     ],
     heroAria:
-      'A paper-craft room. A small figure at a desk raises one card. Sheets peel off a hanging stack of paper into five paper trays, each holding one object: a clock, a calendar, an envelope, an ID card or a folder. The folder comes back down to the desk.',
-    stackTag: 'for Anna',
+      'A paper-craft room. A small figure at a desk raises one card, which floats up to the knot of a paper mobile marked with Anna\'s logo. From the knot, threads hold five paper trays, each with one object: a clock, a calendar, an envelope, an ID card or a folder. Sheets rise from three trays into the knot and come down from it into two. A folder with the same mark comes down to the desk.',
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
@@ -215,8 +214,7 @@ const content = {
       'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
     ],
     heroAria:
-      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog. Vellen papier glijden van een hangende stapel in vijf papieren bakjes, elk met één voorwerp: een klok, een kalender, een envelop, een pasje of een map. De map komt terug op het bureau.',
-    stackTag: 'voor Anna',
+      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog, dat omhoog zweeft naar de knoop van een papieren mobiel met het logo van Anna. Aan de knoop hangen vijf papieren bakjes, elk met één voorwerp: een klok, een kalender, een envelop, een pasje of een map. Vellen papier stijgen uit drie bakjes op naar de knoop en dalen uit de knoop neer in twee andere. Een map met hetzelfde logo komt neer op het bureau.',
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
@@ -534,7 +532,6 @@ export default function Home() {
           <div className="hero-stage-box" ref={heroRef}>
             <PaperHero
               label={t.heroAria}
-              tag={t.stackTag}
               playing={heroHasEntered && heroVisible}
             />
           </div>
