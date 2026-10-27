@@ -204,16 +204,18 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
 });
 
-test('sells the connectors first: a ring of ten marks, thousands available, no tested-with list', () => {
-  const ring = [
+test('sells the connectors first: a stream of twelve marks, thousands available, no tested-with list', () => {
+  const stream = [
     'Microsoft 365',
-    'Google Drive',
-    'Slack',
-    'Notion',
-    'HubSpot',
     'Jira',
-    'Confluence',
+    'Slack',
+    'Loket',
+    'Notion',
     'GitHub',
+    'HubSpot',
+    'ClockWise',
+    'Google Drive',
+    'Confluence',
     'Azure',
     'Asana',
   ];
@@ -221,18 +223,18 @@ test('sells the connectors first: a ring of ten marks, thousands available, no t
     page.indexOf('const connectors = ['),
     page.indexOf('] as const;', page.indexOf('const connectors = [')),
   );
-  for (const name of ring) {
+  for (const name of stream) {
     assert.ok(block.includes(`name: '${name}'`), `missing connector: ${name}`);
   }
-  for (const icon of block.matchAll(/icon: '\/brands\/([a-z0-9-]+\.svg)'/g)) {
+  for (const icon of block.matchAll(/icon: '\/brands\/([a-z0-9-]+\.(?:svg|png))'/g)) {
     assert.ok(
       existsSync(new URL(`../public/brands/${icon[1]}`, import.meta.url)),
       `missing mark: ${icon[1]}`,
     );
   }
-  assert.equal([...block.matchAll(/icon: '/g)].length, ring.length);
-  for (const gone of ['ClockWise', 'Loket', 'Microsoft Teams', 'Mendix']) {
-    assert.ok(!block.includes(gone), `${gone} is not a ring connector`);
+  assert.equal([...block.matchAll(/icon: '/g)].length, stream.length);
+  for (const gone of ['Microsoft Teams', 'Mendix']) {
+    assert.ok(!block.includes(gone), `${gone} is not a stream connector`);
   }
   const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
     (match) => match[1],
@@ -259,6 +261,8 @@ test('sells the connectors first: a ring of ten marks, thousands available, no t
     'Getest met',
     'If one connector works',
     'these are the systems she has been tested with',
+    'Tell us which system your team needs next',
+    'Vertel ons welk systeem',
     'Shipping with Anna',
     'Communication roadmap',
     'on the cards',
@@ -270,29 +274,23 @@ test('sells the connectors first: a ring of ten marks, thousands available, no t
   }
 });
 
-test('the connector ring orbits the hero figure in CSS and stands still under reduced motion', () => {
-  // The ring and the figure are decoration; the names stay readable as a list.
+test('the connector stream passes under Anna\'s knot in CSS and stands still under reduced motion', () => {
+  // The stage is decoration; every disc carries its own name, nothing is listed below.
   assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
-  assert.match(page, /className="connector-ring"/);
-  assert.match(page, /className="connector-disc"/);
-  assert.match(page, /className="connector-figure"/);
-  assert.match(page, /className="connector-names"/);
-  // The figure is the hero's own sprite, placed by its chair back like the hero does.
-  assert.match(page, /\/hero\/seated-\$\{pose\.pose\}\.webp/);
-  assert.match(hero, /export const POSES/);
-  const figure = page.slice(
-    page.indexOf('className="connector-figure"'),
-    page.indexOf('className="connector-orbit"'),
-  );
-  assert.doesNotMatch(figure, /brands\//);
-  // One CSS loop drives orbit, facing, pulse and the arm; no JavaScript timers.
-  assert.match(styles, /--ring-loop/);
-  assert.match(styles, /@keyframes connector-orbit/);
-  assert.match(styles, /@keyframes connector-face/);
-  assert.match(styles, /@keyframes connector-pulse/);
-  assert.match(styles, /@keyframes connector-arm/);
+  assert.match(page, /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/);
+  assert.match(page, /className="connector-thread"/);
+  assert.match(page, /className="connector-stream"/);
+  assert.match(page, /className="connector-disc"[\s\S]{0,600}<small>\{connector\.name\}<\/small>/);
+  assert.doesNotMatch(page, /connector-names/);
+  assert.doesNotMatch(page, /connector-figure|\/hero\/seated-/);
+  assert.doesNotMatch(hero, /export const POSES/);
+  // One CSS loop drives the drift, the thread and the knot; no JavaScript timers.
+  assert.match(styles, /--stream-loop/);
+  assert.match(styles, /@keyframes connector-drift/);
+  assert.match(styles, /@keyframes connector-thread/);
+  assert.match(styles, /@keyframes connector-knot/);
   const reduced = styles.slice(styles.indexOf('@media (prefers-reduced-motion: reduce)'));
-  assert.match(reduced, /\.connector-orbit,[\s\S]*animation: none/);
+  assert.match(reduced, /\.connector-disc,[\s\S]*animation: none/);
 });
 
 test('tells the story in the agreed order', () => {

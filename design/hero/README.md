@@ -82,13 +82,15 @@ colour stay exact.
 Ambient, always: the mobile sways, window light patch follows the real sun (plates), grain
 over everything. Reduced motion: one static frame with the folder on the desk.
 
-## Connector ring (2026-10-27)
-The connectors section reuses seated-1 and seated-2 (no new sprites): the figure sits at
-the centre of a ring of ten paper discs, each with one system's mark (`public/brands`),
-orbiting in CSS 3D (`.connector-stage` in globals.css, one 48 s loop). Every 4.8 s a disc
-passes the far point, in front of the figure: it pulses coral and the figure raises the arm
-(seated-2 without the card) towards it for about a second. Reduced motion: still ring, arm
-down. The figure is placed by its chair back, as in the hero (`POSES` is exported for it).
+## Connector stream (2026-10-27)
+The connectors section reuses only the knot: Anna's paper disc with her mark hangs at the
+top of a stage, and twelve paper discs, each with one system's mark and name
+(`public/brands`), drift right to left beneath it in CSS (`.connector-stage` in
+globals.css, one 60 s loop, edges masked so the stream reads as endless). Every 5 s a disc
+passes under the knot: a thread drops from the knot to it, turns coral, swings with the disc
+for half a second and retracts; the knot and the disc flash coral. Reduced motion: discs
+spread out, no thread. A first version put the hero's seated figure in a ring of orbiting
+discs; Ezra rejected it the same day (the figure is the visitor, not Anna).
 
 ## Generation record (Higgsfield, 2026-10-27)
 Sketch: seedream_v5_pro, 16:9, image reference = round-five paper sketch (job

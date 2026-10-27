@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   ChevronRight,
   CircleCheck,
-  FileCheck2,
   Languages,
   LockKeyhole,
   Pause,
@@ -26,7 +25,7 @@ import {
 } from 'react';
 
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
-import { PaperHero, POSES } from '@/components/paper-hero';
+import { PaperHero } from '@/components/paper-hero';
 import type { LeadKind } from '@/lib/lead-capture';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -65,11 +64,10 @@ const content = {
       'Anna works through MCP connectors that sign in with OAuth. You grant the rights, she works within them.',
     ringLabel: 'Among thousands of connectors',
     ringAria:
-      'The paper figure from the hero on its chair, with a ring of paper discs slowly circling it. Each disc carries the mark of one system.',
+      "A paper disc with Anna's mark, with a slow stream of paper discs passing beneath it, each with the mark and name of one system. As each disc passes, a thread drops from Anna's disc to it and lights up.",
     customBody:
       'If it has a workable API, Anamata can build a connector for it during onboarding.',
     requestConnector: 'Request a connector',
-    connectorNote: 'Tell us which system your team needs next.',
     problemKicker: 'Useful work. Wrong use of your time.',
     problemTitle: 'Anna handles the work around the work.',
     problemBody:
@@ -229,12 +227,10 @@ const content = {
       'Anna werkt via MCP-koppelingen die inloggen met OAuth. Jij geeft de rechten, zij werkt daarbinnen.',
     ringLabel: 'Een greep uit duizenden koppelingen',
     ringAria:
-      'Het papieren figuur uit de hero op zijn stoel, met een ring van papieren schijfjes die er langzaam omheen draait. Elk schijfje draagt het merk van één systeem.',
+      "Een papieren schijf met het merk van Anna, met daaronder een langzame stroom papieren schijfjes, elk met het merk en de naam van één systeem. Bij elk schijfje dat passeert, zakt er een draad van Anna's schijf naar beneden en licht op.",
     customBody:
       'Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen.',
     requestConnector: 'Vraag een koppeling aan',
-    connectorNote:
-      'Vertel ons welk systeem jouw team als volgende nodig heeft.',
     problemKicker: 'Nuttig werk. Verkeerd gebruik van je tijd.',
     problemTitle: 'Anna doet het werk rondom het werk.',
     problemBody:
@@ -366,26 +362,23 @@ const content = {
   },
 } as const;
 
-// Ten of the thousands of connectors, in orbit order. Teams is not among
-// them: the hero already names it as the place you ask Anna.
+// Twelve of the thousands of connectors, in the order they drift past
+// Anna's knot. Teams is not among them: the hero already names it as the
+// place you ask Anna.
 const connectors = [
   { name: 'Microsoft 365', icon: '/brands/microsoft-365.svg' },
-  { name: 'Google Drive', icon: '/brands/google-drive.svg' },
-  { name: 'Slack', icon: '/brands/slack.svg' },
-  { name: 'Notion', icon: '/brands/notion.svg' },
-  { name: 'HubSpot', icon: '/brands/hubspot.svg' },
   { name: 'Jira', icon: '/brands/jira.svg' },
-  { name: 'Confluence', icon: '/brands/confluence.svg' },
+  { name: 'Slack', icon: '/brands/slack.svg' },
+  { name: 'Loket', icon: '/brands/loket.png' },
+  { name: 'Notion', icon: '/brands/notion.svg' },
   { name: 'GitHub', icon: '/brands/github.svg' },
+  { name: 'HubSpot', icon: '/brands/hubspot.svg' },
+  { name: 'ClockWise', icon: '/brands/clockwise.png' },
+  { name: 'Google Drive', icon: '/brands/google-drive.svg' },
+  { name: 'Confluence', icon: '/brands/confluence.svg' },
   { name: 'Azure', icon: '/brands/azure.svg' },
   { name: 'Asana', icon: '/brands/asana.svg' },
 ] as const;
-// The ring reuses the hero's seated figure: resting, and the arm raised
-// towards the disc passing in front of it. Placed by the chair back, as in
-// the hero, so the two poses sit on the same chair.
-const RING_POSES = POSES.filter((pose) => pose.pose !== 3);
-// The chair back's width in percent of the ring stage's width (cqw).
-const RING_FIGURE = { chairWidth: 9 } as const;
 
 // The tray sprites of the hero double as the use-case pictograms, so they
 // cost nothing extra to load.
@@ -615,70 +608,45 @@ export default function Home() {
             <div
               className="connector-stage"
               aria-hidden="true"
-              style={{ '--ring-count': connectors.length } as CSSProperties}
+              style={{ '--n': connectors.length } as CSSProperties}
             >
-              <div className="connector-scene">
-                <div className="connector-floor" />
-                <div className="connector-ring">
-                  <div
-                    className="connector-figure"
-                    style={{
-                      width: `calc(var(--figure-scale, 1) * ${RING_FIGURE.chairWidth}cqw)`,
-                    }}
+              {/* Anna: the knot from the hero, her mark on it. A thread drops
+                  from it to each disc that passes underneath and lights up. */}
+              <div className="connector-knot">
+                <Image
+                  src="/brands/anna-mono-dark.svg"
+                  width={12}
+                  height={12}
+                  alt=""
+                />
+              </div>
+              <span className="connector-thread" />
+              <div className="connector-stream">
+                {connectors.map((connector, index) => (
+                  <span
+                    className="connector-disc"
+                    key={connector.name}
+                    style={{ '--i': index } as CSSProperties}
                   >
-                    {RING_POSES.map((pose) => (
-                      // eslint-disable-next-line @next/next/no-img-element -- the hero's own sprite, already loaded
-                      <img
-                        key={pose.pose}
-                        data-pose={pose.pose}
-                        src={`/hero/seated-${pose.pose}.webp`}
-                        width={pose.iw}
-                        height={pose.ih}
+                    <span className="connector-disc-face">
+                      <Image
+                        src={connector.icon}
                         alt=""
-                        loading="lazy"
-                        decoding="async"
-                        style={{
-                          width: `${(100 * pose.iw) / pose.chair.w}%`,
-                          left: `${(-100 * pose.chair.left) / pose.chair.w}%`,
-                          transform: `translateY(${(-100 * pose.chair.top) / pose.ih}%)`,
-                        }}
+                        width={28}
+                        height={28}
                       />
-                    ))}
-                  </div>
-                  <div className="connector-orbit">
-                    {connectors.map((connector, index) => (
-                      <span
-                        className="connector-disc"
-                        key={connector.name}
-                        style={{ '--i': index } as CSSProperties}
-                      >
-                        <span>
-                          <Image
-                            src={connector.icon}
-                            alt=""
-                            width={28}
-                            height={28}
-                          />
-                        </span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                    </span>
+                    <small>{connector.name}</small>
+                  </span>
+                ))}
               </div>
             </div>
             <p className="sr-only">{t.ringAria}</p>
-            <ul className="connector-names">
-              {connectors.map((connector) => (
-                <li key={connector.name}>{connector.name}</li>
-              ))}
-            </ul>
             <div className="custom-connector">
-              <FileCheck2 size={18} aria-hidden="true" />
               <p>{t.customBody}</p>
               <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
-                <span>{t.requestConnector}</span>
-                <small>{t.connectorNote}</small>
-                <ArrowRight size={17} aria-hidden="true" />
+                {t.requestConnector}
+                <ArrowRight size={15} aria-hidden="true" />
               </a>
             </div>
           </div>
