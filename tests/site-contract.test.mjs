@@ -84,12 +84,12 @@ test('uses the real Teams mark and context-appropriate Anna Relay variants', () 
     page.match(/src="\/brands\/anna-color-navy\.svg"/g)?.length,
     1,
   );
-  // Two in the hero on purpose: the tag on the desk stack and the stamp on
-  // the returned folder (Ezra, 2026-10-27: Anna's mark on the work, not on
-  // the figure).
+  // Three in the hero on purpose: the knot of the mobile (Anna herself), the
+  // tag on the desk stack and the stamp on the returned folder (Ezra,
+  // 2026-10-27: Anna is the mobile; her mark on the work, not on the figure).
   assert.equal(
     hero.match(/src="\/brands\/anna-mono-dark\.svg"/g)?.length,
-    2,
+    3,
   );
   assert.equal(
     page.match(/src="\/brands\/anna-mono-light\.svg"/g)?.length,

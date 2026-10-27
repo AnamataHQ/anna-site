@@ -94,14 +94,17 @@ test('every hero image has explicit dimensions, so the hero never shifts layout'
 test('the loop is 12 s, first motion inside 2 s, defined once in CSS and once in TS', () => {
   assert.match(hero, /export const HERO_LOOP_MS = 12000;/);
   assert.match(styles, /--hero-loop:\s*12s;/);
-  // The figure raises the card at 0 % and the first sheet leaves the stack by 2 s.
+  // The figure raises the card at 0 % and the card is on its way to Anna by 2 s.
   const pose = styles.match(/@keyframes hero-pose-card\s*\{([\s\S]*?)\n\}/)?.[1];
   assert.ok(pose, 'missing hero-pose-card keyframes');
   assert.match(pose, /(^|\n)\s*0%[^}]*opacity:\s*1/);
+  const card = styles.match(/@keyframes hero-card-flight\s*\{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(card, 'missing hero-card-flight keyframes');
+  const cardStops = [...card.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => Number(m[1]));
+  assert.ok(cardStops.some((p) => p > 0 && p <= 16.7), 'card leaves the hand after 2 s');
   const departures = [...hero.matchAll(/\{ n: \d, x: \d+, y: \d+, w: [0-9.]+, iw: \d+, ih: \d+, t: ([0-9.]+)/g)]
     .map((m) => Number(m[1]));
   assert.equal(departures.length, 5);
-  assert.ok(Math.min(...departures) <= 2.0, `first sheet leaves at ${Math.min(...departures)} s`);
   // Pose swaps are stepped, never faded.
   assert.match(styles, /\.hero-figure\s+img\s*\{[^}]*steps\(1/s);
 });
@@ -114,9 +117,18 @@ test('sheets lift off the desk stack one at a time into the trays and the folder
   assert.match(hero, /className="hero-stack"/);
   assert.doesNotMatch(hero, /sling/i);
   assert.doesNotMatch(styles, /sling/i);
-  // Sheets start at the top of the stack and the folder returns to it.
+  // Sheets start at the top of the stack; the folder comes down from Anna
+  // (the knot) and returns to the stack.
   assert.match(hero, /left: `\$\{STACK\.x\}%`,\s*top: `\$\{STACK\.top\}%`/);
-  assert.match(hero, /'--dx': STACK\.x - TRAYS\[4\]\.x/);
+  assert.match(hero, /'--dx': STACK\.x - KNOT\.x/);
+  assert.match(hero, /'--dy': STACK\.top - [0-9.]+ - KNOT\.y/);
+  // Each arm lights from the knot outward before its sheet lifts: the arm
+  // pulse leads the sheet's departure, the tray settles after the landing.
+  assert.match(hero, /className="hero-arm-pulse"[^>]*pathLength=\{100\}/s);
+  assert.match(hero, /'--t': `\$\{tray\.t - ARM_LEAD\}s`/);
+  assert.match(hero, /'--t': `\$\{tray\.t \+ FLIGHT\}s`/);
+  assert.match(styles, /@keyframes hero-arm-pulse/);
+  assert.match(styles, /\.hero-arm-pulse\s*\{[^}]*stroke:\s*var\(--coral\)/s);
   // The stack thins while the sheets are away.
   assert.match(styles, /@keyframes hero-stack-thin/);
   assert.match(styles, /\.hero-stack-paper\s*\{[^}]*animation:\s*hero-stack-thin/s);
@@ -127,7 +139,6 @@ test('sheets lift off the desk stack one at a time into the trays and the folder
   assert.match(styles, /@keyframes hero-sheet-flight/);
   assert.match(styles, /@keyframes hero-tray-settle/);
   assert.match(styles, /@keyframes hero-folder-return/);
-  assert.match(styles, /@keyframes hero-arm-glow/);
   // The thread, the knot and the arms are drawn in code, not in the images.
   assert.match(hero, /<svg[^>]*className="hero-threads"/s);
   assert.match(hero, /<line\b/);
@@ -138,6 +149,28 @@ test('the paper tag on the desk stack is real text in both languages', () => {
   assert.match(page, /stackTag:\s*'for Anna'/);
   assert.match(page, /stackTag:\s*'voor Anna'/);
   assert.match(hero, /\{tag\}/);
+});
+
+test("Anna is the mobile: her mark is the knot, the card flies to it, it flashes when the ask arrives", () => {
+  const knot = hero.match(/<div\s+className="hero-knot"[\s\S]*?<\/div>/)?.[0];
+  assert.ok(knot, 'the knot is not an HTML element');
+  assert.match(knot, /\/brands\/anna-mono-dark\.svg/);
+  assert.match(knot, /left: `\$\{KNOT\.x\}%`/);
+  assert.doesNotMatch(hero, /<circle\b/);
+  // The coral card leaves the hand and ends at the knot.
+  assert.match(hero, /className="hero-card"/);
+  assert.match(hero, /'--dx': KNOT\.x - CARD\.x/);
+  assert.match(hero, /'--dy': KNOT\.y - CARD\.y/);
+  assert.match(styles, /@keyframes hero-knot-receive/);
+  assert.match(styles, /\.hero-knot\s*\{[^}]*animation:\s*hero-knot-receive/s);
+  // The card only shows once the card-up pose has swapped away, so it is
+  // never drawn twice.
+  const pose = styles.match(/@keyframes hero-pose-card\s*\{([\s\S]*?)\n\}/)?.[1];
+  const poseEnd = Number(pose.match(/\n\s*(\d+(?:\.\d+)?)%,\s*\n\s*100%/)?.[1]);
+  const card = styles.match(/@keyframes hero-card-flight\s*\{([\s\S]*?)\n\}/)?.[1];
+  assert.match(card, /(^|\n)\s*0%,?[^}]*opacity:\s*0/);
+  const cardShows = Number(card.match(/\n\s*(\d+(?:\.\d+)?)%\s*\{[^}]*opacity:\s*1/)?.[1]);
+  assert.ok(cardShows >= poseEnd, `card shows at ${cardShows}% before the pose swaps at ${poseEnd}%`);
 });
 
 test("Anna's mark sits on the tag and on the returned folder, never on the figure", () => {
@@ -206,7 +239,10 @@ test('reduced motion shows one still frame with the folder on the desk', () => {
   )?.[1];
   assert.ok(reduced, 'missing reduced-motion block');
   assert.match(reduced, /\.hero-sheet\s*\{[^}]*display:\s*none/s);
-  assert.match(reduced, /\.hero-folder\s*\{[^}]*(display:\s*none|opacity:\s*0)/s);
+  // These may share one grouped rule.
+  for (const hidden of ['hero-folder', 'hero-card', 'hero-arm-pulse']) {
+    assert.match(reduced, new RegExp(`\\.${hidden}[^{]*\\{[^}]*(display:\\s*none|opacity:\\s*0)`, 's'), hidden);
+  }
   assert.match(reduced, /\.hero-figure img\[data-pose='3'\]\s*\{[^}]*opacity:\s*1/s);
   assert.match(reduced, /\.hero-figure img\[data-pose='1'\],\s*\.hero-figure img\[data-pose='2'\]\s*\{[^}]*opacity:\s*0/s);
 });

@@ -10,10 +10,18 @@ the trays; one slim folder, stamped with Anna's mark, drifts back down onto the 
 returned). The window is the light source, not an exit: the work never leaves the room, it
 comes back done.
 
+**Anna is the mobile** (Ezra, 2026-10-27, after the desk-stack round): the figure is the
+visitor, never Anna, so Anna needs a body that is not a person. The knot where the threads
+meet is a paper disc with her mark (HTML, so the #530 logo drops in). Every beat connects to
+it: the ask (the coral card flies from the hand to the knot, the knot flashes), the work
+(an arm lights from the knot outward, and only then does that tray's sheet lift off the
+desk), the return (the stamped folder comes down from the knot onto the stack). Her mark is
+on the knot, the tag and the folder, never on the figure.
+
 Until 2026-10-27 the stack hung in a navy sling above the desk (the pile handed to Anna).
 Ezra asked why the work came out of a pile instead of being lifted off the desk; the desk
-stack is the answer, kept if it conveys the idea better. Anna's identity stays on the objects
-(tag, returned folder), never on the figure: the figure is the visitor's chair.
+stack is the answer. A "asks before she acts" beat (a small card coming back down before
+the sheets move) was discussed and parked: add it only if the loop feels too automatic.
 
 `sketch-approved-2026-10-27.png` is the frame Ezra picked ("right one"). Everything in
 `public/hero/` was generated from it as style reference.
@@ -51,17 +59,21 @@ a served sprite from there with ImageMagick (`convert <src> -resize <w>x -qualit
 | sheet-1..5.webp, sheet-6.webp | five loose sheets; sheet-6 is the slim folder | glide from stack to trays; the folder drifts down |
 | chair.webp | spare: the empty chair seen from behind at eye level | only if a pose without the figure is ever needed |
 
-Layer order, back to front: plate, trays, stack, sheets, folder, seated figure. The desk is in
-the plate. The thread, the knot and the mobile arms are drawn in code so they can move.
+Layer order, back to front: plate, mobile (threads, arms, knot, trays), stack, sheets,
+folder, seated figure, card. The desk is in the plate. The thread, the arms, their coral
+pulses, the knot and the card are drawn in code so they can move and so the mark and the
+colour stay exact.
 
 ## Loop (about 12 s, first motion within 2 s of load)
-1. seated-2 (card up) for 0.8 s, then seated-1.
-2. Five sheets lift off the desk stack one at a time (every 0.9 s from 2.0 s) and glide to a
-   tray; the tray tilts and settles; its thread brightens for 300 ms. The stack thins as
-   they go.
-3. The folder, stamped with Anna's mark, descends from the folder tray onto the stack over
-   1.5 s; seated-3 (holding folder) for 1 s; back to seated-1. The stack is whole again
-   before the loop restarts.
+1. The ask: seated-2 (card up) for 0.8 s; the card leaves the hand and flies to the knot
+   over 1.2 s; seated-1. At 2.0 s the knot flashes a coral ring: Anna has it.
+2. The work: every 0.9 s from 2.0 s an arm pulses coral from the knot to its tray (0.6 s),
+   then that tray's sheet lifts off the desk stack and glides into it (1.2 s); the tray
+   tilts and settles. The stack thins as they go. Sheets fade out of the trays about 5 s
+   after they left the desk.
+3. The return: at 8.0 s the folder, stamped with Anna's mark, comes down from the knot onto
+   the stack (1.5 s); seated-3 (holding folder) for 1 s; back to seated-1. The stack is
+   whole again before the loop restarts.
 Ambient, always: the mobile sways, window light patch follows the real sun (plates), grain
 over everything. Reduced motion: one static frame with the folder on the desk.
 

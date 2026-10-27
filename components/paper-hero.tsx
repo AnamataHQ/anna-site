@@ -27,21 +27,30 @@ const SUN_REFRESH_MS = 5 * 60 * 1000;
 // desk (its top surface is at 79-80 % of the plate), the mug stays visible to
 // its right. `top` is where the sheets leave; `bottom` sits on the desk.
 const STACK = { x: 62.4, top: 74.4, bottom: 80.2, width: 4.6, iw: 300, ih: 231 } as const;
-// Where the mobile is tied, in percent of the plate.
+// Anna is the mobile: one knot, her mark on it, a thread into every system.
+// Where it is tied, in percent of the plate.
 const KNOT = { x: 61, y: 17 } as const;
+// Where the raised coral card sits in the card-up pose (measured on the
+// sprite at the figure's size below); the card flies from here to the knot.
+const CARD = { x: 74.6, y: 55.8, width: 1.5 } as const;
+// An arm lights from the knot outward this long before its sheet lifts, and
+// a sheet's flight to its tray takes this long.
+const ARM_LEAD = 0.6;
+const FLIGHT = 1.2;
 // `width` is the chair's footprint (its legs); each pose scales to that, so the
 // chair stays the same size while the figure changes pose. A real chair is
 // about a third of the desk (which spans 61-76 % of the plate).
 const FIGURE = { x: 72, bottom: 93.5, width: 6.2 } as const;
 
 // Trays: clock, calendar, envelope, ID card, folder. `t` is the second of the
-// loop at which this tray's sheet leaves the stack; its flight takes 1.2 s.
+// loop at which this tray's sheet leaves the stack (the card reaches the knot
+// at 2.0 s; the arm lights ARM_LEAD earlier; the flight takes FLIGHT).
 const TRAYS = [
-  { n: 1, x: 53, y: 46, w: 7.8, iw: 320, ih: 217, t: 2.0, tilt: -1 },
-  { n: 2, x: 59, y: 39, w: 7.8, iw: 320, ih: 206, t: 2.9, tilt: 1 },
-  { n: 3, x: 55, y: 57, w: 7.8, iw: 320, ih: 172, t: 3.8, tilt: -1 },
-  { n: 4, x: 63, y: 51, w: 7.8, iw: 320, ih: 172, t: 4.7, tilt: 1 },
-  { n: 5, x: 69, y: 43, w: 7.8, iw: 320, ih: 219, t: 5.6, tilt: -1 },
+  { n: 1, x: 53, y: 46, w: 7.8, iw: 320, ih: 217, t: 2.6, tilt: -1 },
+  { n: 2, x: 59, y: 39, w: 7.8, iw: 320, ih: 206, t: 3.5, tilt: 1 },
+  { n: 3, x: 55, y: 57, w: 7.8, iw: 320, ih: 172, t: 4.4, tilt: -1 },
+  { n: 4, x: 63, y: 51, w: 7.8, iw: 320, ih: 172, t: 5.3, tilt: 1 },
+  { n: 5, x: 69, y: 43, w: 7.8, iw: 320, ih: 219, t: 6.2, tilt: -1 },
 ] as const;
 
 // Sheets are small and land at the front-left lip of their tray, so the
@@ -181,7 +190,9 @@ export function PaperHero({
         )}
       </div>
 
-      {/* The mobile: one thread from the ceiling to a knot, five arms to the trays. */}
+      {/* The mobile is Anna: one thread from the ceiling to her knot, five arms
+          to the trays. An arm pulses coral from the knot outward each time she
+          reaches into a system. */}
       <div className="hero-mobile" style={{ transformOrigin: `${KNOT.x}% ${KNOT.y}%` }}>
         <svg
           className="hero-threads"
@@ -200,20 +211,37 @@ export function PaperHero({
             <line
               key={tray.n}
               className="hero-arm"
-              style={{ '--t': `${tray.t + 1.2}s` } as CSSProperties}
               x1={KNOT.x * 24}
               y1={KNOT.y * 13.55}
               x2={tray.x * 24}
               y2={(tray.y - heightPercent(tray.w, tray.iw, tray.ih) / 2) * 13.55}
             />
           ))}
-          <circle
-            className="hero-knot"
-            cx={KNOT.x * 24}
-            cy={KNOT.y * 13.55}
-            r={7}
-          />
+          {TRAYS.map((tray) => (
+            <line
+              key={tray.n}
+              className="hero-arm-pulse"
+              pathLength={100}
+              style={{ '--t': `${tray.t - ARM_LEAD}s` } as CSSProperties}
+              x1={KNOT.x * 24}
+              y1={KNOT.y * 13.55}
+              x2={tray.x * 24}
+              y2={(tray.y - heightPercent(tray.w, tray.iw, tray.ih) / 2) * 13.55}
+            />
+          ))}
         </svg>
+        <div
+          className="hero-knot"
+          style={{ left: `${KNOT.x}%`, top: `${KNOT.y}%` }}
+        >
+          <img
+            src="/brands/anna-mono-dark.svg"
+            width={12}
+            height={12}
+            alt=""
+            loading="lazy"
+          />
+        </div>
         {TRAYS.map((tray) => (
           <img
             key={tray.n}
@@ -229,7 +257,7 @@ export function PaperHero({
                 left: `${tray.x}%`,
                 top: `${tray.y}%`,
                 width: `${tray.w}%`,
-                '--t': `${tray.t + 1.2}s`,
+                '--t': `${tray.t + FLIGHT}s`,
                 '--tilt': tray.tilt,
               } as CSSProperties
             }
@@ -295,17 +323,17 @@ export function PaperHero({
         );
       })}
 
-      {/* The slim folder, stamped with Anna's mark, drifts from the folder tray
-          back down onto the stack: done, returned. */}
+      {/* The slim folder, stamped with Anna's mark, comes down from the knot
+          onto the stack: done, handed back. */}
       <div
         className="hero-folder"
         style={
           {
-            left: `${TRAYS[4].x}%`,
-            top: `${TRAYS[4].y - 1}%`,
+            left: `${KNOT.x}%`,
+            top: `${KNOT.y}%`,
             width: '2.4%',
-            '--dx': STACK.x - TRAYS[4].x,
-            '--dy': STACK.top - 1.2 - (TRAYS[4].y - 1),
+            '--dx': STACK.x - KNOT.x,
+            '--dy': STACK.top - 1.2 - KNOT.y,
           } as CSSProperties
         }
       >
@@ -353,6 +381,21 @@ export function PaperHero({
           />
         ))}
       </div>
+
+      {/* The ask: the coral card leaves the raised hand and flies to the knot. */}
+      <span
+        className="hero-card"
+        aria-hidden="true"
+        style={
+          {
+            left: `${CARD.x}%`,
+            top: `${CARD.y}%`,
+            width: `${CARD.width}%`,
+            '--dx': KNOT.x - CARD.x,
+            '--dy': KNOT.y - CARD.y,
+          } as CSSProperties
+        }
+      />
 
       <div className="hero-grain" aria-hidden="true" />
     </div>
