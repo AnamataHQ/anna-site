@@ -12,6 +12,7 @@ import {
   Play,
   RotateCcw,
   Search,
+  SendHorizontal,
   ShieldCheck,
   UserRoundCheck,
 } from 'lucide-react';
@@ -111,58 +112,156 @@ const content = {
     workflowKicker: 'One request, from start to finish',
     workflowTitle: 'Watch the work happen.',
     workflowIntro:
-      'A colleague asks in Microsoft Teams or Slack. Anna retrieves the right context, pauses for approval when needed and reports the completed result in the same conversation.',
-    demoLabel: 'DEMO · NOT THE LIVE RECORD',
+      'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, asks when a decision is yours, and reports back in the same conversation.',
+    demoLabel: 'EXAMPLE · NOT A LIVE RECORD',
     demoChannel: 'Microsoft Teams · Anna',
-    retrieving: 'Retrieving context',
-    ready: 'Context ready',
-    approvalGate: 'Human approval required',
-    approve: 'Approve and continue',
+    working: 'Anna is working',
+    ready: 'Checked',
     executing: 'Anna is carrying this out…',
-    approved: 'Approved',
     replay: 'Replay conversation',
     pause: 'Pause conversation',
     resume: 'Resume conversation',
+    chooseSituation: 'Choose a situation',
     demoHint:
-      'Choose a situation. The conversation plays once, then waits for your approval.',
-    record: 'A clear record remains',
+      'Choose a situation. The conversation plays once, then waits for your reply.',
+    record: 'What Anna did',
     scenarios: [
       {
-        id: 'leave',
-        label: 'Leave request',
-        person: 'Can I take next Friday off?',
-        answer: 'I can check that and prepare the request for you.',
-        context: '9 days remaining · leave policy checked · manager identified',
-        sources: ['Loket', 'Leave policy'],
-        approval:
-          'Everything checks out. Shall I file the leave request for approval?',
+        id: 'week',
+        label: 'Close my week',
+        who: 'Joris',
+        person:
+          'Close my week. Same split as last week, except Thursday was all on the Rotterdam migration.',
+        answer:
+          'On it. I’ll build the sheet from last week’s split and Thursday’s tickets, then show you before I submit.',
+        steps: [
+          'Read last week’s hoursheet: 3 projects, 40 h',
+          'Pulled Thursday’s tickets on the Rotterdam migration: 4 tickets, 8 h',
+          'Drafted week 43: 38 h across 3 projects',
+          'Compared with your usual week: Wednesday afternoon is 2 h short',
+        ],
+        sources: ['Time tracking', 'Ticket board'],
+        question:
+          'Week 43 is ready: 38 h over 3 projects. Wednesday 14:00–16:00 is empty. Shall I book those 2 h on the Rotterdam migration as well and submit the week for approval?',
+        reply: 'Yes, and submit it.',
         result:
-          'Done. Your leave request is filed and waiting for your manager’s approval. I’ll update you here.',
+          'Submitted. Week 43 is with your manager for approval. If it’s still open on Friday at 16:00, I’ll remind you both here.',
+        record: [
+          'Hoursheet week 43 written: 40 h',
+          'Submitted for approval',
+          'Reminder set: Friday 16:00',
+        ],
       },
       {
-        id: 'hours',
-        label: 'Hours',
-        person: 'Log my hours for this week.',
+        id: 'leave',
+        label: 'A week off',
+        who: 'Mila',
+        person: 'I’d like 10 to 14 November off. Can you arrange it?',
         answer:
-          'I’ll fill the week from your calendar and projects, then show you the sheet.',
-        context: '5 days · 2 projects · 38 h from your calendar',
-        sources: ['ClockWise', 'Calendar'],
-        approval:
-          'The sheet matches your calendar. Shall I submit it in ClockWise?',
+          'Let me check your balance and the team first, then I’ll file it.',
+        steps: [
+          'Leave balance: 14 days left, 5 needed',
+          'Leave policy: requests over 3 days need 2 weeks’ notice, you’re at 2 weeks and 1 day',
+          'Team calendar: nobody else from your team is off that week',
+          'Your manager for approval: Esther',
+        ],
+        sources: ['HR system', 'Leave policy', 'Time tracking'],
+        question:
+          'All clear: 5 days, 9 left afterwards, no overlap with the team. Shall I file the request with Esther and block the week in time tracking?',
+        reply: 'Please do.',
         result:
-          'Submitted. Your week is in ClockWise and waiting for approval. I’ll let you know here.',
+          'Filed. Esther has the request, and 10 to 14 November are booked as leave in time tracking so your week closes clean. I’ll tell you here when she approves.',
+        record: [
+          'Leave request filed: 10–14 Nov, 5 days',
+          'Absence booked in time tracking',
+          'Watching for approval',
+        ],
+      },
+      {
+        id: 'month-end',
+        label: 'Month-end hours',
+        who: 'Femke',
+        person:
+          'Who hasn’t submitted October yet? Chase them for me, I need it closed by Friday.',
+        answer:
+          'I’ll check the overview, nudge everyone who’s behind, and report back Friday morning.',
+        steps: [
+          'Overview for October: 34 of 41 people submitted',
+          '7 open: 4 missing days, 3 not submitted at all',
+          'Sent each of the 7 a personal nudge with what’s missing',
+          'Scheduled a follow-up for Thursday and a report for Friday 9:00',
+        ],
+        sources: ['Time tracking', 'Team directory'],
+        question:
+          'Two of them are out this week, Tom and Lisa. Shall I ask their manager to submit for them, or wait until they’re back?',
+        reply: 'Ask their manager.',
+        result:
+          'Done. Marco has both sheets to submit. Friday 9:00 you get the list of who’s still open; so far 5 of 7 have replied.',
+        record: [
+          '7 nudges sent',
+          'Request to Marco: 2 sheets',
+          'Report scheduled: Friday 9:00',
+        ],
+      },
+      {
+        id: 'onboarding',
+        label: 'New colleague',
+        who: 'Femke',
+        person:
+          'Sanne starts Monday as a developer on the Rotterdam team. Set up what you can and tell me what needs me.',
+        answer:
+          'I’ll run the onboarding checklist from the handbook and come back with what’s done and what’s yours.',
+        steps: [
+          'Onboarding checklist from the handbook: 11 items',
+          'Requested accounts: code repository, ticket board, wiki',
+          'Added Sanne to the Rotterdam team channel, active from Monday 9:00',
+          'Booked the welcome lunch and set first-week reminders for her buddy, Joris',
+          'Shared the onboarding guide from the wiki',
+        ],
+        sources: [
+          'Handbook',
+          'Code repository',
+          'Ticket board',
+          'Wiki',
+          'Teams',
+        ],
+        question:
+          '8 of 11 done. The laptop order, the office badge and the contract signature are yours. Shall I open those three tasks for you with Friday as the deadline?',
+        reply: 'Yes, do that.',
+        result:
+          'Done. Three tasks are on your board with Friday as the deadline, and Sanne’s first day is ready. I’ll check on Monday that her accounts are active.',
+        record: [
+          '3 account requests sent',
+          'Channel, lunch and reminders set',
+          '3 tasks opened for Femke, due Friday',
+          'Monday check scheduled',
+        ],
       },
       {
         id: 'follow-up',
-        label: 'Follow-up',
-        person: 'Who did we promise a follow-up this week?',
-        answer: 'I’ll check the open deals and draft the follow-ups.',
-        context: '3 promises open · drafts ready · nothing sent yet',
-        sources: ['HubSpot', 'Mail'],
-        approval:
-          'Three drafts are ready for your review. Shall I send them and log them in HubSpot?',
+        label: 'Customer follow-ups',
+        who: 'Daan',
+        person:
+          'What did we promise customers this week that’s still open? Draft the follow-ups.',
+        answer:
+          'I’ll go through this week’s deal notes and draft one message per open promise.',
+        steps: [
+          'Read this week’s notes on 12 active deals',
+          'Found 4 open promises: a quote, two documents and a call',
+          'Drafted 4 follow-ups in your tone, with the promised item attached where we have it',
+          'Logged each promise as a task on its deal',
+        ],
+        sources: ['CRM', 'Mail'],
+        question:
+          'Four drafts are ready below. The quote for Van Dijk Logistics needs a price from you first. Shall I send the other three now and remind you about the quote tomorrow at 9:00?',
+        reply: 'Send them, remind me tomorrow.',
         result:
-          'Sent. Three follow-ups went out and are logged on their deals in HubSpot.',
+          'Sent three, logged on their deals. The Van Dijk quote is on your list for tomorrow 9:00 with the draft ready.',
+        record: [
+          '3 follow-ups sent and logged',
+          '4 tasks on deals',
+          'Reminder: tomorrow 9:00',
+        ],
       },
     ],
     controlKicker: 'Initiative, with boundaries',
@@ -274,58 +373,150 @@ const content = {
     workflowKicker: 'Eén verzoek, van begin tot eind',
     workflowTitle: 'Bekijk hoe het werk gebeurt.',
     workflowIntro:
-      'Een collega vraagt iets in Microsoft Teams of Slack. Anna haalt de juiste context op, pauzeert voor goedkeuring als dat nodig is en meldt het afgeronde resultaat in hetzelfde gesprek.',
-    demoLabel: 'DEMO · GEEN ECHT DOSSIER',
+      'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, vraagt het jou als een beslissing van jou is en koppelt terug in hetzelfde gesprek.',
+    demoLabel: 'VOORBEELD · GEEN ECHT DOSSIER',
     demoChannel: 'Microsoft Teams · Anna',
-    retrieving: 'Context ophalen',
-    ready: 'Context gereed',
-    approvalGate: 'Menselijke goedkeuring nodig',
-    approve: 'Goedkeuren en doorgaan',
+    working: 'Anna is bezig',
+    ready: 'Gecontroleerd',
     executing: 'Anna voert dit nu uit…',
-    approved: 'Goedgekeurd',
     replay: 'Gesprek opnieuw afspelen',
     pause: 'Gesprek pauzeren',
     resume: 'Gesprek hervatten',
+    chooseSituation: 'Kies een situatie',
     demoHint:
-      'Kies een situatie. Het gesprek speelt één keer af en wacht dan op jouw goedkeuring.',
-    record: 'Er blijft een duidelijk verslag achter',
+      'Kies een situatie. Het gesprek speelt één keer af en wacht dan op jouw antwoord.',
+    record: 'Wat Anna heeft gedaan',
     scenarios: [
       {
-        id: 'leave',
-        label: 'Verlofaanvraag',
-        person: 'Kan ik volgende vrijdag vrij nemen?',
-        answer: 'Ik kan dat controleren en de aanvraag voor je voorbereiden.',
-        context: '9 dagen over · verlofbeleid gecontroleerd · manager gevonden',
-        sources: ['Loket', 'Verlofbeleid'],
-        approval:
-          'Alles klopt. Zal ik de verlofaanvraag ter goedkeuring indienen?',
+        id: 'week',
+        label: 'Mijn week afsluiten',
+        who: 'Joris',
+        person:
+          'Sluit mijn week af. Zelfde verdeling als vorige week, behalve donderdag: die ging helemaal naar de Rotterdam-migratie.',
+        answer:
+          'Doe ik. Ik maak de staat op basis van de verdeling van vorige week en de tickets van donderdag, en laat hem zien voordat ik hem indien.',
+        steps: [
+          'Urenstaat van vorige week gelezen: 3 projecten, 40 u',
+          'Tickets van donderdag op de Rotterdam-migratie opgehaald: 4 tickets, 8 u',
+          'Week 43 opgezet: 38 u over 3 projecten',
+          'Vergeleken met je gebruikelijke week: woensdagmiddag komt 2 u tekort',
+        ],
+        sources: ['Urenregistratie', 'Ticketbord'],
+        question:
+          'Week 43 staat klaar: 38 u over 3 projecten. Woensdag 14:00–16:00 is leeg. Zal ik die 2 u ook op de Rotterdam-migratie boeken en de week ter goedkeuring indienen?',
+        reply: 'Ja, en dien hem in.',
         result:
-          'Geregeld. Je verlofaanvraag is ingediend en wacht op goedkeuring van je manager. Ik houd je hier op de hoogte.',
+          'Ingediend. Week 43 ligt bij je manager ter goedkeuring. Staat hij vrijdag om 16:00 nog open, dan herinner ik jullie hier allebei.',
+        record: [
+          'Urenstaat week 43 geschreven: 40 u',
+          'Ter goedkeuring ingediend',
+          'Herinnering gezet: vrijdag 16:00',
+        ],
       },
       {
-        id: 'hours',
-        label: 'Uren',
-        person: 'Boek mijn uren voor deze week.',
-        answer:
-          'Ik vul de week vanuit je agenda en projecten en laat je het overzicht zien.',
-        context: '5 dagen · 2 projecten · 38 u uit je agenda',
-        sources: ['ClockWise', 'Agenda'],
-        approval:
-          'Het overzicht klopt met je agenda. Zal ik het indienen in ClockWise?',
+        id: 'leave',
+        label: 'Een week vrij',
+        who: 'Mila',
+        person:
+          'Ik wil graag 10 tot en met 14 november vrij. Kun jij dat regelen?',
+        answer: 'Ik kijk eerst naar je saldo en het team, dan dien ik het in.',
+        steps: [
+          'Verlofsaldo: 14 dagen over, 5 nodig',
+          'Verlofbeleid: aanvragen langer dan 3 dagen minimaal 2 weken vooraf, je zit op 2 weken en 1 dag',
+          'Teamkalender: niemand anders uit je team is die week vrij',
+          'Je manager voor de goedkeuring: Esther',
+        ],
+        sources: ['HR-systeem', 'Verlofbeleid', 'Urenregistratie'],
+        question:
+          'Alles klopt: 5 dagen, daarna 9 over, geen overlap met het team. Zal ik de aanvraag bij Esther indienen en de week in de urenregistratie blokkeren?',
+        reply: 'Graag.',
         result:
-          'Ingediend. Je week staat in ClockWise en wacht op goedkeuring. Ik laat het je hier weten.',
+          'Ingediend. Esther heeft de aanvraag, en 10 tot en met 14 november staan als verlof in de urenregistratie, zodat je week netjes sluit. Ik meld het hier zodra ze goedkeurt.',
+        record: [
+          'Verlofaanvraag ingediend: 10–14 nov, 5 dagen',
+          'Afwezigheid geboekt in urenregistratie',
+          'Wacht op goedkeuring',
+        ],
+      },
+      {
+        id: 'month-end',
+        label: 'Maandafsluiting',
+        who: 'Femke',
+        person:
+          'Wie heeft oktober nog niet ingediend? Jaag ze voor me op, ik wil het vrijdag dicht hebben.',
+        answer:
+          'Ik check het overzicht, por iedereen die achterloopt en meld me vrijdagochtend terug.',
+        steps: [
+          'Overzicht oktober: 34 van de 41 mensen hebben ingediend',
+          '7 open: 4 missen dagen, 3 hebben niets ingediend',
+          'Alle 7 een persoonlijk berichtje gestuurd met wat er ontbreekt',
+          'Opvolging gepland voor donderdag en een rapport voor vrijdag 9:00',
+        ],
+        sources: ['Urenregistratie', 'Personeelsoverzicht'],
+        question:
+          'Twee van hen zijn deze week afwezig, Tom en Lisa. Zal ik hun manager vragen om voor hen in te dienen, of wachten tot ze terug zijn?',
+        reply: 'Vraag hun manager.',
+        result:
+          'Gedaan. Marco heeft beide staten om in te dienen. Vrijdag 9:00 krijg je de lijst van wie nog openstaat; tot nu toe hebben 5 van de 7 gereageerd.',
+        record: [
+          '7 berichtjes gestuurd',
+          'Verzoek aan Marco: 2 staten',
+          'Rapport gepland: vrijdag 9:00',
+        ],
+      },
+      {
+        id: 'onboarding',
+        label: 'Nieuwe collega',
+        who: 'Femke',
+        person:
+          'Sanne begint maandag als developer in het Rotterdam-team. Regel wat je kunt en zeg me wat ik zelf moet doen.',
+        answer:
+          'Ik loop de onboardingchecklist uit het handboek af en kom terug met wat klaar is en wat van jou is.',
+        steps: [
+          'Onboardingchecklist uit het handboek: 11 punten',
+          'Accounts aangevraagd: coderepository, ticketbord, wiki',
+          'Sanne toegevoegd aan het Rotterdam-kanaal, actief vanaf maandag 9:00',
+          'Welkomstlunch geboekt en herinneringen voor de eerste week gezet voor haar buddy, Joris',
+          'Onboardinggids uit de wiki gedeeld',
+        ],
+        sources: ['Handboek', 'Coderepository', 'Ticketbord', 'Wiki', 'Teams'],
+        question:
+          '8 van de 11 klaar. De laptopbestelling, de toegangspas en de handtekening onder het contract zijn voor jou. Zal ik die drie taken voor je aanmaken met vrijdag als deadline?',
+        reply: 'Ja, doe dat.',
+        result:
+          'Gedaan. Drie taken staan op je bord met vrijdag als deadline, en Sannes eerste dag is voorbereid. Maandag controleer ik of haar accounts actief zijn.',
+        record: [
+          '3 accountaanvragen verstuurd',
+          'Kanaal, lunch en herinneringen geregeld',
+          '3 taken aangemaakt voor Femke, deadline vrijdag',
+          'Controle gepland: maandag',
+        ],
       },
       {
         id: 'follow-up',
-        label: 'Opvolging',
-        person: 'Wie hebben we deze week een opvolging beloofd?',
-        answer: 'Ik controleer de open deals en zet de opvolgingen klaar.',
-        context: '3 beloftes open · concepten klaar · nog niets verstuurd',
-        sources: ['HubSpot', 'Mail'],
-        approval:
-          'Drie concepten staan klaar voor je. Zal ik ze versturen en vastleggen in HubSpot?',
+        label: 'Klantopvolging',
+        who: 'Daan',
+        person:
+          'Wat hebben we klanten deze week beloofd dat nog openstaat? Schrijf de opvolgingen alvast.',
+        answer:
+          'Ik ga door de dealnotities van deze week en schrijf per open belofte één bericht.',
+        steps: [
+          'Notities van deze week gelezen op 12 actieve deals',
+          '4 open beloftes gevonden: een offerte, twee documenten en een belafspraak',
+          '4 opvolgingen geschreven in jouw toon, met het beloofde stuk erbij waar we het hebben',
+          'Elke belofte als taak op de deal gezet',
+        ],
+        sources: ['CRM', 'Mail'],
+        question:
+          'Vier concepten staan hieronder klaar. De offerte voor Van Dijk Logistics heeft eerst een prijs van jou nodig. Zal ik de andere drie nu versturen en je morgen om 9:00 aan de offerte herinneren?',
+        reply: 'Versturen, en herinner me morgen.',
         result:
-          'Verstuurd. Drie opvolgingen zijn de deur uit en staan bij hun deals in HubSpot.',
+          'Drie verstuurd en op hun deals gelogd. De offerte voor Van Dijk staat morgen 9:00 op je lijst, met het concept klaar.',
+        record: [
+          '3 opvolgingen verstuurd en gelogd',
+          '4 taken op deals',
+          'Herinnering: morgen 9:00',
+        ],
       },
     ],
     controlKicker: 'Initiatief, met grenzen',
@@ -406,7 +597,7 @@ const traySizes = {
 export default function Home() {
   const [language, setLanguage] = useState<Language>('en');
   const [leadKind, setLeadKind] = useState<LeadKind | null>(null);
-  const [scenarioId, setScenarioId] = useState('leave');
+  const [scenarioId, setScenarioId] = useState('week');
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -420,6 +611,14 @@ export default function Home() {
   const t = content[language];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
+  // Steps of the replay: 0 the ask, 1 Anna's answer, 2 the work card, then one
+  // tick per step of work, the question, the reply, the result.
+  const questionStep = scenario.steps.length + 4;
+  const replyStep = questionStep + 1;
+  const doneStep = replyStep + 1;
+  const finalStepOf = (id: string) =>
+    (t.scenarios.find((item) => item.id === id) ?? t.scenarios[0]).steps
+      .length + 6;
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -440,7 +639,7 @@ export default function Home() {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
     const updatePreference = () => {
       setReduceMotion(media.matches);
-      if (media.matches) setDemoStep(5);
+      if (media.matches) setDemoStep(99);
     };
     const initialUpdate = window.setTimeout(updatePreference, 0);
     media.addEventListener('change', updatePreference);
@@ -454,16 +653,22 @@ export default function Home() {
     if (!workflowHasEntered) return;
     const timer = window.setTimeout(() => {
       setIsPaused(false);
-      setDemoStep(reduceMotion ? 5 : 0);
+      setDemoStep(reduceMotion ? 99 : 0);
     }, 0);
     return () => window.clearTimeout(timer);
   }, [workflowHasEntered, reduceMotion]);
 
   useEffect(() => {
-    if (!workflowVisible || reduceMotion || isPaused || demoStep >= 4) return;
+    if (
+      !workflowVisible ||
+      reduceMotion ||
+      isPaused ||
+      demoStep >= questionStep
+    )
+      return;
     const timer = window.setTimeout(() => setDemoStep((step) => step + 1), 920);
     return () => window.clearTimeout(timer);
-  }, [demoStep, isPaused, reduceMotion, workflowVisible]);
+  }, [demoStep, isPaused, reduceMotion, workflowVisible, questionStep]);
 
   useEffect(
     () => () => {
@@ -487,20 +692,22 @@ export default function Home() {
   const restartDemo = () => {
     clearExecutionTimer();
     setIsPaused(false);
-    setDemoStep(reduceMotion ? 5 : 0);
+    setDemoStep(reduceMotion ? 99 : 0);
     setReplayKey((key) => key + 1);
   };
   const changeScenario = (value: string) => {
     clearExecutionTimer();
     setScenarioId(value);
     setIsPaused(false);
-    setDemoStep(reduceMotion ? 5 : 0);
+    setDemoStep(reduceMotion ? finalStepOf(value) : 0);
   };
-  const approveDemo = () => {
-    if (demoStep >= 5 || isExecuting) return;
+  // The viewer sends the colleague's reply; Anna works, then reports.
+  const sendReply = () => {
+    if (demoStep !== questionStep || isExecuting) return;
+    setDemoStep(replyStep);
     setIsExecuting(true);
     executionTimerRef.current = window.setTimeout(() => {
-      setDemoStep(5);
+      setDemoStep(doneStep);
       setIsExecuting(false);
       executionTimerRef.current = null;
     }, EXECUTION_DELAY_MS);
@@ -740,11 +947,7 @@ export default function Home() {
               <div className="scenario-controls">
                 <TabsList
                   className="scenario-tabs"
-                  aria-label={
-                    language === 'en'
-                      ? 'Choose a demo situation'
-                      : 'Kies een demosituatie'
-                  }
+                  aria-label={t.chooseSituation}
                 >
                   {t.scenarios.map((item) => (
                     <TabsTrigger value={item.id} key={item.id}>
@@ -761,7 +964,7 @@ export default function Home() {
                     <RotateCcw size={15} aria-hidden="true" />
                     {t.replay}
                   </button>
-                  {!reduceMotion && demoStep < 4 && (
+                  {!reduceMotion && demoStep < questionStep && (
                     <button
                       type="button"
                       onClick={() => setIsPaused((paused) => !paused)}
@@ -796,22 +999,31 @@ export default function Home() {
                 <span>{t.demoLabel}</span>
               </div>
               <div className="demo-thread" aria-live="polite">
-                <DemoMessage visible={demoStep >= 0} avatar="Y" kind="person">
+                <DemoMessage
+                  visible={demoStep >= 0}
+                  kind="person"
+                  who={scenario.who}
+                >
                   <p>{scenario.person}</p>
                 </DemoMessage>
                 <DemoMessage visible={demoStep >= 1} kind="anna">
                   <p>{scenario.answer}</p>
                 </DemoMessage>
                 <DemoMessage visible={demoStep >= 2} kind="anna">
-                  <div className="context-card" data-ready={demoStep >= 3}>
+                  <div
+                    className="work-card"
+                    data-ready={demoStep >= questionStep}
+                  >
                     <div className="context-card-title">
-                      {demoStep >= 3 ? (
+                      {demoStep >= questionStep ? (
                         <CircleCheck size={17} aria-hidden="true" />
                       ) : (
                         <Search size={17} aria-hidden="true" />
                       )}
-                      <strong>{demoStep >= 3 ? t.ready : t.retrieving}</strong>
-                      {demoStep < 3 && (
+                      <strong>
+                        {demoStep >= questionStep ? t.ready : t.working}
+                      </strong>
+                      {demoStep < questionStep && (
                         <span className="typing-dots" aria-hidden="true">
                           <i />
                           <i />
@@ -819,7 +1031,18 @@ export default function Home() {
                         </span>
                       )}
                     </div>
-                    <p>{scenario.context}</p>
+                    <ol className="work-steps">
+                      {scenario.steps.map((step, index) => (
+                        <li
+                          key={step}
+                          data-visible={demoStep >= 3 + index}
+                          data-done={demoStep >= 4 + index}
+                        >
+                          <Check size={13} aria-hidden="true" />
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ol>
                     <div className="source-pills">
                       {scenario.sources.map((source) => (
                         <span key={source}>{source}</span>
@@ -827,42 +1050,63 @@ export default function Home() {
                     </div>
                   </div>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= 4} kind="anna">
-                  <div className="approval-card">
-                    <div className="approval-kicker">
-                      <UserRoundCheck size={16} aria-hidden="true" />
-                      {demoStep >= 5 ? t.approved : t.approvalGate}
-                    </div>
-                    <p>{scenario.approval}</p>
-                    <button
-                      type="button"
-                      className="approve-button"
-                      onClick={approveDemo}
-                      disabled={demoStep >= 5 || isExecuting}
-                      aria-busy={isExecuting}
-                      data-executing={isExecuting}
-                    >
-                      <Check size={16} aria-hidden="true" />{' '}
-                      {demoStep >= 5
-                        ? t.approved
-                        : isExecuting
-                          ? t.executing
-                          : t.approve}
-                    </button>
-                  </div>
-                </DemoMessage>
-                <DemoMessage visible={demoStep >= 5} kind="anna">
-                  <div className="result-message">
-                    <CheckCircle2 size={18} aria-hidden="true" />
-                    <p>{scenario.result}</p>
-                  </div>
+                <DemoMessage visible={demoStep >= questionStep} kind="anna">
+                  <p>{scenario.question}</p>
                 </DemoMessage>
                 <div
-                  className="record-line"
-                  data-visible={demoStep >= 5}
-                  aria-hidden={demoStep < 5}
+                  className="reply-row"
+                  data-visible={demoStep === questionStep}
+                  aria-hidden={demoStep !== questionStep}
+                  inert={demoStep !== questionStep}
                 >
-                  <LockKeyhole size={15} aria-hidden="true" /> {t.record}
+                  <button
+                    type="button"
+                    className="reply-button"
+                    onClick={sendReply}
+                    disabled={isExecuting}
+                    aria-busy={isExecuting}
+                  >
+                    {scenario.reply}
+                    <SendHorizontal size={15} aria-hidden="true" />
+                  </button>
+                </div>
+                <DemoMessage
+                  visible={demoStep >= replyStep}
+                  kind="person"
+                  who={scenario.who}
+                >
+                  <p>{scenario.reply}</p>
+                </DemoMessage>
+                <DemoMessage visible={demoStep >= replyStep} kind="anna">
+                  {demoStep >= doneStep ? (
+                    <div className="result-message">
+                      <CheckCircle2 size={18} aria-hidden="true" />
+                      <p>{scenario.result}</p>
+                    </div>
+                  ) : (
+                    <p className="executing-line">
+                      {t.executing}
+                      <span className="typing-dots" aria-hidden="true">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                    </p>
+                  )}
+                </DemoMessage>
+                <div
+                  className="record-list"
+                  data-visible={demoStep >= doneStep}
+                  aria-hidden={demoStep < doneStep}
+                >
+                  <strong>
+                    <LockKeyhole size={14} aria-hidden="true" /> {t.record}
+                  </strong>
+                  <ul>
+                    {scenario.record.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             </div>
@@ -961,12 +1205,12 @@ export default function Home() {
 
 function DemoMessage({
   visible,
-  avatar,
+  who,
   kind,
   children,
 }: {
   visible: boolean;
-  avatar?: string;
+  who?: string;
   kind: 'person' | 'anna';
   children: React.ReactNode;
 }) {
@@ -986,10 +1230,13 @@ function DemoMessage({
             height={34}
           />
         ) : (
-          avatar
+          who?.[0]
         )}
       </div>
-      <div className="message-bubble">{children}</div>
+      <div className="message-body">
+        <span className="message-who">{kind === 'anna' ? 'Anna' : who}</span>
+        <div className="message-bubble">{children}</div>
+      </div>
     </div>
   );
 }

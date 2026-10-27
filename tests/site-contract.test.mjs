@@ -59,111 +59,78 @@ test('ships complete English and Dutch page copy', () => {
   assert.match(page, /English/);
 });
 
-test('explains supervised work journeys from request through reported result', () => {
+test('explains five complete processes, each a conversation that asks when a decision is yours', () => {
+  const block = page.slice(
+    page.indexOf('scenarios: ['),
+    page.indexOf("controlKicker: 'Initiative"),
+  );
   for (const phrase of [
-    'Can I take next Friday off?',
-    'I can check that and prepare the request for you.',
-    'Human approval required',
-    'Your leave request is filed',
-    'Kan ik volgende vrijdag vrij nemen?',
-    'Ik kan dat controleren en de aanvraag voor je voorbereiden.',
-    'Menselijke goedkeuring nodig',
-    'Je verlofaanvraag is ingediend',
+    "label: 'Close my week'",
+    "label: 'A week off'",
+    "label: 'Month-end hours'",
+    "label: 'New colleague'",
+    "label: 'Customer follow-ups'",
+    'Shall I',
   ]) {
-    assert.ok(page.includes(phrase), `missing workflow copy: ${phrase}`);
+    assert.ok(block.includes(phrase), `missing scenario detail: ${phrase}`);
   }
-});
-
-test('uses the real Teams mark and context-appropriate Anna Relay variants', () => {
-  assert.match(page, /src="\/brands\/microsoft-teams\.svg"/);
-  assert.equal(
-    page.match(/src="\/brands\/anna-color-transparent\.svg"/g)?.length,
-    1,
-  );
-  assert.equal(
-    page.match(/src="\/brands\/anna-color-navy\.svg"/g)?.length,
-    1,
-  );
-  // Two in the hero on purpose: the knot of the mobile (Anna herself) and
-  // the stamp on the returned folder (Ezra, 2026-10-27: Anna is the mobile;
-  // her mark on her and her output, never on the figure).
-  assert.equal(
-    hero.match(/src="\/brands\/anna-mono-dark\.svg"/g)?.length,
-    2,
-  );
-  assert.equal(
-    page.match(/src="\/brands\/anna-mono-light\.svg"/g)?.length,
-    1,
-  );
-  assert.doesNotMatch(page, /src="\/brands\/anna\.svg"/);
-  assert.doesNotMatch(page, /src="\/brands\/anna\.png"/);
-  assert.doesNotMatch(page, /className="teams-mini"[^>]*>\s*T\s*</s);
-  assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
-  assert.doesNotMatch(page, /className="brand-mark"[^>]*>\s*A\s*</s);
-  assert.doesNotMatch(hero, /className="hero-sling-tag"[^>]*>\s*A\s*</s);
-  assert.match(layout, /icons:\s*\{[\s\S]*?icon:\s*'\/favicon\.svg'/);
-  for (const asset of [
-    'anna-color-transparent.svg',
-    'anna-color-black.svg',
-    'anna-color-navy.svg',
-    'anna-mono-dark.svg',
-    'anna-mono-light.svg',
-  ]) {
-    assert.equal(
-      existsSync(new URL(`../public/brands/${asset}`, import.meta.url)),
-      true,
-      `missing Anna brand asset: ${asset}`,
-    );
-  }
-  for (const colour of [
-    '#2C548C',
-    '#3159C7',
-    '#6252EF',
-    '#8D4DFF',
-    '#E15091',
-    '#FF5C42',
-  ]) {
+  // Every scenario: who asks, at least four steps of work, a question, the reply, a record.
+  assert.equal([...block.matchAll(/who: '/g)].length, 5);
+  assert.equal([...block.matchAll(/question:/g)].length, 5);
+  assert.equal([...block.matchAll(/reply: '/g)].length, 5);
+  assert.equal([...block.matchAll(/record: \[/g)].length, 5);
+  for (const steps of block.matchAll(/steps: \[([\s\S]*?)\]/g)) {
     assert.ok(
-      annaColourTransparent.includes(colour),
-      `missing Relay colour: ${colour}`,
+      [...steps[1].matchAll(/'/g)].length >= 8,
+      'a scenario has fewer than four steps',
     );
   }
-  assert.match(annaColourTransparent, /data-master="relay-master-04"/);
-  assert.match(annaColourTransparent, /offset="0\.49"/);
-  assert.match(annaColourTransparent, /offset="0\.61"/);
-  assert.match(annaColourTransparent, /M42 158V62/);
-  assert.match(annaColourTransparent, /M158 42V138/);
-  assert.match(annaColourBlack, /fill="#000000"/);
-  assert.match(annaColourNavy, /fill="#08152E"/);
-  assert.match(annaMonoDark, /fill="#08152E"/);
-  assert.match(annaMonoLight, /fill="#FFFFFF"/);
-  assert.equal(favicon, annaColourBlack);
+  const nl = page.slice(
+    page.indexOf("workflowKicker: 'Eén verzoek"),
+    page.indexOf("controlKicker: 'Initiatief"),
+  );
+  for (const phrase of [
+    'Mijn week afsluiten',
+    'Een week vrij',
+    'Maandafsluiting',
+    'Nieuwe collega',
+    'Klantopvolging',
+    'Zal ik',
+  ]) {
+    assert.ok(nl.includes(phrase), `missing Dutch scenario detail: ${phrase}`);
+  }
+  // No vendor names in the conversations: generic systems only.
+  for (const vendor of ['ClockWise', 'Loket', 'HubSpot', 'Notion', 'Jira']) {
+    assert.ok(
+      !block.includes(vendor) && !nl.includes(vendor),
+      `vendor named in a scenario: ${vendor}`,
+    );
+  }
+  // The confirmation is a chat question and a reply, not an approval card.
+  assert.doesNotMatch(
+    page,
+    /Human approval required|Menselijke goedkeuring nodig|approval-card|Approve and continue/,
+  );
+  assert.match(page, /className="reply-button"/);
+  assert.match(page, /scenario\.reply/);
+  assert.match(page, /className="work-steps"/);
+  assert.match(page, /className="record-list"/);
+  assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
+  // Not called a demo.
+  assert.doesNotMatch(page, /DEMO ·|Choose a demo|Kies een demosituatie/);
 });
 
-test('starts motion when each experience enters the viewport', () => {
-  assert.match(page, /IntersectionObserver/);
-  assert.match(page, /heroHasEntered/);
-  assert.match(page, /workflowHasEntered/);
-  assert.match(page, /workflowVisible/);
-  assert.match(page, /data-in-view=/);
-  assert.match(styles, /\[data-playing='false'\]/);
-});
-
-test('shows three selectable, replayable conversation demos', () => {
+test('shows five selectable, replayable conversations', () => {
   assert.match(page, /from '@\/components\/ui\/tabs'/);
   for (const phrase of [
-    'Leave request',
-    'Hours',
-    'Follow-up',
-    'Verlofaanvraag',
-    'Uren',
-    'Opvolging',
-    'Retrieving context',
-    'Context ophalen',
+    'Anna is working',
+    'Anna is bezig',
     'Replay conversation',
     'Gesprek opnieuw afspelen',
     'Pause conversation',
     'Gesprek pauzeren',
+    'What Anna did',
+    'Wat Anna heeft gedaan',
   ]) {
     assert.ok(page.includes(phrase), `missing animated demo detail: ${phrase}`);
   }
@@ -171,7 +138,7 @@ test('shows three selectable, replayable conversation demos', () => {
   assert.match(page, /demoStep/);
 });
 
-test('shows Anna working briefly after approval before reporting completion', () => {
+test('shows Anna working briefly after the reply before reporting completion', () => {
   assert.match(page, /const EXECUTION_DELAY_MS = 1600/);
   assert.match(page, /isExecuting/);
   assert.match(page, /Anna is carrying this out/);
@@ -226,7 +193,9 @@ test('sells the connectors first: twelve marks tied to Anna, thousands available
   for (const name of stream) {
     assert.ok(block.includes(`name: '${name}'`), `missing connector: ${name}`);
   }
-  for (const icon of block.matchAll(/icon: '\/brands\/([a-z0-9-]+\.(?:svg|png))'/g)) {
+  for (const icon of block.matchAll(
+    /icon: '\/brands\/([a-z0-9-]+\.(?:svg|png))'/g,
+  )) {
     assert.ok(
       existsSync(new URL(`../public/brands/${icon[1]}`, import.meta.url)),
       `missing mark: ${icon[1]}`,
@@ -252,8 +221,14 @@ test('sells the connectors first: twelve marks tied to Anna, thousands available
   );
   assert.match(page, /Among thousands of connectors/);
   assert.match(page, /Een greep uit duizenden koppelingen/);
-  assert.match(page, /If it has a workable API, Anamata can build a connector for it during onboarding\./);
-  assert.match(page, /Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen\./);
+  assert.match(
+    page,
+    /If it has a workable API, Anamata can build a connector for it during onboarding\./,
+  );
+  assert.match(
+    page,
+    /Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen\./,
+  );
   assert.match(page, /Request a connector/);
   assert.match(page, /Vraag een koppeling aan/);
   for (const gone of [
@@ -270,17 +245,29 @@ test('sells the connectors first: twelve marks tied to Anna, thousands available
     'Available now',
     '+∞',
   ]) {
-    assert.ok(!page.includes(gone), `old connector copy still present: ${gone}`);
+    assert.ok(
+      !page.includes(gone),
+      `old connector copy still present: ${gone}`,
+    );
   }
 });
 
-test('the connectors are a still paper string map tied to Anna\'s knot, fading at the edges', () => {
+test("the connectors are a still paper string map tied to Anna's knot, fading at the edges", () => {
   // The map is decoration; every disc carries its own name, nothing is listed below.
   assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
-  assert.match(page, /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/);
+  assert.match(
+    page,
+    /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/,
+  );
   assert.match(page, /<svg className="connector-threads"/);
-  assert.match(page, /className="connector-disc"[\s\S]{0,700}<small>\{connector\.name\}<\/small>/);
-  assert.doesNotMatch(page, /connector-names|connector-stream|connector-figure|\/hero\/seated-/);
+  assert.match(
+    page,
+    /className="connector-disc"[\s\S]{0,700}<small>\{connector\.name\}<\/small>/,
+  );
+  assert.doesNotMatch(
+    page,
+    /connector-names|connector-stream|connector-figure|\/hero\/seated-/,
+  );
   assert.doesNotMatch(hero, /export const POSES/);
   // One thread from the knot to every disc, and a few that leave the frame.
   const block = page.slice(
@@ -296,11 +283,23 @@ test('the connectors are a still paper string map tied to Anna\'s knot, fading a
 });
 
 test('tells the story in the agreed order', () => {
-  const order = ['hero', 'connectors', 'capability-section', 'use-case-section', 'workflow-section', 'control-section', 'cta-section'];
+  const order = [
+    'hero',
+    'connectors',
+    'capability-section',
+    'use-case-section',
+    'workflow-section',
+    'control-section',
+    'cta-section',
+  ];
   const positions = order.map((name) => page.indexOf(`className="${name}"`));
   for (const [index, position] of positions.entries()) {
     assert.ok(position >= 0, `missing section ${order[index]}`);
-    if (index > 0) assert.ok(position > positions[index - 1], `${order[index]} is out of order`);
+    if (index > 0)
+      assert.ok(
+        position > positions[index - 1],
+        `${order[index]} is out of order`,
+      );
   }
   for (const useCase of [
     'ClockWise',
@@ -314,7 +313,7 @@ test('tells the story in the agreed order', () => {
 });
 
 test('includes transparency and accessibility essentials', () => {
-  assert.match(page, /DEMO · NOT THE LIVE RECORD/);
+  assert.match(page, /EXAMPLE · NOT A LIVE RECORD/);
   assert.match(page, /aria-label=/);
   assert.match(styles, /prefers-reduced-motion/);
   assert.match(layout, /Anna \| Anamata/);
