@@ -23,14 +23,16 @@ export const HERO_LOOP_MS = 12000;
 const PLATE = { width: 2400, height: 1355 } as const;
 const SUN_REFRESH_MS = 5 * 60 * 1000;
 
-// Where the stack hangs and where the mobile is tied, in percent of the plate.
-const SLING = { x: 79, top: 0, threadBottom: 24, width: 17.7 } as const;
-const STACK_TOP = { x: 79, y: 37 } as const;
+// The work is on the visitor's desk: a paper stack at the left end of the
+// desk (its top surface is at 79-80 % of the plate), the mug stays visible to
+// its right. `top` is where the sheets leave; `bottom` sits on the desk.
+const STACK = { x: 62.4, top: 74.4, bottom: 80.2, width: 4.6, iw: 300, ih: 231 } as const;
+// Where the mobile is tied, in percent of the plate.
 const KNOT = { x: 61, y: 17 } as const;
-const DESK = { x: 70, y: 78 } as const;
 // `width` is the chair's footprint (its legs); each pose scales to that, so the
-// chair stays the same size while the figure changes pose.
-const FIGURE = { x: 71, bottom: 93, width: 4.4 } as const;
+// chair stays the same size while the figure changes pose. A real chair is
+// about a third of the desk (which spans 61-76 % of the plate).
+const FIGURE = { x: 72, bottom: 93.5, width: 6.2 } as const;
 
 // Trays: clock, calendar, envelope, ID card, folder. `t` is the second of the
 // loop at which this tray's sheet leaves the stack; its flight takes 1.2 s.
@@ -53,12 +55,14 @@ const SHEETS = [
 ] as const;
 const LANDING = { dx: -2.2, dy: 1.6 } as const;
 
-// Measured on the full-resolution sprites: the chair legs' span and left edge,
-// so every pose is scaled and shifted to the same chair footprint.
+// Measured on the full-resolution sprites (design/hero/source): the chair
+// legs' span and left edge, so every pose is scaled and shifted to the same
+// chair footprint. Poses 2 and 3 were generated from pose 1 as reference, so
+// the figure itself is the same size in all three.
 const POSES = [
-  { pose: 1, iw: 300, ih: 530, legs: 352, legsLeft: 81, native: 516 },
-  { pose: 2, iw: 300, ih: 611, legs: 346, legsLeft: 94, native: 561 },
-  { pose: 3, iw: 300, ih: 501, legs: 358, legsLeft: 145, native: 551 },
+  { pose: 1, iw: 360, ih: 636, legs: 352, legsLeft: 81, native: 516 },
+  { pose: 2, iw: 360, ih: 785, legs: 699, legsLeft: 281, native: 1182 },
+  { pose: 3, iw: 360, ih: 667, legs: 870, legsLeft: 190, native: 1282 },
 ] as const;
 
 const PLATE_RATIO = PLATE.width / PLATE.height;
@@ -233,26 +237,25 @@ export function PaperHero({
         ))}
       </div>
 
-      {/* The stack in its sling, on its own thread, swaying from the ceiling. */}
+      {/* The stack of work on the desk, tagged for Anna; it thins as sheets leave. */}
       <div
-        className="hero-sling"
+        className="hero-stack"
         style={{
-          left: `${SLING.x}%`,
-          width: `${SLING.width}%`,
-          '--thread': `${(SLING.threadBottom / 60) * 100}%`,
-        } as CSSProperties}
+          left: `${STACK.x}%`,
+          top: `${STACK.bottom}%`,
+          width: `${STACK.width}%`,
+        }}
       >
-        <span className="hero-sling-thread" aria-hidden="true" />
         <img
-          className="hero-sling-stack"
-          src="/hero/sling.webp"
-          width={680}
-          height={768}
+          className="hero-stack-paper"
+          src="/hero/stack.webp"
+          width={STACK.iw}
+          height={STACK.ih}
           alt=""
           loading="lazy"
           decoding="async"
         />
-        <span className="hero-sling-tag">
+        <span className="hero-stack-tag">
           <img
             src="/brands/anna-mono-dark.svg"
             width={12}
@@ -264,7 +267,7 @@ export function PaperHero({
         </span>
       </div>
 
-      {/* Sheets peel off the stack into the trays, one every 0.9 s. */}
+      {/* Sheets lift off the stack into the trays, one every 0.9 s. */}
       {SHEETS.map((sheet, index) => {
         const tray = TRAYS[index];
         return (
@@ -279,11 +282,11 @@ export function PaperHero({
             decoding="async"
             style={
               {
-                left: `${STACK_TOP.x}%`,
-                top: `${STACK_TOP.y}%`,
+                left: `${STACK.x}%`,
+                top: `${STACK.top}%`,
                 width: `${sheet.w}%`,
-                '--dx': tray.x + LANDING.dx - STACK_TOP.x,
-                '--dy': tray.y + LANDING.dy - STACK_TOP.y,
+                '--dx': tray.x + LANDING.dx - STACK.x,
+                '--dy': tray.y + LANDING.dy - STACK.top,
                 '--rot': `${sheet.rot}deg`,
                 '--t': `${tray.t}s`,
               } as CSSProperties
@@ -292,25 +295,37 @@ export function PaperHero({
         );
       })}
 
-      {/* The slim folder drifts from the folder tray back down to the desk. */}
-      <img
+      {/* The slim folder, stamped with Anna's mark, drifts from the folder tray
+          back down onto the stack: done, returned. */}
+      <div
         className="hero-folder"
-        src="/hero/sheet-6.webp"
-        width={140}
-        height={374}
-        alt=""
-        loading="lazy"
-        decoding="async"
         style={
           {
             left: `${TRAYS[4].x}%`,
             top: `${TRAYS[4].y - 1}%`,
             width: '2.4%',
-            '--dx': DESK.x - TRAYS[4].x,
-            '--dy': DESK.y - (TRAYS[4].y - 1),
+            '--dx': STACK.x - TRAYS[4].x,
+            '--dy': STACK.top - 1.2 - (TRAYS[4].y - 1),
           } as CSSProperties
         }
-      />
+      >
+        <img
+          src="/hero/sheet-6.webp"
+          width={140}
+          height={374}
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          className="hero-folder-mark"
+          src="/brands/anna-mono-dark.svg"
+          width={12}
+          height={12}
+          alt=""
+          loading="lazy"
+        />
+      </div>
 
       {/* The figure on its chair, seen from behind: three poses, swapped like stop-motion. */}
       <div

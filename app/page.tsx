@@ -53,7 +53,7 @@ const content = {
     ],
     heroAria:
       'A paper-craft room. A small figure at a desk raises one card. Sheets peel off a hanging stack of paper into five paper trays, each holding one object: a clock, a calendar, an envelope, an ID card or a folder. The folder comes back down to the desk.',
-    slingTag: 'for Anna',
+    stackTag: 'for Anna',
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
@@ -216,7 +216,7 @@ const content = {
     ],
     heroAria:
       'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog. Vellen papier glijden van een hangende stapel in vijf papieren bakjes, elk met één voorwerp: een klok, een kalender, een envelop, een pasje of een map. De map komt terug op het bureau.',
-    slingTag: 'voor Anna',
+    stackTag: 'voor Anna',
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
@@ -534,7 +534,7 @@ export default function Home() {
           <div className="hero-stage-box" ref={heroRef}>
             <PaperHero
               label={t.heroAria}
-              tag={t.slingTag}
+              tag={t.stackTag}
               playing={heroHasEntered && heroVisible}
             />
           </div>

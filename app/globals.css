@@ -299,38 +299,28 @@ footer > a:last-child:hover {
   animation-delay: calc(var(--t) - var(--hero-loop));
 }
 
-/* The stack in its sling, swaying from the ceiling on its own thread. */
-.hero-sling {
+/* The stack of work on the desk. The sprite's bottom sits on the desk top;
+   it thins while its sheets are in the trays. */
+.hero-stack {
   position: absolute;
-  top: 0;
-  height: 60%;
+  height: 0;
   transform: translateX(-50%);
-  transform-origin: 50% 0;
-  animation: hero-sling-sway 7s ease-in-out infinite alternate;
 }
-.hero-sling-thread {
+.hero-stack-paper {
   position: absolute;
-  top: 0;
-  left: 50%;
-  width: 2px;
-  height: var(--thread);
-  margin-left: -1px;
-  background: var(--thread-colour);
-  animation: hero-thread-lift var(--hero-loop) ease-in-out infinite;
-}
-.hero-sling-stack {
-  position: absolute;
-  top: var(--thread);
+  bottom: 0;
   left: 0;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 2cqh 2.4cqh rgba(11, 22, 48, 0.22));
-  animation: hero-sling-lift var(--hero-loop) ease-in-out infinite;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0.5cqh 0.7cqh rgba(11, 22, 48, 0.16));
+  animation: hero-stack-thin var(--hero-loop) ease-in-out infinite;
 }
-.hero-sling-tag {
+.hero-stack-tag {
   position: absolute;
-  top: calc(var(--thread) + 15%);
-  left: 24%;
+  bottom: -0.6cqh;
+  left: -14%;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -340,23 +330,22 @@ footer > a:last-child:hover {
   padding: 0.3em 0.55em;
   color: var(--ink);
   font-family: var(--font-geist-mono), monospace;
-  font-size: clamp(9px, 0.82cqw, 14px);
+  font-size: clamp(8px, 0.6cqw, 11px);
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
-  rotate: -8deg;
-  transform-origin: 100% 0;
+  rotate: -6deg;
+  transform-origin: 0 100%;
   box-shadow: 0 2px 6px rgba(11, 22, 48, 0.14);
-  animation: hero-sling-lift var(--hero-loop) ease-in-out infinite;
 }
-.hero-sling-tag img {
+.hero-stack-tag img {
   width: 1em;
   height: 1em;
 }
 
-/* Sheets leave the stack one by one; the folder comes back down. */
+/* Sheets lift off the stack one by one; the folder comes back down onto it. */
 .hero-sheet {
   position: absolute;
   height: auto;
@@ -367,11 +356,25 @@ footer > a:last-child:hover {
 }
 .hero-folder {
   position: absolute;
-  height: auto;
   opacity: 0;
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 0.6cqh 0.8cqh rgba(11, 22, 48, 0.16));
   animation: hero-folder-return var(--hero-loop) ease-in-out infinite;
+}
+.hero-folder img:first-child {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+/* Anna's mark, stamped on the returned folder. */
+.hero-folder-mark {
+  position: absolute;
+  top: 9%;
+  left: 50%;
+  width: 46%;
+  height: auto;
+  transform: translateX(-50%);
+  opacity: 0.85;
 }
 
 /* The figure: three poses on the same chair, swapped like stop-motion. */
@@ -445,36 +448,18 @@ footer > a:last-child:hover {
     opacity: 0;
   }
 }
-@keyframes hero-sling-lift {
+@keyframes hero-stack-thin {
   0%,
-  6.67% {
-    transform: translateY(0);
+  12% {
+    transform: scaleY(1);
   }
-  16.67% {
-    transform: translateY(-3cqh);
+  52%,
+  84% {
+    transform: scaleY(0.72);
   }
-  83% {
-    transform: translateY(-3cqh);
-  }
-  95%,
+  93%,
   100% {
-    transform: translateY(0);
-  }
-}
-@keyframes hero-thread-lift {
-  0%,
-  6.67% {
-    height: var(--thread);
-  }
-  16.67% {
-    height: calc(var(--thread) - 3cqh);
-  }
-  83% {
-    height: calc(var(--thread) - 3cqh);
-  }
-  95%,
-  100% {
-    height: var(--thread);
+    transform: scaleY(1);
   }
 }
 @keyframes hero-sheet-flight {
@@ -483,24 +468,24 @@ footer > a:last-child:hover {
     transform: translate(-50%, -50%) rotate(0deg);
   }
   3% {
-    transform: translate(-50%, -50%) translateY(-4cqh)
+    transform: translate(-50%, -50%) translateY(-6cqh)
       rotate(calc(var(--rot) * -0.5));
   }
   10%,
-  78% {
+  42% {
     opacity: 1;
     transform: translate(-50%, -50%)
       translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
       rotate(var(--rot));
   }
-  82%,
-  83% {
+  46% {
     opacity: 0;
     transform: translate(-50%, -50%)
       translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh))
       rotate(var(--rot));
   }
-  84% {
+  47%,
+  90% {
     opacity: 0;
     transform: translate(-50%, -50%) rotate(0deg);
   }
@@ -557,14 +542,6 @@ footer > a:last-child:hover {
     opacity: 0;
     transform: translate(-50%, -50%)
       translate(calc(var(--dx) * 1cqw), calc(var(--dy) * 1cqh)) rotate(-72deg);
-  }
-}
-@keyframes hero-sling-sway {
-  from {
-    transform: translateX(-50%) rotate(-2.2deg);
-  }
-  to {
-    transform: translateX(-50%) rotate(2.2deg);
   }
 }
 @keyframes hero-mobile-sway {
@@ -1656,17 +1633,11 @@ footer > a:last-child {
   .hero-figure img[data-pose='2'] {
     opacity: 0;
   }
-  .hero-sling-tag {
-    rotate: -8deg;
-  }
   .hero-figure img,
-  .hero-sling,
   .hero-mobile,
   .hero-tray,
   .hero-arm,
-  .hero-sling-stack,
-  .hero-sling-thread,
-  .hero-sling-tag {
+  .hero-stack-paper {
     animation: none;
   }
   .hero-plate {

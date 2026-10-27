@@ -94,21 +94,32 @@ test('every hero image has explicit dimensions, so the hero never shifts layout'
 test('the loop is 12 s, first motion inside 2 s, defined once in CSS and once in TS', () => {
   assert.match(hero, /export const HERO_LOOP_MS = 12000;/);
   assert.match(styles, /--hero-loop:\s*12s;/);
-  // The figure raises the card at 0 % and the sling lifts before 2 s (16.7 %).
+  // The figure raises the card at 0 % and the first sheet leaves the stack by 2 s.
   const pose = styles.match(/@keyframes hero-pose-card\s*\{([\s\S]*?)\n\}/)?.[1];
   assert.ok(pose, 'missing hero-pose-card keyframes');
   assert.match(pose, /(^|\n)\s*0%[^}]*opacity:\s*1/);
-  const lift = styles.match(/@keyframes hero-sling-lift\s*\{([\s\S]*?)\n\}/)?.[1];
-  assert.ok(lift, 'missing hero-sling-lift keyframes');
-  const liftStarts = [...lift.matchAll(/(\d+(?:\.\d+)?)%/g)].map((m) => Number(m[1]));
-  assert.ok(liftStarts.some((p) => p > 0 && p <= 16.7), 'sling lift starts after 2 s');
+  const departures = [...hero.matchAll(/\{ n: \d, x: \d+, y: \d+, w: [0-9.]+, iw: \d+, ih: \d+, t: ([0-9.]+)/g)]
+    .map((m) => Number(m[1]));
+  assert.equal(departures.length, 5);
+  assert.ok(Math.min(...departures) <= 2.0, `first sheet leaves at ${Math.min(...departures)} s`);
   // Pose swaps are stepped, never faded.
   assert.match(styles, /\.hero-figure\s+img\s*\{[^}]*steps\(1/s);
 });
 
-test('sheets peel one at a time into the trays and the folder comes back down', () => {
+test('sheets lift off the desk stack one at a time into the trays and the folder comes back onto it', () => {
   assert.ok(hero.includes('/hero/sheet-${sheet.n}.webp'));
   assert.ok(hero.includes('/hero/tray-${tray.n}.webp'));
+  // The work is on the visitor's desk: a paper stack sprite, no hanging sling.
+  assert.match(hero, /\/hero\/stack\.webp/);
+  assert.match(hero, /className="hero-stack"/);
+  assert.doesNotMatch(hero, /sling/i);
+  assert.doesNotMatch(styles, /sling/i);
+  // Sheets start at the top of the stack and the folder returns to it.
+  assert.match(hero, /left: `\$\{STACK\.x\}%`,\s*top: `\$\{STACK\.top\}%`/);
+  assert.match(hero, /'--dx': STACK\.x - TRAYS\[4\]\.x/);
+  // The stack thins while the sheets are away.
+  assert.match(styles, /@keyframes hero-stack-thin/);
+  assert.match(styles, /\.hero-stack-paper\s*\{[^}]*animation:\s*hero-stack-thin/s);
   for (let i = 1; i <= 5; i += 1) {
     assert.match(hero, new RegExp(`\\{ n: ${i}, x: \\d+, y: \\d+`), `tray ${i}`);
   }
@@ -122,11 +133,24 @@ test('sheets peel one at a time into the trays and the folder comes back down', 
   assert.match(hero, /<line\b/);
 });
 
-test('the paper tag on the sling is real text in both languages', () => {
-  assert.match(hero, /className="hero-sling-tag"/);
-  assert.match(page, /slingTag:\s*'for Anna'/);
-  assert.match(page, /slingTag:\s*'voor Anna'/);
+test('the paper tag on the desk stack is real text in both languages', () => {
+  assert.match(hero, /className="hero-stack-tag"/);
+  assert.match(page, /stackTag:\s*'for Anna'/);
+  assert.match(page, /stackTag:\s*'voor Anna'/);
   assert.match(hero, /\{tag\}/);
+});
+
+test("Anna's mark sits on the tag and on the returned folder, never on the figure", () => {
+  const tag = hero.match(/<span className="hero-stack-tag">([\s\S]*?)<\/span>/)?.[1];
+  assert.ok(tag, 'missing stack tag');
+  assert.match(tag, /\/brands\/anna-mono-dark\.svg/);
+  const folder = hero.match(/<div\s+className="hero-folder"[\s\S]*?<\/div>/)?.[0];
+  assert.ok(folder, 'the folder is not a group');
+  assert.match(folder, /\/hero\/sheet-6\.webp/);
+  assert.match(folder, /className="hero-folder-mark"[^>]*src="\/brands\/anna-mono-dark\.svg"/s);
+  const figure = hero.match(/<div\s+className="hero-figure"[\s\S]*?<\/div>/)?.[0];
+  assert.ok(figure, 'missing figure group');
+  assert.doesNotMatch(figure, /brands\//);
 });
 
 test('headline, sub and actions are verbatim in English and Dutch', () => {
@@ -172,8 +196,8 @@ test('the stage always reaches the right edge on tablets and phones, and the cop
   assert.match(styles, /translateX\(max\(-64%, calc\(50cqw - 100%\)\)\)/);
   assert.match(styles, /translateX\(max\(-66%, calc\(50cqw - 100%\)\)\)/);
   assert.match(styles, /\.hero::before\s*\{[^}]*linear-gradient/s);
-  assert.match(styles, /\.hero-sling-tag\s*\{[^}]*rotate:\s*-8deg/s);
-  assert.doesNotMatch(styles, /\.hero-sling-tag\s*\{[^}]*transform:\s*rotate/s);
+  assert.match(styles, /\.hero-stack-tag\s*\{[^}]*rotate:\s*-?\d+deg/s);
+  assert.doesNotMatch(styles, /\.hero-stack-tag\s*\{[^}]*transform:\s*rotate/s);
 });
 
 test('reduced motion shows one still frame with the folder on the desk', () => {
@@ -259,10 +283,14 @@ test('exactly one plate shows at a time, so the desk and mug never double-expose
 test('every pose is scaled to the same chair footprint', () => {
   const poses = [...hero.matchAll(/\{ pose: (\d), iw: \d+, ih: \d+, legs: (\d+), legsLeft: (\d+), native: (\d+) \}/g)];
   assert.equal(poses.length, 3);
-  for (const [, , legs] of poses) {
-    // The chairs were generated separately; their leg spans agree within 4 %.
-    assert.ok(Math.abs(Number(legs) - 352) / 352 < 0.04, `legs ${legs}`);
+  for (const [, pose, legs, legsLeft, native] of poses) {
+    // Legs are measured in each sprite's own pixels; the span and its left
+    // edge must fit inside the sprite, or the scaling formula is off.
+    assert.ok(Number(legs) > 0 && Number(legsLeft) + Number(legs) <= Number(native), `pose ${pose}`);
   }
+  // Poses 2 and 3 are generated from pose 1 as reference (README), so the
+  // chair-footprint scaling also equalises the figure itself.
+  assert.match(readme, /seated-2 .* and seated-3\s.*regenerated with seated-1/s);
   assert.match(hero, /width: `\$\{\(100 \* pose\.native\) \/ pose\.legs\}%`/);
   assert.match(hero, /left: `\$\{\(-100 \* pose\.legsLeft\) \/ pose\.legs\}%`/);
 });
@@ -276,5 +304,6 @@ test('landed sheets sit at the lip of the tray and stay small, so the tray objec
 
 test('the generation record keeps the served and source assets apart', () => {
   assert.match(readme, /design\/hero\/source/);
-  assert.ok(existsSync(new URL('../design/hero/source/sling.webp', import.meta.url)));
+  assert.ok(existsSync(new URL('../design/hero/source/stack.webp', import.meta.url)));
+  assert.match(readme, /stack\.webp/);
 });
