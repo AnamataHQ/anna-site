@@ -68,19 +68,6 @@ test('the connector request link stays a plain mailto', () => {
   assert.match(page, /href="mailto:info@anamata\.ai\?subject=Connector%20request%20for%20Anna"/);
 });
 
-test('the Slack lines are unchanged', () => {
-  assert.ok(
-    page.includes(
-      'Microsoft Teams today, with Slack on the cards as another way to work with Anna.',
-    ),
-  );
-  assert.ok(
-    page.includes(
-      'Microsoft Teams vandaag, met Slack op de planning als extra manier om met Anna te werken.',
-    ),
-  );
-});
-
 test('Turnstile loads only when the form opens, never with the page', () => {
   assert.doesNotMatch(layout, /challenges\.cloudflare\.com/);
   assert.doesNotMatch(page, /challenges\.cloudflare\.com/);

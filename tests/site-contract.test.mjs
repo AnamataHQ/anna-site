@@ -3,6 +3,10 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const page = readFileSync(new URL('../app/page.tsx', import.meta.url), 'utf8');
+const hero = readFileSync(
+  new URL('../components/paper-hero.tsx', import.meta.url),
+  'utf8',
+);
 const layout = readFileSync(
   new URL('../app/layout.tsx', import.meta.url),
   'utf8',
@@ -81,7 +85,7 @@ test('uses the real Teams mark and context-appropriate Anna Relay variants', () 
     1,
   );
   assert.equal(
-    page.match(/src="\/brands\/anna-mono-dark\.svg"/g)?.length,
+    hero.match(/src="\/brands\/anna-mono-dark\.svg"/g)?.length,
     1,
   );
   assert.equal(
@@ -93,7 +97,7 @@ test('uses the real Teams mark and context-appropriate Anna Relay variants', () 
   assert.doesNotMatch(page, /className="teams-mini"[^>]*>\s*T\s*</s);
   assert.doesNotMatch(page, /<DemoMessage[^>]+avatar="A"/s);
   assert.doesNotMatch(page, /className="brand-mark"[^>]*>\s*A\s*</s);
-  assert.doesNotMatch(page, /className="anna-tray-mark"[^>]*>\s*A\s*</s);
+  assert.doesNotMatch(hero, /className="hero-sling-tag"[^>]*>\s*A\s*</s);
   assert.match(layout, /icons:\s*\{[\s\S]*?icon:\s*'\/favicon\.svg'/);
   for (const asset of [
     'anna-color-transparent.svg',
@@ -133,149 +137,24 @@ test('uses the real Teams mark and context-appropriate Anna Relay variants', () 
   assert.equal(favicon, annaColourBlack);
 });
 
-test('uses a familiar calendar that fills with routine work and clears in view', () => {
-  for (const phrase of [
-    'Work that needs you',
-    'Werk dat jou nodig heeft',
-    'Follow-ups',
-    'Opvolging',
-    'Inbox triage',
-    'Inbox verwerken',
-    'Time returned',
-    'Tijd terug',
-  ]) {
-    assert.ok(
-      page.includes(phrase),
-      `missing cleared-day hero copy: ${phrase}`,
-    );
-  }
-  assert.match(page, /className="cleared-day"/);
-  assert.match(page, /className="calendar-event/);
-  assert.match(page, /className="focus-fragment"/);
-  assert.match(page, /data-incoming=\{task\.incoming\}/);
-  assert.match(page, /Work week/);
-  assert.match(page, /Werkweek/);
-  assert.doesNotMatch(page, /anna-workflow\.png/);
-  assert.match(styles, /@keyframes clear-admin/);
-  assert.match(styles, /@keyframes fill-open-slots/);
-  assert.match(styles, /@keyframes merge-focus/);
-  assert.match(styles, /@keyframes expand-anchor-day/);
-  assert.doesNotMatch(styles, /\.cleared-day[^}]*transform:\s*rotate/s);
-});
-
-test('keeps valuable work distinct before merging it into one anchor card', () => {
-  for (const phrase of [
-    'Set priorities',
-    'Make hiring decision',
-    'Team check-in',
-    'Resolve project blocker',
-    'Prioriteiten bepalen',
-    'Wervingsbesluit nemen',
-    'Teamoverleg',
-    'Projectblokkade oplossen',
-  ]) {
-    assert.ok(page.includes(phrase), `missing valuable-work task: ${phrase}`);
-  }
-  assert.match(page, /data-side=\{segment\.side\}/);
-  assert.match(page, /className="focus-block focus-anchor"/);
-  assert.match(page, /className="anchor-compact"/);
-  assert.match(page, /className="anchor-expanded"/);
-});
-
-test('pauses, expands one anchor slowly and counts its timeframe outward', () => {
-  assert.match(page, /const CALENDAR_MERGE_DELAY_MS = 6800/);
-  assert.match(page, /const CALENDAR_MERGE_DURATION_MS = 2900/);
-  assert.match(page, /requestAnimationFrame/);
-  assert.match(page, /formatCalendarTime/);
-  assert.match(page, /focusWindow/);
-  assert.match(styles, /animation:\s*expand-anchor-day 10\.4s/);
-  assert.match(styles, /font-variant-numeric:\s*tabular-nums/);
-});
-
-test('aligns agenda cards to the calendar and labels their timeframes', () => {
-  for (const timeframe of [
-    '09:00–09:25',
-    '10:25–10:45',
-    '11:30–11:55',
-    '12:25–12:55',
-    '13:40–14:00',
-    '15:00–15:20',
-    '16:10–16:30',
-    '08:00–17:00',
-  ]) {
-    assert.ok(
-      page.includes(timeframe),
-      `missing agenda timeframe: ${timeframe}`,
-    );
-  }
-  assert.match(page, /--event-start/);
-  assert.match(page, /--event-duration/);
-  assert.match(styles, /top:\s*calc\(var\(--event-start\)/);
-  assert.match(styles, /height:\s*calc\(var\(--event-duration\)/);
-});
-
-test('balances a nine-hour day with exactly 2h 40m handled by Anna', () => {
-  const focusSource = page.match(
-    /const focusSegments = \[([\s\S]*?)\] as const;/,
-  )?.[1];
-  assert.ok(focusSource, 'missing valuable-work schedule');
-  const focusMinutes = [...focusSource.matchAll(/duration:\s*(\d+)/g)].reduce(
-    (total, match) => total + Number(match[1]),
-    0,
-  );
-  assert.equal(focusMinutes, 380);
-
-  const taskLists = [...page.matchAll(/tasks: \[([\s\S]*?)\],\n\s*handled:/g)];
-  assert.equal(taskLists.length, 2);
-  for (const [, taskSource] of taskLists) {
-    const routineMinutes = [
-      ...taskSource.matchAll(/duration:\s*(\d+)/g),
-    ].reduce((total, match) => total + Number(match[1]), 0);
-    assert.equal(routineMinutes, 160);
-  }
-});
-
-test('keeps the Anna summary outside the calendar grid at every width', () => {
-  assert.match(page, /className="anna-tray calendar-summary"/);
-  assert.match(styles, /\.anna-tray\s*\{[^}]*position:\s*static/);
-  assert.doesNotMatch(styles, /\.anna-tray\s*\{[^}]*position:\s*absolute/);
-});
-
-test('explains the before and after without motion', () => {
-  for (const phrase of [
-    'Before · 7 routine tasks split up the day',
-    'After · 08:00–17:00 for work that needs you',
-    'Voor · 7 routinetaken versnipperen de dag',
-    'Na · 08:00–17:00 voor werk dat jou nodig heeft',
-  ]) {
-    assert.ok(page.includes(phrase), `missing reduced-motion story: ${phrase}`);
-  }
-  assert.match(page, /className="reduced-motion-story"/);
-  assert.match(
-    styles,
-    /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.reduced-motion-story\s*\{[^}]*display:\s*grid/,
-  );
-  assert.match(page, /setFocusWindow\(FINAL_FOCUS_WINDOW\)/);
-});
-
 test('starts motion when each experience enters the viewport', () => {
   assert.match(page, /IntersectionObserver/);
   assert.match(page, /heroHasEntered/);
   assert.match(page, /workflowHasEntered/);
   assert.match(page, /workflowVisible/);
   assert.match(page, /data-in-view=/);
-  assert.match(styles, /\[data-in-view='true'\]/);
+  assert.match(styles, /\[data-playing='false'\]/);
 });
 
 test('shows three selectable, replayable conversation demos', () => {
   assert.match(page, /from '@\/components\/ui\/tabs'/);
   for (const phrase of [
     'Leave request',
-    'Desk booking',
-    'Record update',
+    'Hours',
+    'Follow-up',
     'Verlofaanvraag',
-    'Werkplek boeken',
-    'Dossier bijwerken',
+    'Uren',
+    'Opvolging',
     'Retrieving context',
     'Context ophalen',
     'Replay conversation',
@@ -306,9 +185,6 @@ test('makes Anna boundaries and recognisable team tasks concrete', () => {
     'Anna doet',
     'Anna vraagt',
     'Anna doet nooit zonder toestemming',
-    'HR',
-    'Operations',
-    'Office management',
   ]) {
     assert.ok(
       page.includes(phrase),
@@ -317,48 +193,72 @@ test('makes Anna boundaries and recognisable team tasks concrete', () => {
   }
 });
 
-test('offers both requested conversion paths', () => {
-  assert.match(page, /Book a demo/);
-  assert.match(page, /Plan een demo/);
+test('offers early access and contact, with identical wording in hero and closing section', () => {
+  assert.equal((page.match(/'Request early access'/g) ?? []).length, 1);
+  assert.equal((page.match(/'Vraag vroege toegang aan'/g) ?? []).length, 1);
   assert.match(page, /Contact Anamata/);
   assert.match(page, /mailto:info@anamata\.ai/);
+  assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
 });
 
-test('distinguishes ready, shipping, roadmap and extensible connections', () => {
+test('sells the connectors first: tested examples, thousands available, no roadmap logos', () => {
   for (const integration of [
     'Microsoft Teams',
+    'Slack',
+    'Notion',
+    'HubSpot',
     'ClockWise',
     'Loket',
-    'Slack',
-    'Mendix office seat booking',
-    'Mendix CV updates',
-    'Microsoft 365',
-    'Atlassian',
-    'Jira',
-    'Notion',
-    'GitHub',
   ]) {
     assert.ok(
       page.includes(integration),
-      `missing integration: ${integration}`,
+      `missing connector: ${integration}`,
     );
   }
-  assert.match(page, /Available now/);
-  assert.match(page, /Nu beschikbaar/);
-  assert.match(page, /Shipping with Anna/);
-  assert.match(page, /Wordt met Anna geleverd/);
-  assert.match(page, /Communication roadmap/);
-  assert.match(page, /Roadmap communicatie/);
-  assert.match(page, /Examples, not limits/);
-  assert.match(page, /Voorbeelden, geen grenzen/);
-  assert.match(page, /SSO-secured MCP connectors/);
-  assert.match(page, /MCP-koppelingen met SSO/);
+  const sections = [...page.matchAll(/<section[^>]*id="([a-z-]+)"/g)].map(
+    (match) => match[1],
+  );
+  assert.deepEqual(sections.slice(0, 2), ['top', 'connectors']);
+  assert.match(page, /OAuth/);
+  assert.match(page, /MCP/);
+  assert.match(page, /thousands/i);
+  assert.match(page, /duizenden/i);
   assert.match(page, /If it has an API/);
   assert.match(page, /Als het een API heeft/);
-  assert.match(page, /thousands of business systems/i);
-  assert.match(page, /duizenden bedrijfssystemen/i);
   assert.match(page, /Request a connector/);
   assert.match(page, /Vraag een koppeling aan/);
+  for (const gone of [
+    'Shipping with Anna',
+    'Communication roadmap',
+    'Mendix',
+    'on the cards',
+    'op de planning',
+    'Available now',
+    '+∞',
+    'Atlassian',
+    'Jira',
+    'GitHub',
+  ]) {
+    assert.ok(!page.includes(gone), `old connector copy still present: ${gone}`);
+  }
+});
+
+test('tells the story in the agreed order', () => {
+  const order = ['hero', 'connectors', 'capability-section', 'use-case-section', 'workflow-section', 'control-section', 'cta-section'];
+  const positions = order.map((name) => page.indexOf(`className="${name}"`));
+  for (const [index, position] of positions.entries()) {
+    assert.ok(position >= 0, `missing section ${order[index]}`);
+    if (index > 0) assert.ok(position > positions[index - 1], `${order[index]} is out of order`);
+  }
+  for (const useCase of [
+    'ClockWise',
+    'Loket',
+    'HubSpot',
+    'Log my hours',
+    'Uren boeken',
+  ]) {
+    assert.ok(page.includes(useCase), `missing use case: ${useCase}`);
+  }
 });
 
 test('includes transparency and accessibility essentials', () => {

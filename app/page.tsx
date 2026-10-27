@@ -1,9 +1,7 @@
 'use client';
 
 import {
-  ArrowDown,
   ArrowRight,
-  CalendarDays,
   Check,
   CheckCircle2,
   ChevronRight,
@@ -16,14 +14,13 @@ import {
   RotateCcw,
   Search,
   ShieldCheck,
-  Sparkles,
   UserRoundCheck,
 } from 'lucide-react';
 import Image from 'next/image';
-import type { CSSProperties } from 'react';
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
 
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
+import { PaperHero } from '@/components/paper-hero';
 import type { LeadKind } from '@/lib/lead-capture';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -31,80 +28,6 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 type Language = 'en' | 'nl';
 
 const EXECUTION_DELAY_MS = 1600;
-const CALENDAR_MERGE_DELAY_MS = 6800;
-const CALENDAR_MERGE_DURATION_MS = 2900;
-const INITIAL_FOCUS_WINDOW = { start: 715, end: 745 } as const;
-const FINAL_FOCUS_WINDOW = { start: 480, end: 1020 } as const;
-
-const focusSegments = [
-  {
-    time: '08:00–09:00',
-    start: 0,
-    duration: 60,
-    side: 'before',
-    label: { en: 'Set priorities', nl: 'Prioriteiten bepalen' },
-  },
-  {
-    time: '09:25–10:25',
-    start: 85,
-    duration: 60,
-    side: 'before',
-    label: { en: 'Review proposal', nl: 'Voorstel beoordelen' },
-  },
-  {
-    time: '10:45–11:30',
-    start: 165,
-    duration: 45,
-    side: 'before',
-    label: { en: 'Make hiring decision', nl: 'Wervingsbesluit nemen' },
-  },
-  {
-    time: '11:55–12:25',
-    start: 235,
-    duration: 30,
-    side: 'anchor',
-    label: { en: 'Team check-in', nl: 'Teamoverleg' },
-  },
-  {
-    time: '12:55–13:40',
-    start: 295,
-    duration: 45,
-    side: 'after',
-    label: {
-      en: 'Resolve project blocker',
-      nl: 'Projectblokkade oplossen',
-    },
-  },
-  {
-    time: '14:00–15:00',
-    start: 360,
-    duration: 60,
-    side: 'after',
-    label: { en: 'Coach a colleague', nl: 'Collega coachen' },
-  },
-  {
-    time: '15:20–16:10',
-    start: 440,
-    duration: 50,
-    side: 'after',
-    label: { en: 'Plan the roadmap', nl: 'Roadmap plannen' },
-  },
-  {
-    time: '16:30–17:00',
-    start: 510,
-    duration: 30,
-    side: 'after',
-    label: { en: 'Strategy work', nl: 'Strategiewerk' },
-  },
-] as const;
-
-const formatCalendarTime = (minutes: number) => {
-  const hours = Math.floor(minutes / 60);
-  const remainder = minutes % 60;
-  return `${String(hours).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
-};
-
-const anchorSegment = focusSegments[3];
 
 const content = {
   en: {
@@ -114,84 +37,33 @@ const content = {
     nav: {
       how: 'How Anna works',
       control: 'You stay in control',
-      fit: 'Where she fits',
-      demo: 'Book a demo',
+      connectors: 'Connectors',
     },
-    eyebrow: 'Your digital AI assistant',
-    heroTitle:
-      'The work still needs doing. It does not need to take your time.',
-    heroBody:
-      'Anna takes care of repetitive coordination and administration for small and mid-sized organisations. She answers, prepares and acts, while your team stays in control.',
-    bookDemo: 'Book a demo',
+    earlyAccess: 'Request early access',
     contact: 'Contact Anamata',
-    scroll: 'See how she works',
-    day: {
-      aria: 'A working day where Anna clears routine administration and gives focus time back.',
-      date: 'Tuesday · 18 June',
-      view: 'Work week',
-      today: 'Today',
-      weekday: 'TUE 18',
-      focus: 'Work that needs you',
-      focusDetail: 'Strategy · decisions · people',
-      finalTime: '08:00–17:00',
-      tasks: [
-        {
-          label: 'Inbox triage',
-          time: '09:00–09:25',
-          start: 60,
-          duration: 25,
-          incoming: false,
-        },
-        {
-          label: 'Follow-ups',
-          time: '10:25–10:45',
-          start: 145,
-          duration: 20,
-          incoming: false,
-        },
-        {
-          label: 'Leave request',
-          time: '11:30–11:55',
-          start: 210,
-          duration: 25,
-          incoming: false,
-        },
-        {
-          label: 'Meeting prep',
-          time: '12:25–12:55',
-          start: 265,
-          duration: 30,
-          incoming: false,
-        },
-        {
-          label: 'Update records',
-          time: '13:40–14:00',
-          start: 340,
-          duration: 20,
-          incoming: true,
-        },
-        {
-          label: 'Send reminders',
-          time: '15:00–15:20',
-          start: 420,
-          duration: 20,
-          incoming: true,
-        },
-        {
-          label: 'Status update',
-          time: '16:10–16:30',
-          start: 490,
-          duration: 20,
-          incoming: false,
-        },
-      ],
-      handled: 'Handled by Anna',
-      handledCount: '7 routine tasks completed',
-      returned: 'Time returned',
-      returnedAmount: '2h 40m',
-      before: 'Before · 7 routine tasks split up the day',
-      after: 'After · 08:00–17:00 for work that needs you',
-    },
+    eyebrow: 'Your digital AI assistant',
+    heroTitle: 'Anna does the work nobody should waste time on.',
+    heroBody:
+      'Ask her in Teams or Slack. She connects to the systems your work lives in, asks before she acts, and reports back.',
+    trust: 'Early access, 2026',
+    facts: [
+      'Works inside Microsoft Teams and Slack',
+      'Connects over OAuth to the systems you already use',
+      'Asks before she acts, within the rights you grant',
+    ],
+    heroAria:
+      'A paper-craft room. A small figure at a desk raises one card. Sheets peel off a hanging stack of paper into five paper trays, one with a clock, a calendar, an envelope, an ID card and a folder. The folder comes back down to the desk.',
+    slingTag: 'for Anna',
+    connectorsKicker: 'Every system the work lives in',
+    connectorsTitle: 'Anna connects to the systems you already use.',
+    connectorsBody:
+      'Anna works through MCP connectors that sign in with OAuth, with the rights you grant and nothing more. These are the systems she has been tested with; thousands of connectors are available.',
+    testedWith: 'Tested with',
+    customTitle: 'If it has an API, it can join the workflow.',
+    customBody:
+      'For internal or specialist systems without their own connector, Anamata can build one during onboarding.',
+    requestConnector: 'Request a connector',
+    connectorNote: 'Tell us which system your team needs next.',
     problemKicker: 'Useful work. Wrong use of your time.',
     problemTitle: 'Anna handles the work around the work.',
     problemBody:
@@ -213,38 +85,35 @@ const content = {
         body: 'Completes approved actions in connected systems and reports what happened.',
       },
     ],
-    examplesKicker: 'Recognisable across the team',
-    examplesTitle: 'Start with the tasks everyone keeps putting off.',
-    taskGroups: [
+    examplesKicker: 'Three things to start with',
+    examplesTitle: 'Work your team recognises.',
+    examples: [
       {
-        title: 'HR',
-        examples: [
-          'Answer routine policy questions',
-          'Prepare leave requests',
-          'Keep employee records current',
-        ],
+        tray: 1,
+        title: 'Hours in ClockWise',
+        ask: 'Log my hours for this week.',
+        outcome:
+          'Anna fills the week from your calendar and projects, shows you the sheet and submits it once you say so.',
       },
       {
-        title: 'Operations',
-        examples: [
-          'Check project handovers',
-          'Route recurring requests',
-          'Prepare status updates',
-        ],
+        tray: 2,
+        title: 'Leave via Loket',
+        ask: 'Can I take next Friday off?',
+        outcome:
+          'Anna checks your balance and the policy, prepares the request and files it after your approval.',
       },
       {
-        title: 'Office management',
-        examples: [
-          'Book desks and rooms',
-          'Follow up on confirmations',
-          'Answer workplace questions',
-        ],
+        tray: 4,
+        title: 'Follow-up in HubSpot',
+        ask: 'Who did we promise a follow-up this week?',
+        outcome:
+          'Anna lists the open promises on your deals, drafts the follow-ups and logs what was sent.',
       },
     ],
     workflowKicker: 'One request, from start to finish',
     workflowTitle: 'Watch the work happen.',
     workflowIntro:
-      'A colleague asks in Microsoft Teams. Anna retrieves the right context, pauses for approval when needed and reports the completed result in the same conversation.',
+      'A colleague asks in Microsoft Teams or Slack. Anna retrieves the right context, pauses for approval when needed and reports the completed result in the same conversation.',
     demoLabel: 'DEMO · NOT THE LIVE RECORD',
     demoChannel: 'Microsoft Teams · Anna',
     retrieving: 'Retrieving context',
@@ -273,40 +142,35 @@ const content = {
           'Done. Your leave request is filed and waiting for your manager’s approval. I’ll update you here.',
       },
       {
-        id: 'desk',
-        label: 'Desk booking',
-        person: 'Can you book my usual desk for Thursday?',
-        answer: 'Yes. I’ll check your preference and what is available.',
-        context: 'Thursday 08:00–15:00 · usual area · desk 528 available',
-        sources: ['Workplace guide', 'Desk availability'],
-        approval: 'Desk 528 is free for your usual hours. Shall I book it?',
+        id: 'hours',
+        label: 'Hours',
+        person: 'Log my hours for this week.',
+        answer:
+          'I’ll fill the week from your calendar and projects, then show you the sheet.',
+        context: '5 days · 2 projects · 38 h from your calendar',
+        sources: ['ClockWise', 'Calendar'],
+        approval:
+          'The sheet matches your calendar. Shall I submit it in ClockWise?',
         result:
-          'Booked. Desk 528 is yours on Thursday from 08:00 to 15:00. The confirmation is in this chat.',
+          'Submitted. Your week is in ClockWise and waiting for approval. I’ll let you know here.',
       },
       {
-        id: 'record',
-        label: 'Record update',
-        person: 'Please add today’s status to the project handover record.',
-        answer: 'I’ll collect the latest agreed status and prepare the update.',
-        context:
-          'Latest team update found · 3 changes · editor permission checked',
-        sources: ['Project notes', 'Handover record'],
+        id: 'follow-up',
+        label: 'Follow-up',
+        person: 'Who did we promise a follow-up this week?',
+        answer: 'I’ll check the open deals and draft the follow-ups.',
+        context: '3 promises open · drafts ready · nothing sent yet',
+        sources: ['HubSpot', 'Mail'],
         approval:
-          'I have prepared three changes. Would you like me to apply them to the handover record?',
+          'Three drafts are ready for your review. Shall I send them and log them in HubSpot?',
         result:
-          'Updated. Three changes were added to the handover record, with a link and timestamp saved here.',
+          'Sent. Three follow-ups went out and are logged on their deals in HubSpot.',
       },
     ],
     controlKicker: 'Initiative, with boundaries',
     controlTitle: 'Anna can move work forward. You decide how far.',
     controlBody:
       'Set the rules once. Anna works within them, asks when judgement is needed and keeps a clear record of every completed action.',
-    controlPoints: [
-      'Your systems and permissions remain the source of truth.',
-      'Sensitive actions can always require human approval.',
-      'Every result is reported back to the team.',
-      'Anna is always clearly presented as AI.',
-    ],
     boundaryCards: [
       {
         title: 'Anna does',
@@ -321,34 +185,10 @@ const content = {
         body: 'Make consequential decisions, step outside configured access or quietly act without leaving a record.',
       },
     ],
-    fitKicker: 'Fits into the workday',
-    fitTitle: 'Works where your team already works.',
-    fitBody:
-      'Anna meets colleagues in the channels they already use and works with the operational systems behind them. Start with what ships with Anna, then connect the rest of your landscape.',
-    integrationLabel: 'Your connected workday',
-    available: 'Available now',
-    availableNote: 'The work surfaces Anna can connect with today.',
-    shipping: 'Shipping with Anna',
-    shippingNote:
-      'Anamata’s Mendix workflows, ready as part of the Anna launch.',
-    roadmap: 'Communication roadmap',
-    roadmapNote:
-      'Microsoft Teams today, with Slack on the cards as another way to work with Anna.',
-    examples: 'Examples, not limits',
-    scaleTitle: 'One Anna. Thousands of business systems.',
-    scaleBody:
-      'The next layer is SSO-secured MCP connectors. As full SSO support comes online, they open up the major corporate platforms your organisation already runs. These logos show the breadth, not a fixed catalogue.',
-    customTitle: 'If it has an API, it can join the workflow.',
-    customBody:
-      'For internal or specialist systems without their own connector, Anamata can build one during onboarding.',
-    requestConnector: 'Request a connector',
-    connectorNote: 'Tell us which system your team needs next.',
     ctaKicker: 'Give time back to the work that needs you',
     ctaTitle: 'Show us the tasks that keep getting in the way.',
     ctaBody:
-      'In a short conversation, we will map one real workflow and show where Anna can help safely and practically.',
-    ctaPrimary: 'Book a demo',
-    ctaSecondary: 'Contact Anamata',
+      'In a short conversation, we map one real workflow and show where Anna can help safely and practically.',
     footerLine: 'Anna is your digital AI assistant by Anamata.',
     transparency:
       'Anna is AI. She identifies herself as such, and people remain in control of what she may do.',
@@ -360,84 +200,34 @@ const content = {
     nav: {
       how: 'Zo werkt Anna',
       control: 'Jij houdt de regie',
-      fit: 'Waar ze werkt',
-      demo: 'Plan een demo',
+      connectors: 'Koppelingen',
     },
-    eyebrow: 'Jouw digitale AI-assistent',
-    heroTitle:
-      'Het werk moet nog steeds gebeuren. Het hoeft niet jouw tijd te kosten.',
-    heroBody:
-      'Anna neemt terugkerende afstemming en administratie over voor kleine en middelgrote organisaties. Ze beantwoordt, bereidt voor en voert uit, terwijl jouw team de regie houdt.',
-    bookDemo: 'Plan een demo',
+    earlyAccess: 'Vraag vroege toegang aan',
     contact: 'Neem contact op',
-    scroll: 'Bekijk hoe ze werkt',
-    day: {
-      aria: 'Een werkdag waarin Anna routineadministratie afhandelt en focustijd teruggeeft.',
-      date: 'Dinsdag · 18 juni',
-      view: 'Werkweek',
-      today: 'Vandaag',
-      weekday: 'DI 18',
-      focus: 'Werk dat jou nodig heeft',
-      focusDetail: 'Strategie · besluiten · mensen',
-      finalTime: '08:00–17:00',
-      tasks: [
-        {
-          label: 'Inbox verwerken',
-          time: '09:00–09:25',
-          start: 60,
-          duration: 25,
-          incoming: false,
-        },
-        {
-          label: 'Opvolging',
-          time: '10:25–10:45',
-          start: 145,
-          duration: 20,
-          incoming: false,
-        },
-        {
-          label: 'Verlofaanvraag',
-          time: '11:30–11:55',
-          start: 210,
-          duration: 25,
-          incoming: false,
-        },
-        {
-          label: 'Overleg voorbereiden',
-          time: '12:25–12:55',
-          start: 265,
-          duration: 30,
-          incoming: false,
-        },
-        {
-          label: 'Dossiers bijwerken',
-          time: '13:40–14:00',
-          start: 340,
-          duration: 20,
-          incoming: true,
-        },
-        {
-          label: 'Herinneringen sturen',
-          time: '15:00–15:20',
-          start: 420,
-          duration: 20,
-          incoming: true,
-        },
-        {
-          label: 'Status bijwerken',
-          time: '16:10–16:30',
-          start: 490,
-          duration: 20,
-          incoming: false,
-        },
-      ],
-      handled: 'Afgehandeld door Anna',
-      handledCount: '7 routinetaken afgerond',
-      returned: 'Tijd terug',
-      returnedAmount: '2u 40m',
-      before: 'Voor · 7 routinetaken versnipperen de dag',
-      after: 'Na · 08:00–17:00 voor werk dat jou nodig heeft',
-    },
+    eyebrow: 'Jouw digitale AI-assistent',
+    heroTitle: 'Anna doet het werk waar niemand tijd aan zou moeten verspillen.',
+    heroBody:
+      'Vraag het haar in Teams of Slack. Ze verbindt met de systemen waar jouw werk in staat, vraagt voordat ze handelt en koppelt terug.',
+    trust: 'Vroege toegang, 2026',
+    facts: [
+      'Werkt in Microsoft Teams en Slack',
+      'Koppelt via OAuth met de systemen die je al gebruikt',
+      'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
+    ],
+    heroAria:
+      'Een kamer van papier. Een klein figuur aan een bureau steekt één kaartje omhoog. Vellen papier glijden van een hangende stapel in vijf papieren bakjes, met een klok, een kalender, een envelop, een pasje en een map. De map komt terug op het bureau.',
+    slingTag: 'voor Anna',
+    connectorsKicker: 'Elk systeem waar het werk in staat',
+    connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
+    connectorsBody:
+      'Anna werkt via MCP-koppelingen die inloggen met OAuth, met de rechten die jij geeft en niets meer. Dit zijn de systemen waarmee ze is getest; er zijn duizenden koppelingen beschikbaar.',
+    testedWith: 'Getest met',
+    customTitle: 'Als het een API heeft, kan het meedoen in het werkproces.',
+    customBody:
+      'Voor interne of specialistische systemen zonder eigen koppeling kan Anamata er tijdens de onboarding een bouwen.',
+    requestConnector: 'Vraag een koppeling aan',
+    connectorNote:
+      'Vertel ons welk systeem jouw team als volgende nodig heeft.',
     problemKicker: 'Nuttig werk. Verkeerd gebruik van je tijd.',
     problemTitle: 'Anna doet het werk rondom het werk.',
     problemBody:
@@ -459,38 +249,35 @@ const content = {
         body: 'Rondt goedgekeurde acties af in gekoppelde systemen en rapporteert wat er is gebeurd.',
       },
     ],
-    examplesKicker: 'Herkenbaar voor het hele team',
-    examplesTitle: 'Begin bij de taken die iedereen blijft uitstellen.',
-    taskGroups: [
+    examplesKicker: 'Drie dingen om mee te beginnen',
+    examplesTitle: 'Werk dat je team herkent.',
+    examples: [
       {
-        title: 'HR',
-        examples: [
-          'Beantwoord terugkerende beleidsvragen',
-          'Bereid verlofaanvragen voor',
-          'Houd medewerkersdossiers bij',
-        ],
+        tray: 1,
+        title: 'Uren boeken in ClockWise',
+        ask: 'Boek mijn uren voor deze week.',
+        outcome:
+          'Anna vult de week vanuit je agenda en projecten, laat je het overzicht zien en dient het in zodra jij dat zegt.',
       },
       {
-        title: 'Operations',
-        examples: [
-          'Controleer projectoverdrachten',
-          'Routeer terugkerende verzoeken',
-          'Bereid statusupdates voor',
-        ],
+        tray: 2,
+        title: 'Verlof via Loket',
+        ask: 'Kan ik volgende vrijdag vrij nemen?',
+        outcome:
+          'Anna controleert je saldo en het beleid, bereidt de aanvraag voor en dient hem in na jouw goedkeuring.',
       },
       {
-        title: 'Office management',
-        examples: [
-          'Boek werkplekken en ruimtes',
-          'Volg bevestigingen op',
-          'Beantwoord werkplekvragen',
-        ],
+        tray: 4,
+        title: 'Opvolging in HubSpot',
+        ask: 'Wie hebben we deze week een opvolging beloofd?',
+        outcome:
+          'Anna zet de open beloftes uit je deals op een rij, schrijft de opvolgingen en legt vast wat is verstuurd.',
       },
     ],
     workflowKicker: 'Eén verzoek, van begin tot eind',
     workflowTitle: 'Bekijk hoe het werk gebeurt.',
     workflowIntro:
-      'Een collega vraagt iets in Microsoft Teams. Anna haalt de juiste context op, pauzeert voor goedkeuring als dat nodig is en meldt het afgeronde resultaat in hetzelfde gesprek.',
+      'Een collega vraagt iets in Microsoft Teams of Slack. Anna haalt de juiste context op, pauzeert voor goedkeuring als dat nodig is en meldt het afgeronde resultaat in hetzelfde gesprek.',
     demoLabel: 'DEMO · NOT THE LIVE RECORD',
     demoChannel: 'Microsoft Teams · Anna',
     retrieving: 'Context ophalen',
@@ -519,44 +306,35 @@ const content = {
           'Geregeld. Je verlofaanvraag is ingediend en wacht op goedkeuring van je manager. Ik houd je hier op de hoogte.',
       },
       {
-        id: 'desk',
-        label: 'Werkplek boeken',
-        person: 'Kun je mijn gebruikelijke werkplek voor donderdag boeken?',
-        answer: 'Ja. Ik controleer je voorkeur en wat er beschikbaar is.',
-        context:
-          'Donderdag 08:00–15:00 · vaste zone · werkplek 528 beschikbaar',
-        sources: ['Werkplekgids', 'Beschikbaarheid'],
+        id: 'hours',
+        label: 'Uren',
+        person: 'Boek mijn uren voor deze week.',
+        answer:
+          'Ik vul de week vanuit je agenda en projecten en laat je het overzicht zien.',
+        context: '5 dagen · 2 projecten · 38 u uit je agenda',
+        sources: ['ClockWise', 'Agenda'],
         approval:
-          'Werkplek 528 is vrij op je gebruikelijke tijden. Zal ik deze boeken?',
+          'Het overzicht klopt met je agenda. Zal ik het indienen in ClockWise?',
         result:
-          'Geboekt. Werkplek 528 is donderdag van 08:00 tot 15:00 voor jou. De bevestiging staat in dit gesprek.',
+          'Ingediend. Je week staat in ClockWise en wacht op goedkeuring. Ik laat het je hier weten.',
       },
       {
-        id: 'record',
-        label: 'Dossier bijwerken',
-        person:
-          'Voeg de status van vandaag toe aan het projectoverdrachtsdossier.',
-        answer:
-          'Ik verzamel de laatst afgesproken status en bereid de wijziging voor.',
-        context:
-          'Laatste teamupdate gevonden · 3 wijzigingen · schrijfrecht gecontroleerd',
-        sources: ['Projectnotities', 'Overdrachtsdossier'],
+        id: 'follow-up',
+        label: 'Opvolging',
+        person: 'Wie hebben we deze week een opvolging beloofd?',
+        answer: 'Ik controleer de open deals en zet de opvolgingen klaar.',
+        context: '3 beloftes open · concepten klaar · nog niets verstuurd',
+        sources: ['HubSpot', 'Mail'],
         approval:
-          'Ik heb drie wijzigingen voorbereid. Zal ik ze in het overdrachtsdossier verwerken?',
+          'Drie concepten staan klaar voor je. Zal ik ze versturen en vastleggen in HubSpot?',
         result:
-          'Bijgewerkt. Drie wijzigingen zijn toegevoegd aan het overdrachtsdossier, met link en tijdstip in dit gesprek.',
+          'Verstuurd. Drie opvolgingen zijn de deur uit en staan bij hun deals in HubSpot.',
       },
     ],
     controlKicker: 'Initiatief, met grenzen',
     controlTitle: 'Anna kan werk vooruitbrengen. Jij bepaalt hoe ver.',
     controlBody:
       'Stel de regels één keer in. Anna werkt erbinnen, vraagt om hulp wanneer menselijk oordeel nodig is en houdt elke afgeronde actie duidelijk bij.',
-    controlPoints: [
-      'Jouw systemen en rechten blijven de bron van waarheid.',
-      'Gevoelige acties kunnen altijd menselijke goedkeuring vereisen.',
-      'Elk resultaat wordt teruggemeld aan het team.',
-      'Anna wordt altijd duidelijk als AI gepresenteerd.',
-    ],
     boundaryCards: [
       {
         title: 'Anna doet',
@@ -571,65 +349,33 @@ const content = {
         body: 'Belangrijke besluiten nemen, buiten ingestelde toegang treden of stilletjes handelen zonder een verslag achter te laten.',
       },
     ],
-    fitKicker: 'Past in de werkdag',
-    fitTitle: 'Werkt waar jouw team al werkt.',
-    fitBody:
-      'Anna ontmoet collega’s in de kanalen die ze al gebruiken en werkt met de operationele systemen daarachter. Begin met wat met Anna wordt geleverd en verbind daarna de rest van je landschap.',
-    integrationLabel: 'Jouw verbonden werkdag',
-    available: 'Nu beschikbaar',
-    availableNote: 'De werkomgevingen waarmee Anna vandaag kan verbinden.',
-    shipping: 'Wordt met Anna geleverd',
-    shippingNote:
-      'De Mendix-werkprocessen van Anamata, klaar als onderdeel van de lancering van Anna.',
-    roadmap: 'Roadmap communicatie',
-    roadmapNote:
-      'Microsoft Teams vandaag, met Slack op de planning als extra manier om met Anna te werken.',
-    examples: 'Voorbeelden, geen grenzen',
-    scaleTitle: 'Eén Anna. Duizenden bedrijfssystemen.',
-    scaleBody:
-      'De volgende laag bestaat uit MCP-koppelingen met SSO. Zodra volledige SSO-ondersteuning beschikbaar is, openen ze de grote bedrijfsplatforms die jouw organisatie al gebruikt. Deze logo’s tonen de breedte, niet een vaste catalogus.',
-    customTitle: 'Als het een API heeft, kan het meedoen in het werkproces.',
-    customBody:
-      'Voor interne of specialistische systemen zonder eigen koppeling kan Anamata er tijdens de onboarding een bouwen.',
-    requestConnector: 'Vraag een koppeling aan',
-    connectorNote:
-      'Vertel ons welk systeem jouw team als volgende nodig heeft.',
     ctaKicker: 'Geef tijd terug aan het werk dat jou nodig heeft',
     ctaTitle: 'Laat ons zien welke taken steeds in de weg zitten.',
     ctaBody:
       'In een kort gesprek brengen we één echt werkproces in kaart en laten we zien waar Anna veilig en praktisch kan helpen.',
-    ctaPrimary: 'Plan een demo',
-    ctaSecondary: 'Neem contact op',
     footerLine: 'Anna is jouw digitale AI-assistent van Anamata.',
     transparency:
       'Anna is AI. Ze maakt dat altijd duidelijk en mensen houden de regie over wat ze mag doen.',
   },
 } as const;
 
-const availableIntegrations = [
+// The systems Anna has been tested with, in the order of the hero's trays.
+const connectors = [
   { name: 'Microsoft Teams', icon: '/brands/microsoft-teams.svg' },
+  { name: 'Slack', icon: '/brands/slack.svg' },
+  { name: 'Notion', icon: '/brands/notion.svg' },
+  { name: 'HubSpot', icon: '/brands/hubspot.svg' },
   { name: 'ClockWise', icon: '/brands/clockwise.png' },
   { name: 'Loket', icon: '/brands/loket.png' },
 ] as const;
 
-const shippingIntegrations = {
-  en: [
-    { name: 'Mendix office seat booking', icon: '/brands/mendix.svg' },
-    { name: 'Mendix CV updates', icon: '/brands/mendix.svg' },
-  ],
-  nl: [
-    { name: 'Mendix werkplek boeken', icon: '/brands/mendix.svg' },
-    { name: 'Mendix cv bijwerken', icon: '/brands/mendix.svg' },
-  ],
+// The tray sprites of the hero double as the use-case pictograms, so they
+// cost nothing extra to load.
+const traySizes = {
+  1: { width: 320, height: 217 },
+  2: { width: 320, height: 206 },
+  4: { width: 320, height: 172 },
 } as const;
-
-const ecosystemExamples = [
-  { name: 'Microsoft 365', icon: '/brands/microsoft-365.svg' },
-  { name: 'Atlassian', icon: '/brands/atlassian.svg' },
-  { name: 'Jira', icon: '/brands/jira.svg' },
-  { name: 'Notion', icon: '/brands/notion.svg' },
-  { name: 'GitHub', icon: '/brands/github.svg' },
-] as const;
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>('en');
@@ -640,18 +386,14 @@ export default function Home() {
   const [isExecuting, setIsExecuting] = useState(false);
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const [focusWindow, setFocusWindow] = useState<{
-    start: number;
-    end: number;
-  }>(INITIAL_FOCUS_WINDOW);
   const executionTimerRef = useRef<number | null>(null);
-  const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>();
+  const [heroRef, heroVisible, heroHasEntered] =
+    useElementVisibility<HTMLDivElement>(0.1);
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
   const t = content[language];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
-  const focusTime = `${formatCalendarTime(focusWindow.start)}–${formatCalendarTime(focusWindow.end)}`;
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -681,55 +423,6 @@ export default function Home() {
       media.removeEventListener('change', updatePreference);
     };
   }, []);
-
-  useEffect(() => {
-    if (!heroHasEntered) return;
-
-    let animationFrame = 0;
-    if (reduceMotion) {
-      const resetTimer = window.setTimeout(
-        () => setFocusWindow(FINAL_FOCUS_WINDOW),
-        0,
-      );
-      return () => window.clearTimeout(resetTimer);
-    }
-
-    const resetTimer = window.setTimeout(
-      () => setFocusWindow(INITIAL_FOCUS_WINDOW),
-      0,
-    );
-
-    const mergeTimer = window.setTimeout(() => {
-      const startedAt = window.performance.now();
-      const updateFocusWindow = (now: number) => {
-        const progress = Math.min(
-          (now - startedAt) / CALENDAR_MERGE_DURATION_MS,
-          1,
-        );
-        setFocusWindow({
-          start: Math.round(
-            INITIAL_FOCUS_WINDOW.start +
-              (FINAL_FOCUS_WINDOW.start - INITIAL_FOCUS_WINDOW.start) *
-                progress,
-          ),
-          end: Math.round(
-            INITIAL_FOCUS_WINDOW.end +
-              (FINAL_FOCUS_WINDOW.end - INITIAL_FOCUS_WINDOW.end) * progress,
-          ),
-        });
-        if (progress < 1) {
-          animationFrame = window.requestAnimationFrame(updateFocusWindow);
-        }
-      };
-      animationFrame = window.requestAnimationFrame(updateFocusWindow);
-    }, CALENDAR_MERGE_DELAY_MS);
-
-    return () => {
-      window.clearTimeout(resetTimer);
-      window.clearTimeout(mergeTimer);
-      window.cancelAnimationFrame(animationFrame);
-    };
-  }, [heroHasEntered, reduceMotion]);
 
   useEffect(() => {
     if (!workflowHasEntered) return;
@@ -803,16 +496,16 @@ export default function Home() {
               height={33}
             />
           </span>
-          <span className="brand-name">ANNA</span>
+          <span className="brand-name">Anna</span>
           <span className="brand-by">by anamata.ai</span>
         </a>
         <nav
           className="desktop-nav"
           aria-label={language === 'en' ? 'Main navigation' : 'Hoofdnavigatie'}
         >
+          <a href="#connectors">{t.nav.connectors}</a>
           <a href="#how">{t.nav.how}</a>
           <a href="#control">{t.nav.control}</a>
-          <a href="#fit">{t.nav.fit}</a>
         </nav>
         <div className="header-actions">
           <button
@@ -826,11 +519,11 @@ export default function Home() {
           </button>
           <a
             className="header-cta"
-            href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+            href="mailto:info@anamata.ai?subject=Early%20access%20to%20Anna"
             onClick={leadOpener('demo')}
             aria-haspopup="dialog"
           >
-            {t.nav.demo}
+            {t.earlyAccess}
             <ArrowRight size={16} aria-hidden="true" />
           </a>
         </div>
@@ -838,20 +531,33 @@ export default function Home() {
 
       <div id="main-content">
         <section className="hero" id="top" aria-labelledby="hero-title">
+          <div className="hero-stage-box" ref={heroRef}>
+            <PaperHero
+              label={t.heroAria}
+              tag={t.slingTag}
+              playing={heroHasEntered && heroVisible}
+            />
+          </div>
           <div className="hero-copy">
-            <p className="eyebrow light">
-              <Sparkles size={15} aria-hidden="true" /> {t.eyebrow}
+            <p className="eyebrow hero-eyebrow">
+              <Image
+                src="/brands/anna-color-black.svg"
+                alt=""
+                width={14}
+                height={14}
+              />
+              {t.eyebrow}
             </p>
             <h1 id="hero-title">{t.heroTitle}</h1>
             <p className="hero-body">{t.heroBody}</p>
             <div className="hero-actions">
               <a
                 className="button button-primary"
-                href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+                href="mailto:info@anamata.ai?subject=Early%20access%20to%20Anna"
                 onClick={leadOpener('demo')}
                 aria-haspopup="dialog"
               >
-                {t.bookDemo}
+                {t.earlyAccess}
                 <ArrowRight size={18} aria-hidden="true" />
               </a>
               <a
@@ -863,133 +569,57 @@ export default function Home() {
                 {t.contact}
               </a>
             </div>
-            <a className="scroll-cue" href="#how">
-              <ArrowDown size={15} aria-hidden="true" /> {t.scroll}
-            </a>
+            <p className="hero-trust">{t.trust}</p>
+            <ul className="hero-facts">
+              {t.facts.map((fact) => (
+                <li key={fact}>
+                  <Check size={14} aria-hidden="true" />
+                  {fact}
+                </li>
+              ))}
+            </ul>
           </div>
+        </section>
 
-          <div
-            className="hero-visual"
-            ref={heroRef}
-            data-in-view={heroHasEntered}
-          >
-            <figure className="cleared-day" aria-label={t.day.aria}>
-              <figcaption className="day-header">
-                <div className="calendar-controls">
-                  <span className="today-chip">{t.day.today}</span>
-                  <span className="calendar-chevrons" aria-hidden="true">
-                    ‹&nbsp;&nbsp;›
-                  </span>
-                  <span>
-                    <CalendarDays size={16} aria-hidden="true" /> {t.day.date}
-                  </span>
-                </div>
-                <span className="calendar-view">{t.day.view}</span>
-              </figcaption>
-              <div className="day-column-header">
-                <span>{t.day.weekday}</span>
-                <i aria-hidden="true" />
-              </div>
-              <div className="day-body">
-                <div className="time-rail" aria-hidden="true">
-                  <span>08:00</span>
-                  <span>09:00</span>
-                  <span>10:00</span>
-                  <span>11:00</span>
-                  <span>12:00</span>
-                  <span>13:00</span>
-                  <span>14:00</span>
-                  <span>15:00</span>
-                  <span>16:00</span>
-                </div>
-                <div className="calendar-grid">
-                  <div className="focus-layer" aria-hidden="true">
-                    {focusSegments
-                      .filter((segment) => segment.side !== 'anchor')
-                      .map((segment) => (
-                        <div
-                          className="focus-fragment"
-                          data-side={segment.side}
-                          key={segment.time}
-                          style={
-                            {
-                              '--event-start': `${(segment.start / 540) * 100}%`,
-                              '--event-duration': `${(segment.duration / 540) * 100}%`,
-                            } as CSSProperties
-                          }
-                        >
-                          <small>{segment.time}</small>
-                          <span>{segment.label[language]}</span>
-                        </div>
-                      ))}
-                  </div>
-                  <div className="events-layer" aria-hidden="true">
-                    {t.day.tasks.map((task) => (
-                      <div
-                        className="calendar-event"
-                        key={task.label}
-                        data-incoming={task.incoming}
-                        style={
-                          {
-                            '--event-start': `${(task.start / 540) * 100}%`,
-                            '--event-duration': `${(task.duration / 540) * 100}%`,
-                          } as CSSProperties
-                        }
-                      >
-                        <small>{task.time}</small>
-                        <span>{task.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div
-                    className="focus-block focus-anchor"
-                    style={
-                      {
-                        '--event-start': `${(anchorSegment.start / 540) * 100}%`,
-                        '--event-duration': `${(anchorSegment.duration / 540) * 100}%`,
-                      } as CSSProperties
-                    }
-                  >
-                    <div className="anchor-compact" aria-hidden="true">
-                      <small>{focusTime}</small>
-                      <span>{anchorSegment.label[language]}</span>
-                    </div>
-                    <div className="anchor-expanded">
-                      <span className="focus-dot" aria-hidden="true" />
-                      <small className="anchor-time">{focusTime}</small>
-                      <strong>{t.day.focus}</strong>
-                      <span className="anchor-detail">{t.day.focusDetail}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="anna-tray calendar-summary">
-                <span className="anna-tray-mark" aria-hidden="true">
+        <section
+          className="connectors"
+          id="connectors"
+          aria-labelledby="connectors-title"
+        >
+          <div className="section-intro">
+            <div>
+              <p className="eyebrow">{t.connectorsKicker}</p>
+              <h2 id="connectors-title">{t.connectorsTitle}</h2>
+            </div>
+            <p>{t.connectorsBody}</p>
+          </div>
+          <div className="connector-panel">
+            <p className="integration-panel-label">{t.testedWith}</p>
+            <div className="integration-grid connector-grid">
+              {connectors.map((connector) => (
+                <div className="integration-card" key={connector.name}>
                   <Image
-                    src="/brands/anna-mono-dark.svg"
+                    src={connector.icon}
                     alt=""
-                    width={32}
-                    height={32}
+                    width={28}
+                    height={28}
                   />
-                </span>
-                <div>
-                  <small>{t.day.handled}</small>
-                  <strong>
-                    <Check size={13} aria-hidden="true" />
-                    {t.day.handledCount}
-                  </strong>
+                  <span>{connector.name}</span>
                 </div>
-                <span className="returned-time">
-                  <small>{t.day.returned}</small>
-                  {t.day.returnedAmount}
-                </span>
+              ))}
+            </div>
+            <div className="custom-connector">
+              <FileCheck2 size={21} aria-hidden="true" />
+              <div>
+                <strong>{t.customTitle}</strong>
+                <p>{t.customBody}</p>
               </div>
-              <div className="reduced-motion-story">
-                <span>{t.day.before}</span>
-                <ChevronRight size={15} aria-hidden="true" />
-                <strong>{t.day.after}</strong>
-              </div>
-            </figure>
+              <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
+                <span>{t.requestConnector}</span>
+                <small>{t.connectorNote}</small>
+                <ArrowRight size={17} aria-hidden="true" />
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1017,26 +647,33 @@ export default function Home() {
               </article>
             ))}
           </div>
-          <div className="task-examples">
-            <div className="task-examples-heading">
-              <p className="eyebrow">{t.examplesKicker}</p>
-              <h3>{t.examplesTitle}</h3>
-            </div>
-            <div className="task-group-grid">
-              {t.taskGroups.map((group) => (
-                <article className="task-group" key={group.title}>
-                  <h4>{group.title}</h4>
-                  <ul>
-                    {group.examples.map((example) => (
-                      <li key={example}>
-                        <Check size={14} aria-hidden="true" />
-                        {example}
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              ))}
-            </div>
+        </section>
+
+        <section
+          className="use-case-section"
+          id="use-cases"
+          aria-labelledby="use-case-title"
+        >
+          <div className="use-case-heading">
+            <p className="eyebrow">{t.examplesKicker}</p>
+            <h2 id="use-case-title">{t.examplesTitle}</h2>
+          </div>
+          <div className="use-case-grid">
+            {t.examples.map((example) => (
+              <article className="use-case" key={example.title}>
+                <Image
+                  className="use-case-tray"
+                  src={`/hero/tray-${example.tray}.webp`}
+                  width={traySizes[example.tray].width}
+                  height={traySizes[example.tray].height}
+                  alt=""
+                  loading="lazy"
+                />
+                <h3>{example.title}</h3>
+                <p className="use-case-ask">“{example.ask}”</p>
+                <p>{example.outcome}</p>
+              </article>
+            ))}
           </div>
         </section>
 
@@ -1047,11 +684,11 @@ export default function Home() {
           data-in-view={workflowHasEntered}
         >
           <div className="workflow-heading">
-            <p className="eyebrow light">{t.workflowKicker}</p>
+            <p className="eyebrow">{t.workflowKicker}</p>
             <h2 id="workflow-title">{t.workflowTitle}</h2>
             <p>{t.workflowIntro}</p>
           </div>
-          <div className="scenario-shell">
+          <div className="scenario-shell paper-panel">
             <Tabs value={scenarioId} onValueChange={changeScenario}>
               <div className="scenario-controls">
                 <TabsList
@@ -1195,15 +832,6 @@ export default function Home() {
             <h2 id="control-title">{t.controlTitle}</h2>
             <p>{t.controlBody}</p>
           </div>
-          <div className="control-list">
-            {t.controlPoints.map((point, index) => (
-              <div key={point} className="control-point">
-                <span>0{index + 1}</span>
-                <p>{point}</p>
-                <Check size={19} aria-hidden="true" />
-              </div>
-            ))}
-          </div>
           <div className="boundary-grid">
             {t.boundaryCards.map((card, index) => (
               <article className="boundary-card" key={card.title}>
@@ -1221,103 +849,18 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="fit-section" id="fit" aria-labelledby="fit-title">
-          <div className="fit-copy">
-            <p className="eyebrow">{t.fitKicker}</p>
-            <h2 id="fit-title">{t.fitTitle}</h2>
-            <p>{t.fitBody}</p>
-          </div>
-          <div className="integration-panel">
-            <p className="integration-panel-label">{t.integrationLabel}</p>
-            <IntegrationGroup
-              label={t.available}
-              note={t.availableNote}
-              integrations={availableIntegrations}
-            />
-            <IntegrationGroup
-              label={t.shipping}
-              note={t.shippingNote}
-              integrations={shippingIntegrations[language]}
-              muted
-            />
-
-            <div className="channel-roadmap">
-              <div className="integration-group-heading">
-                <span>{t.roadmap}</span>
-                <p>{t.roadmapNote}</p>
-              </div>
-              <div className="channel-route">
-                <div className="channel-node current">
-                  <Image
-                    src="/brands/microsoft-teams.svg"
-                    alt=""
-                    width={30}
-                    height={30}
-                  />
-                  <strong>Microsoft Teams</strong>
-                </div>
-                <span aria-hidden="true">→</span>
-                <div className="channel-node roadmap-node">
-                  <Image
-                    src="/brands/slack.svg"
-                    alt=""
-                    width={30}
-                    height={30}
-                  />
-                  <strong>Slack</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="ecosystem-card">
-              <span className="ecosystem-badge">{t.examples}</span>
-              <h3>{t.scaleTitle}</h3>
-              <p>{t.scaleBody}</p>
-              <div className="ecosystem-logos">
-                {ecosystemExamples.map((integration) => (
-                  <div key={integration.name} title={integration.name}>
-                    <Image
-                      src={integration.icon}
-                      alt=""
-                      width={28}
-                      height={28}
-                    />
-                    <span>{integration.name}</span>
-                  </div>
-                ))}
-                <span className="more-systems" aria-label={t.scaleTitle}>
-                  +∞
-                </span>
-              </div>
-
-              <div className="custom-connector">
-                <FileCheck2 size={21} aria-hidden="true" />
-                <div>
-                  <strong>{t.customTitle}</strong>
-                  <p>{t.customBody}</p>
-                </div>
-                <a href="mailto:info@anamata.ai?subject=Connector%20request%20for%20Anna">
-                  <span>{t.requestConnector}</span>
-                  <small>{t.connectorNote}</small>
-                  <ArrowRight size={17} aria-hidden="true" />
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="cta-section" aria-labelledby="cta-title">
-          <p className="eyebrow light">{t.ctaKicker}</p>
+          <p className="eyebrow">{t.ctaKicker}</p>
           <h2 id="cta-title">{t.ctaTitle}</h2>
           <p>{t.ctaBody}</p>
           <div className="cta-actions">
             <a
               className="button button-primary"
-              href="mailto:info@anamata.ai?subject=Demo%20ANNA"
+              href="mailto:info@anamata.ai?subject=Early%20access%20to%20Anna"
               onClick={leadOpener('demo')}
               aria-haspopup="dialog"
             >
-              {t.ctaPrimary}
+              {t.earlyAccess}
               <ArrowRight size={18} aria-hidden="true" />
             </a>
             <a
@@ -1326,7 +869,7 @@ export default function Home() {
               onClick={leadOpener('contact')}
               aria-haspopup="dialog"
             >
-              {t.ctaSecondary}
+              {t.contact}
               <ArrowRight size={17} aria-hidden="true" />
             </a>
           </div>
@@ -1343,7 +886,7 @@ export default function Home() {
               height={33}
             />
           </span>
-          <span className="brand-name">ANNA</span>
+          <span className="brand-name">Anna</span>
         </a>
         <div className="footer-copy">
           <strong>{t.footerLine}</strong>
@@ -1385,6 +928,7 @@ function DemoMessage({
       className={`message-row ${kind === 'anna' ? 'anna-row' : ''}`}
       data-visible={visible}
       aria-hidden={!visible}
+      inert={!visible}
     >
       <div className={`avatar ${kind}`} aria-hidden="true">
         {kind === 'anna' ? (
@@ -1399,35 +943,6 @@ function DemoMessage({
         )}
       </div>
       <div className="message-bubble">{children}</div>
-    </div>
-  );
-}
-
-function IntegrationGroup({
-  label,
-  note,
-  integrations,
-  muted = false,
-}: {
-  label: string;
-  note: string;
-  integrations: readonly { name: string; icon: string }[];
-  muted?: boolean;
-}) {
-  return (
-    <div className={`integration-group ${muted ? 'coming-group' : ''}`}>
-      <div className="integration-group-heading">
-        <span>{label}</span>
-        <p>{note}</p>
-      </div>
-      <div className="integration-grid">
-        {integrations.map((integration) => (
-          <div className="integration-card" key={integration.name}>
-            <Image src={integration.icon} alt="" width={28} height={28} />
-            <span>{integration.name}</span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

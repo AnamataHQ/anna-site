@@ -29,6 +29,12 @@ exit: the work never leaves the room, it comes back done.
 - A paper tag on the sling is a real HTML element (translatable), never text in the image.
 
 ## Files
+`public/hero/` holds the served versions: plates at 2400 px, sprites re-encoded at about twice
+their largest on-screen size (sling 680 px, figure 300 px, trays 320 px, sheets 170 px). The
+full-resolution originals, straight from generation, are in `design/hero/source/`; regenerate
+a served sprite from there with ImageMagick (`convert <src> -resize <w>x -quality 85
+-define webp:alpha-quality=90 <dst>`).
+
 | file | what | role in the page |
 |---|---|---|
 | plate-morning / plate-midday / plate-afternoon.webp | the empty room with desk and cup, three lights | cross-faded by the real sun altitude (vlieger method) |

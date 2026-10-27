@@ -40,3 +40,6 @@ next-env.d.ts
 # logo kit: exporter output and its local deps
 /design/anna-logo-kit-v1.zip
 /design/anna-logo-kit-v1/node_modules/
+
+# Playwright MCP screenshots
+/.playwright-mcp/
