@@ -920,14 +920,6 @@ export default function Home() {
               </a>
             </div>
             <p className="hero-trust">{t.trust}</p>
-            <ul className="hero-facts">
-              {t.facts.map((fact) => (
-                <li key={fact}>
-                  <Check size={14} aria-hidden="true" />
-                  {fact}
-                </li>
-              ))}
-            </ul>
           </div>
           <div
             className="hero-visual"
@@ -942,6 +934,14 @@ export default function Home() {
               reduceMotion={reduceMotion}
             />
           </div>
+          <ul className="hero-facts">
+            {t.facts.map((fact) => (
+              <li key={fact}>
+                <Check size={14} aria-hidden="true" />
+                {fact}
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section
