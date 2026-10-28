@@ -334,15 +334,15 @@ const content = {
     boundaryCards: [
       {
         title: 'Anna does',
-        body: 'Answer, collect context, prepare work and carry out actions that sit inside her permissions.',
+        body: 'Collects what is needed, prepares the work and carries out the actions you have allowed.',
       },
       {
         title: 'Anna asks',
-        body: 'When information is missing, judgement is needed or an action reaches an approval boundary.',
+        body: 'When something is missing, when a call is yours to make, or when an action needs your approval first.',
       },
       {
-        title: 'Anna never does without permission',
-        body: 'Make consequential decisions, step outside configured access or quietly act without leaving a record.',
+        title: 'Anna never',
+        body: 'Takes big decisions on her own, goes beyond the access you gave her, or acts without leaving a record.',
       },
     ],
     ctaKicker: 'Give time back to the work that needs you',
@@ -651,15 +651,15 @@ const content = {
     boundaryCards: [
       {
         title: 'Anna doet',
-        body: 'Beantwoorden, context verzamelen, werk voorbereiden en acties uitvoeren die binnen haar rechten vallen.',
+        body: 'Verzamelen wat nodig is, het werk voorbereiden en de acties uitvoeren die jij hebt toegestaan.',
       },
       {
         title: 'Anna vraagt',
-        body: 'Wanneer informatie ontbreekt, menselijk oordeel nodig is of een actie een goedkeuringsgrens bereikt.',
+        body: 'Als iets ontbreekt, als een keuze aan jou is, of als een actie eerst jouw goedkeuring nodig heeft.',
       },
       {
-        title: 'Anna doet nooit zonder toestemming',
-        body: 'Belangrijke besluiten nemen, buiten ingestelde toegang treden of stilletjes handelen zonder een verslag achter te laten.',
+        title: 'Anna doet nooit',
+        body: 'Zelf grote besluiten nemen, verder gaan dan de toegang die jij gaf, of handelen zonder een verslag achter te laten.',
       },
     ],
     ctaKicker: 'Geef tijd terug aan het werk dat jou nodig heeft',

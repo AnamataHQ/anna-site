@@ -182,18 +182,29 @@ test('explains how Anna works as the three steps the demo just showed', () => {
 
 test('makes Anna boundaries and recognisable team tasks concrete', () => {
   for (const phrase of [
-    'Anna does',
-    'Anna asks',
-    'Anna never does without permission',
-    'Anna doet',
-    'Anna vraagt',
-    'Anna doet nooit zonder toestemming',
+    "title: 'Anna does'",
+    "title: 'Anna asks'",
+    "title: 'Anna never'",
+    "title: 'Anna doet'",
+    "title: 'Anna vraagt'",
+    "title: 'Anna doet nooit'",
+    'carries out the actions you have allowed.',
+    'when an action needs your approval first.',
+    'acts without leaving a record.',
+    'de acties uitvoeren die jij hebt toegestaan.',
+    'eerst jouw goedkeuring nodig heeft.',
+    'zonder een verslag achter te laten.',
   ]) {
     assert.ok(
       page.includes(phrase),
       `missing operating model detail: ${phrase}`,
     );
   }
+  // Plain words, no system-speak (Ezra, 2026-10-28).
+  assert.doesNotMatch(
+    page,
+    /approval boundary|configured access|goedkeuringsgrens|ingestelde toegang|never does without permission/,
+  );
 });
 
 test('offers early access and contact, with identical wording in hero and closing section', () => {
