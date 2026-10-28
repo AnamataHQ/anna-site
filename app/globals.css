@@ -1670,7 +1670,8 @@ footer {
   color: white;
 }
 .control-statement {
-  align-self: start;
+  /* Centred against the stacked cards; the 1180 block puts it back on top. */
+  align-self: center;
 }
 .control-statement h2 {
   max-width: 700px;

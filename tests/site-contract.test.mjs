@@ -526,6 +526,9 @@ test('hierarchy: the hero promise is the loudest line', () => {
   assert.match(baseRule('.boundary-grid'), /grid-template-columns: 1fr;/);
   const wide = mediaBlocks('max-width: 1180px');
   assert.match(wide, /\.boundary-grid \{[^}]*grid-column: 1 \/ -1/);
+  // The statement is centred against the card stack so the section does not
+  // read as a short text at the top left beside a tall column on the right.
+  assert.match(baseRule('.control-statement'), /align-self: center;/);
 
   // The hero facts are a child of the hero grid, not of the copy, so on one
   // column they can sit under the calendar.
