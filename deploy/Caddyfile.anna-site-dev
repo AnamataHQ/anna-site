@@ -1,0 +1,58 @@
+# dev.anna-site.anamata.ai on vps-RGF: the preview site. It serves whatever
+# branch was pushed last, rsynced by .github/workflows/deploy.yml to
+# /var/www/anna-site-dev.
+#
+# Append this block to /etc/caddy/Caddyfile after the anna-site.anamata.ai
+# block, replace REPLACE_WITH_HASH (see deploy/README.md), then validate and
+# reload. The anamata.ai wildcard already points at this server, so Caddy
+# obtains the certificate itself.
+
+dev.anna-site.anamata.ai {
+	# One shared password for everyone who may look. The hash comes from
+	# `caddy hash-password`; the password itself is stored nowhere.
+	@protected not path /robots.txt
+	basic_auth @protected {
+		viewer REPLACE_WITH_HASH
+	}
+
+	# Not a second copy of the live site for search engines: crawlers are
+	# refused by the password, and anyone who gets in is told to index nothing.
+	header X-Robots-Tag "noindex, nofollow, noarchive"
+	handle /robots.txt {
+		respond <<ROBOTS
+			User-agent: *
+			Disallow: /
+			ROBOTS 200
+	}
+
+	# No lead service here: a test submission shows the form's mail fallback.
+	handle /api/lead {
+		respond 503
+	}
+
+	handle {
+		root * /var/www/anna-site-dev
+		# Build metadata is not part of the site.
+		@buildMetadata path /.vite/*
+		respond @buildMetadata 404
+		# Content-hashed bundles never change under the same name.
+		@hashedAssets path /_next/static/*
+		header @hashedAssets Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} {path}.html {path}/index.html
+		file_server
+	}
+
+	handle_errors 404 {
+		root * /var/www/anna-site-dev
+		rewrite * /404.html
+		file_server
+	}
+
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+	}
+}
