@@ -87,3 +87,36 @@ test('build output needs no Worker runtime', () => {
     );
   }
 });
+
+test('build output carries the share card with the production image', () => {
+  const index = readFileSync(new URL('index.html', exportDir), 'utf8');
+  const meta = (key) =>
+    [...index.matchAll(/<meta\b[^>]*>/g)]
+      .map((m) => m[0])
+      .find((tag) => tag.includes(`"${key}"`));
+  const image = meta('og:image');
+  assert.ok(image, 'no og:image meta');
+  assert.match(
+    image,
+    /content="https:\/\/anna-site\.anamata\.ai\/share\/anna-1200x630\.png"/,
+  );
+  assert.match(meta('og:image:width') ?? '', /content="1200"/);
+  assert.match(meta('og:image:height') ?? '', /content="630"/);
+  assert.match(meta('og:type') ?? '', /content="website"/);
+  assert.match(meta('og:site_name') ?? '', /content="Anamata"/);
+  assert.match(meta('og:locale') ?? '', /content="en_NL"/);
+  assert.match(
+    meta('og:url') ?? '',
+    /content="https:\/\/anna-site\.anamata\.ai\/?"/,
+  );
+  assert.match(meta('twitter:card') ?? '', /content="summary_large_image"/);
+  assert.match(
+    meta('twitter:image') ?? '',
+    /content="https:\/\/anna-site\.anamata\.ai\/share\/anna-1200x630\.png"/,
+  );
+  assert.match(
+    meta('og:description') ?? '',
+    /content="Anna is the digital AI assistant from Anamata that finishes recurring administration/,
+  );
+  assert.doesNotMatch(index, /hreflang/);
+});

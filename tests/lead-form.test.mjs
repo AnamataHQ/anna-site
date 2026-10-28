@@ -51,14 +51,15 @@ test('the form uses the approved text in both languages', () => {
 test('demo buttons open the demo form, contact buttons the contact form', () => {
   const demoOpens = page.match(/onClick=\{leadOpener\('demo'\)\}/g) ?? [];
   const contactOpens = page.match(/onClick=\{leadOpener\('contact'\)\}/g) ?? [];
-  // Header, hero and closing section for demo; hero and closing section for contact.
-  assert.equal(demoOpens.length, 3);
-  assert.equal(contactOpens.length, 2);
+  // Demo: header, hero, under the demo, after the use cases and the closing
+  // section. Contact: hero, closing section and footer (plan step 2).
+  assert.equal(demoOpens.length, 5);
+  assert.equal(contactOpens.length, 3);
 });
 
 test('every opener keeps its mailto link as the fallback without JavaScript', () => {
   const openers = page.match(/<a\b[^>]*leadOpener[^>]*>/gs) ?? [];
-  assert.equal(openers.length, 5);
+  assert.equal(openers.length, 8);
   for (const opener of openers) {
     assert.match(opener, /href="mailto:info@anamata\.ai/);
     assert.match(opener, /aria-haspopup="dialog"/);

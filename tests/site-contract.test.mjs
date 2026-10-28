@@ -443,8 +443,14 @@ test('on phones the situations are one scrollable row of chips and the playback 
   );
   assert.match(phone, /\.playback-controls button span \{[^}]*display: none/);
   assert.match(phone, /\.playback-controls button \{[^}]*width: 40px/);
-  // The chat window is not padded out to a fixed tall block.
-  assert.match(phone, /\.demo-thread \{[^}]*min-height: 420px/);
+  // The chat window is not padded out to a fixed tall block (at most 400px
+  // since the rhythm pass, 2026-10-28).
+  const phoneThread = phone.match(/\.demo-thread \{[^}]*min-height: (\d+)px/);
+  assert.ok(phoneThread, 'the 640px block sets the chat window height');
+  assert.ok(
+    Number(phoneThread[1]) <= 400,
+    `phone chat window min-height ${phoneThread[1]}px`,
+  );
   assert.doesNotMatch(phone, /\.demo-thread \{[^}]*min-height: 680px/);
   // The panel gives the chat the width of the phone.
   assert.match(phone, /\.scenario-shell\.paper-panel \{[^}]*padding: 0\.75rem/);
@@ -463,10 +469,408 @@ test('the demo never clips: controls wrap above the tablet width and steps may g
   assert.doesNotMatch(styles, /max-height: 80px/);
 });
 
+// Measured hierarchy (plan step 1, 2026-10-28): section headings, padding and
+// the demo window were sized for a louder page than the hero promise allows.
+const baseRule = (selector) => {
+  const match = styles.match(
+    new RegExp(`\\n${selector.replace(/[.[\]()]/g, '\\$&')} \\{([^}]*)\\}`),
+  );
+  assert.ok(match, `no base rule for ${selector}`);
+  return match[1];
+};
+const mediaBlocks = (query) =>
+  [...styles.matchAll(new RegExp(`@media \\(${query}\\) \\{`, 'g'))]
+    .map((m) => styles.slice(m.index, styles.indexOf('@media', m.index + 1)))
+    .join('\n');
+const clampOf = (declarations, property) => {
+  const match = declarations.match(
+    new RegExp(
+      `${property}: clamp\\(([\\d.]+)rem, ([\\d.]+)vw, ([\\d.]+)rem\\)`,
+    ),
+  );
+  assert.ok(match, `no ${property} clamp in: ${declarations}`);
+  return { min: Number(match[1]), vw: Number(match[2]), max: Number(match[3]) };
+};
+
+test('hierarchy: the hero promise is the loudest line', () => {
+  // Section headings sit well below the hero h1.
+  const h1 = clampOf(baseRule('.hero h1'), 'font-size');
+  const h2Rule = styles.match(
+    /\n\.section-intro h2,\n\.workflow-heading h2,\n\.control-statement h2,\n\.use-case-heading h2,\n\.cta-section h2 \{([^}]*)\}/,
+  );
+  assert.ok(h2Rule, 'no shared section h2 rule');
+  const h2 = clampOf(h2Rule[1], 'font-size');
+  assert.ok(h2.max <= 3.4, `section h2 max ${h2.max}rem`);
+  assert.ok(h2.max < h1.max, 'section h2 max is not below the hero h1 max');
+  assert.ok(h2.vw < h1.vw, 'section h2 grows faster than the hero h1');
+
+  // Sections sit closer together; the closing call is not a full screen.
+  for (const selector of [
+    '.capability-section,\n.connectors,\n.use-case-section',
+    '.workflow-section',
+    '.control-section',
+  ]) {
+    const { max } = clampOf(baseRule(selector), 'padding');
+    assert.ok(max <= 7.5, `${selector} padding max ${max}rem`);
+  }
+  const cta = clampOf(baseRule('.cta-section'), 'padding');
+  assert.ok(cta.max <= 8.5, `cta padding max ${cta.max}rem`);
+
+  // The demo window is not two-thirds empty after a scenario plays.
+  const thread = baseRule('.demo-thread').match(/min-height: (\d+)px/);
+  assert.ok(thread && Number(thread[1]) <= 500, 'demo-thread min-height');
+
+  // The control cards fill the right column instead of leaving it empty, and
+  // span the section again where it is one column.
+  assert.match(baseRule('.boundary-grid'), /grid-column: 2;/);
+  assert.match(baseRule('.boundary-grid'), /grid-template-columns: 1fr;/);
+  const wide = mediaBlocks('max-width: 1180px');
+  assert.match(wide, /\.boundary-grid \{[^}]*grid-column: 1 \/ -1/);
+  // The statement is centred against the card stack so the section does not
+  // read as a short text at the top left beside a tall column on the right.
+  assert.match(baseRule('.control-statement'), /align-self: center;/);
+
+  // The hero facts are a child of the hero grid, not of the copy, so on one
+  // column they can sit under the calendar.
+  const heroStart = page.indexOf('<section className="hero"');
+  const heroSection = page.slice(
+    heroStart,
+    page.indexOf('</section>', heroStart),
+  );
+  const factsAt = heroSection.indexOf('<ul className="hero-facts"');
+  assert.ok(factsAt > 0, 'hero facts missing from the hero');
+  const before = heroSection.slice(0, factsAt);
+  assert.equal(
+    (before.match(/<div\b/g) ?? []).length -
+      (before.match(/<\/div>/g) ?? []).length,
+    0,
+    'the hero facts sit inside another element of the hero',
+  );
+  const areas = baseRule('.hero').match(/grid-template-areas:([^;]*);/);
+  assert.ok(areas, 'the hero declares no grid areas');
+  const rows = [...areas[1].matchAll(/'([^']*)'/g)].map((m) =>
+    m[1].trim().split(/\s+/),
+  );
+  assert.ok(
+    rows.every((row) => row.length === 2),
+    'hero areas are two columns',
+  );
+  assert.ok(rows.some((row) => row[0] === 'copy' && row[1] === 'visual'));
+  assert.ok(rows.some((row) => row[0] === 'facts' && row[1] === 'visual'));
+  const wideHero = wide.match(/\n {2}\.hero \{([^}]*)\}/);
+  assert.ok(wideHero, 'the 1180px block has no hero rule');
+  const wideAreas = wideHero[1].match(/grid-template-areas:([^;]*);/);
+  assert.ok(wideAreas, 'the 1180px block declares no hero areas');
+  assert.deepEqual(
+    [...wideAreas[1].matchAll(/'([^']*)'/g)].map((m) => m[1].trim()),
+    ['copy', 'visual', 'facts'],
+  );
+  const sidePadding = (selector) => {
+    const rule = wide.match(
+      new RegExp(`\\n {2}${selector.replace('.', '\\.')} \\{([^}]*)\\}`),
+    );
+    assert.ok(rule, `the 1180px block has no ${selector} rule`);
+    return ['left', 'right'].map(
+      (side) => rule[1].match(new RegExp(`padding-${side}: ([^;]+);`))?.[1],
+    );
+  };
+  assert.deepEqual(sidePadding('.hero-facts'), sidePadding('.hero-copy'));
+
+  // Phones (review at 390px, 2026-10-28): headings stay below the hero line,
+  // the facts line up with the copy and follow the calendar closely.
+  const phone = mediaBlocks('max-width: 820px');
+  const phoneRule = (selector) => {
+    const rule = phone.match(
+      new RegExp(
+        `\\n {2}${selector.replace(/[.[\]()=']/g, (c) => '\\' + c)} \\{([^}]*)\\}`,
+      ),
+    );
+    assert.ok(rule, `the 820px block has no ${selector} rule`);
+    return rule[1];
+  };
+  const phoneH1 = clampOf(phoneRule('.hero h1'), 'font-size');
+  const phoneH2 = clampOf(phoneRule('.cta-section h2'), 'font-size');
+  const at = ({ min, vw, max }, px) =>
+    Math.min(Math.max(min * 16, (vw * px) / 100), max * 16);
+  for (let px = 320; px <= 820; px += 10) {
+    assert.ok(
+      at(phoneH2, px) < at(phoneH1, px),
+      `section h2 is not below the hero h1 at ${px}px`,
+    );
+  }
+  const copySide = phoneRule('.hero-copy').match(/padding: \S+ (\S+) /)[1];
+  assert.match(
+    phoneRule('.hero-facts'),
+    new RegExp(
+      `padding-right: ${copySide};[\\s\\S]*padding-left: ${copySide};`,
+    ),
+  );
+  for (const block of [wide, phone]) {
+    assert.match(block, /\.hero-visual \{[^}]*padding: \S+ \S+ 1\.5rem;/);
+  }
+  assert.match(wide, /\.hero-facts \{[^}]*padding-bottom: 3rem;/);
+  assert.match(
+    mediaBlocks('max-width: 500px'),
+    /\.day-body \{[^}]*min-height: 360px/,
+  );
+  // Stacked beside the statement, the control cards take their own height.
+  assert.doesNotMatch(baseRule('.boundary-card'), /min-height: \d/);
+  assert.match(wide, /\.boundary-card \{[^}]*min-height: 235px/);
+
+  // The connector map: Anna's knot clearly the centre, names readable.
+  const stage = baseRule('.connector-stage');
+  const knot = Number(stage.match(/--knot: ([\d.]+)cqw/)[1]);
+  const disc = Number(stage.match(/--disc: ([\d.]+)cqw/)[1]);
+  assert.ok(knot >= 1.8 * disc, `knot ${knot}cqw against discs ${disc}cqw`);
+  const label = baseRule('.connector-disc small').match(
+    /font-size: ([\d.]+)rem/,
+  );
+  assert.ok(label && Number(label[1]) >= 0.65, 'connector label size');
+  const far = baseRule(".connector-disc[data-depth='3'] small");
+  assert.ok(Number(far.match(/font-size: ([\d.]+)rem/)[1]) >= 0.6);
+  const phoneStage = phoneRule('.connector-stage');
+  const phoneKnot = Number(phoneStage.match(/--knot: ([\d.]+)cqw/)[1]);
+  const phoneDisc = Number(phoneStage.match(/--disc: ([\d.]+)cqw/)[1]);
+  assert.ok(phoneKnot >= 1.6 * phoneDisc, 'phone knot against discs');
+  assert.ok(
+    Number(
+      phoneRule('.connector-disc small').match(/font-size: ([\d.]+)rem/)[1],
+    ) >= 0.6,
+    'phone connector label size',
+  );
+  // The edge fade leaves every depth-1 and depth-2 disc and its name fully
+  // opaque. Model at 1440px: a 1236px stage of 16/6, Geist Mono at 0.68em per
+  // character including letter-spacing, a 1.55 line height.
+  const mask = stage.match(
+    /ellipse ([\d.]+)% ([\d.]+)% at ([\d.]+)% ([\d.]+)%,\s*black ([\d.]+)%/,
+  );
+  assert.ok(mask, 'connector mask is not an ellipse with a black stop');
+  const [rx, ry, cx, cy, stop] = mask.slice(1).map(Number);
+  const width = 1236;
+  const height = (width * 6) / 16;
+  const fontPx = Number(label[1]) * 16;
+  const block = page.slice(
+    page.indexOf('const connectors = ['),
+    page.indexOf('] as const;', page.indexOf('const connectors = [')),
+  );
+  const entries = [
+    ...block.matchAll(
+      /name: '([^']+)',[\s\S]*?x: (\d+),\s*y: (\d+),\s*depth: (\d)/g,
+    ),
+  ];
+  assert.equal(entries.length, 12);
+  for (const [, name, x, y, depth] of entries) {
+    if (Number(depth) > 2) continue;
+    const face = ((disc * width) / 100) * (depth === '2' ? 0.84 : 1);
+    const total = face + (0.4 * width) / 100 + fontPx * 1.55;
+    const half = (total / 2 / height) * 100;
+    const labelHalf = ((name.length * fontPx * 0.68) / 2 / width) * 100;
+    const corners = [
+      [Number(x), Number(y) - half],
+      [Number(x) - labelHalf, Number(y) + half],
+      [Number(x) + labelHalf, Number(y) + half],
+    ];
+    for (const [px, py] of corners) {
+      const r = Math.hypot((px - cx) / rx, (py - cy) / ry) * 100;
+      assert.ok(r <= stop, `${name} is faded by the mask (${r.toFixed(0)}%)`);
+    }
+  }
+});
+
 test('includes transparency and accessibility essentials', () => {
   assert.match(page, /EXAMPLE · NOT A LIVE RECORD/);
   assert.match(page, /aria-label=/);
   assert.match(styles, /prefers-reduced-motion/);
   assert.match(layout, /Anna \| Anamata/);
   assert.match(layout, /description:/);
+});
+
+// Share layer and small navigation (plan step 2, 2026-10-28).
+const SHARE_DESCRIPTION =
+  'Anna is the digital AI assistant from Anamata that finishes recurring administration in the systems your team already uses, in Teams or Slack, and asks when a decision is yours.';
+const contentBlock = (language) =>
+  language === 'en'
+    ? page.slice(page.indexOf('  en: {'), page.indexOf('  nl: {'))
+    : page.slice(page.indexOf('  nl: {'), page.indexOf('} as const;'));
+
+test('a shared link shows a card: production image, title and one English sentence', () => {
+  assert.match(
+    layout,
+    /metadataBase: new URL\('https:\/\/anna-site\.anamata\.ai'\)/,
+  );
+  assert.ok(layout.includes(`'${SHARE_DESCRIPTION}'`), 'description string');
+  assert.doesNotMatch(layout, /Meet Anna, your digital AI assistant/);
+  assert.ok(layout.includes('openGraph: {'), 'no openGraph block');
+  const og = layout.slice(
+    layout.indexOf('openGraph: {'),
+    layout.indexOf('twitter: {'),
+  );
+  for (const field of [
+    /type: 'website'/,
+    /siteName: 'Anamata'/,
+    /locale: 'en_NL'/,
+    /url: '\/'/,
+    /images: \[/,
+  ]) {
+    assert.match(og, field);
+  }
+  for (const field of [
+    /url: '\/share\/anna-1200x630\.png'/,
+    /width: 1200/,
+    /height: 630/,
+    /alt: 'Anna by Anamata'/,
+  ]) {
+    assert.match(layout, field);
+  }
+  assert.match(
+    layout,
+    /twitter: \{[\s\S]*card: 'summary_large_image'[\s\S]*images: \[/,
+  );
+  assert.match(layout, /title: SHARE_TITLE|title: 'Anna \| Anamata'/);
+  // Both URLs serve English HTML, so an alternate-language link would lie.
+  assert.doesNotMatch(layout, /hreflang|alternates|languages:/);
+});
+
+test('the share image exists, is 1200 by 630 and at most 150 KB', () => {
+  assert.ok(
+    existsSync(new URL('../design/share/anna-share.html', import.meta.url)),
+    'missing the share image template',
+  );
+  assert.ok(
+    existsSync(new URL('../design/share/README.md', import.meta.url)),
+    'missing the share image README',
+  );
+  const png = new URL('../public/share/anna-1200x630.png', import.meta.url);
+  assert.ok(
+    existsSync(png),
+    'render design/share/anna-share.html to public/share/anna-1200x630.png',
+  );
+  const bytes = readFileSync(png);
+  assert.ok(bytes.length <= 150 * 1024, `share image is ${bytes.length} bytes`);
+  // PNG signature, then the IHDR width and height.
+  assert.equal(bytes.toString('latin1', 1, 4), 'PNG');
+  assert.equal(bytes.readUInt32BE(16), 1200);
+  assert.equal(bytes.readUInt32BE(20), 630);
+});
+
+test('a ?lang=nl link opens the page in Dutch and the switch keeps the link in step', () => {
+  assert.match(
+    page,
+    /new URLSearchParams\(window\.location\.search\)\.get\('lang'\) === 'nl'/,
+  );
+  assert.match(page, /setLanguage\('nl'\)/);
+  assert.match(page, /window\.history\.replaceState\(/);
+  assert.match(page, /searchParams\.set\('lang', 'nl'\)/);
+  assert.match(page, /searchParams\.delete\('lang'\)/);
+  // The html lang attribute still follows the language.
+  assert.match(page, /document\.documentElement\.lang = language/);
+});
+
+test('the footer has a second row: contact, LinkedIn once known, anamata.ai, the language switch', () => {
+  for (const [language, other] of [
+    ['en', 'Nederlands'],
+    ['nl', 'English'],
+  ]) {
+    const block = contentBlock(language);
+    for (const label of [
+      "contact: 'Contact'",
+      "linkedin: 'LinkedIn'",
+      "site: 'anamata.ai'",
+      `otherLanguage: '${other}'`,
+    ]) {
+      assert.ok(block.includes(label), `${language} footer label: ${label}`);
+    }
+  }
+  const links = readFileSync(
+    new URL('../lib/site-links.ts', import.meta.url),
+    'utf8',
+  );
+  // No invented URL: empty until the real company page is known.
+  assert.match(
+    links,
+    /export const ANAMATA_LINKEDIN_URL: string =\s*'(https:\/\/www\.linkedin\.com\/[^']+)?';/,
+  );
+  const start = page.indexOf('className="footer-links"');
+  assert.ok(
+    start > page.indexOf('<footer>'),
+    'no footer-links row in the footer',
+  );
+  const row = page.slice(start, page.indexOf('</footer>'));
+  assert.match(
+    row,
+    /onClick=\{leadOpener\('contact'\)\}[\s\S]*?\{t\.footerLinks\.contact\}/,
+  );
+  assert.match(
+    row,
+    /ANAMATA_LINKEDIN_URL &&[\s\S]*?href=\{ANAMATA_LINKEDIN_URL\}[\s\S]*?\{t\.footerLinks\.linkedin\}/,
+  );
+  assert.match(
+    row,
+    /href="https:\/\/anamata\.ai"[\s\S]*?\{t\.footerLinks\.site\}/,
+  );
+  assert.match(
+    row,
+    /className="language-switch"[\s\S]*?onClick=\{switchLanguage\}[\s\S]*?\{t\.otherLanguage\}/,
+  );
+  assert.match(styles, /\n\.footer-links \{[^}]*grid-column: 1 \/ -1/);
+});
+
+test('early access is offered five times, each opening the lead dialog', () => {
+  const uses = [...page.matchAll(/\{t\.earlyAccess\}/g)];
+  assert.ok(uses.length >= 5, `t.earlyAccess used ${uses.length} times`);
+  for (const use of uses) {
+    const before = page.slice(Math.max(0, use.index - 400), use.index);
+    assert.match(before, /onClick=\{leadOpener\('demo'\)\}/);
+  }
+  // A quiet link under the demo window, a ghost button after the use cases.
+  const demoLink = page.indexOf('demo-cta-link');
+  assert.ok(demoLink > page.indexOf('className="demo-window"'));
+  assert.ok(demoLink < page.indexOf('className="use-case-section"'));
+  const ghost = page.indexOf('use-case-cta');
+  assert.ok(ghost > page.indexOf('className="use-case-grid"'));
+  assert.ok(ghost < page.indexOf('className="capability-section"'));
+  assert.match(page, /className="button button-ghost use-case-cta"/);
+  assert.match(styles, /\n\.demo-cta-link \{/);
+  assert.match(styles, /\n\.use-case-cta \{/);
+});
+
+test('each use case opens its own conversation in the demo', () => {
+  const examples = [...page.matchAll(/examples: \[([\s\S]*?)\n\s{4}\],/g)];
+  assert.equal(examples.length, 2);
+  for (const [language, watch] of [
+    ['en', "watchThisOne: 'Watch this one'"],
+    ['nl', "watchThisOne: 'Bekijk deze'"],
+  ]) {
+    const block = contentBlock(language);
+    assert.ok(block.includes(watch), `${language}: ${watch}`);
+    const ids = [...block.matchAll(/\n\s{8}id: '([a-z-]+)'/g)].map((m) => m[1]);
+    const list = block.slice(block.indexOf('examples: ['));
+    const linked = [
+      ...list
+        .slice(0, list.indexOf('\n    ],'))
+        .matchAll(/scenario: '([a-z-]+)'/g),
+    ].map((m) => m[1]);
+    assert.deepEqual(linked, ['week', 'leave', 'follow-up']);
+    for (const id of linked) assert.ok(ids.includes(id), `no scenario ${id}`);
+  }
+  const card = page.slice(
+    page.indexOf('<article className="use-case"'),
+    page.indexOf('</article>', page.indexOf('<article className="use-case"')),
+  );
+  assert.match(card, /<button[\s\S]*?className="use-case-watch"/);
+  assert.match(card, /data-scenario=\{example\.scenario\}/);
+  assert.match(card, /\{t\.watchThisOne\}/);
+  // A visually hidden scenario name gives each button its own accessible name.
+  assert.match(card, /className="sr-only"[\s\S]*?\.label/);
+  // Selects the scenario, brings the demo into view, focuses the tab.
+  assert.match(page, /changeScenario\(id\)/);
+  assert.match(page, /getElementById\('demo'\)/);
+  assert.match(page, /behavior: reduceMotion \? 'instant' : 'smooth'/);
+  assert.match(
+    page,
+    /tabRefs\.current\[id\]\?\.focus\(\{ preventScroll: true \}\)/,
+  );
+  assert.match(styles, /\n\.use-case-watch \{/);
+  // The sticky header is 74px; the demo must land below it, not under it.
+  assert.match(styles, /\.workflow-section \{[^}]*scroll-margin-top: (8|9)\d?px/);
 });
