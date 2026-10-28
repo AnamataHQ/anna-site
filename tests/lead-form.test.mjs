@@ -8,10 +8,11 @@ const form = read('../components/lead-form.tsx');
 const layout = read('../app/layout.tsx');
 const viteConfig = read('../vite.config.ts');
 
-// Approved form text (Taiga #344, approved 2026-10-07). Exact strings.
+// Approved form text (Taiga #344, approved 2026-10-07; early-access heading
+// replaces 'Book a demo', Ezra 2026-10-28). Exact strings.
 const APPROVED = {
   en: [
-    'Book a demo',
+    'Request early access',
     'Contact Anamata',
     'Name',
     'Work email',
@@ -24,7 +25,7 @@ const APPROVED = {
     "Sending didn't work. Email us directly at",
   ],
   nl: [
-    'Plan een demo',
+    'Vraag vroege toegang aan',
     'Neem contact op',
     'Naam',
     'Zakelijk e-mailadres',
@@ -65,7 +66,10 @@ test('every opener keeps its mailto link as the fallback without JavaScript', ()
 });
 
 test('the connector request link stays a plain mailto', () => {
-  assert.match(page, /href="mailto:info@anamata\.ai\?subject=Connector%20request%20for%20Anna"/);
+  assert.match(
+    page,
+    /href="mailto:info@anamata\.ai\?subject=Connector%20request%20for%20Anna"/,
+  );
 });
 
 test('Turnstile loads only when the form opens, never with the page', () => {
@@ -81,7 +85,11 @@ test('the form is an accessible modal dialog', () => {
   assert.match(form, /aria-labelledby=/);
   assert.match(form, /role="status"|aria-live="polite"/);
   for (const field of ['name', 'email', 'org', 'message']) {
-    assert.match(form, new RegExp(`htmlFor=\\{\`\\$\\{id\\}-${field}\`\\}`), `label for ${field}`);
+    assert.match(
+      form,
+      new RegExp(`htmlFor=\\{\`\\$\\{id\\}-${field}\`\\}`),
+      `label for ${field}`,
+    );
   }
   assert.match(form, /type="email"/);
   assert.match(form, /autoComplete="email"/);
@@ -113,7 +121,10 @@ test('the built page itself loads no third-party script', () => {
   const index = new URL('../dist/client/index.html', import.meta.url);
   if (!existsSync(index)) return; // build-dependent; CI builds before testing
   const html = readFileSync(index, 'utf8');
-  assert.doesNotMatch(html, /<script[^>]+src="https?:\/\/(?!anna-site\.anamata\.ai)/);
+  assert.doesNotMatch(
+    html,
+    /<script[^>]+src="https?:\/\/(?!anna-site\.anamata\.ai)/,
+  );
 });
 
 test('a result from a closed or reopened dialog is ignored', () => {

@@ -496,7 +496,7 @@ const content = {
       },
     ],
     workflowKicker: 'Eén verzoek, van begin tot eind',
-    workflowTitle: 'Bekijk hoe het werk gebeurt.',
+    workflowTitle: 'Zie hoe het werk gebeurt.',
     workflowIntro:
       'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, vraagt het jou als een beslissing van jou is en koppelt terug in hetzelfde gesprek.',
     demoLabel: 'VOORBEELD · GEEN ECHT DOSSIER',

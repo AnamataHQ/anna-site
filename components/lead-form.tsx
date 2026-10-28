@@ -19,10 +19,11 @@ import {
 const SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
 
-// Approved form text (Taiga #344, 2026-10-07). Change only with approval.
+// Approved form text (Taiga #344, 2026-10-07; early-access heading approved
+// 2026-10-28). Change only with approval.
 const TEXT = {
   en: {
-    heading: { demo: 'Book a demo', contact: 'Contact Anamata' },
+    heading: { demo: 'Request early access', contact: 'Contact Anamata' },
     name: 'Name',
     email: 'Work email',
     org: 'Organisation',
@@ -35,7 +36,7 @@ const TEXT = {
     close: 'Close',
   },
   nl: {
-    heading: { demo: 'Plan een demo', contact: 'Neem contact op' },
+    heading: { demo: 'Vraag vroege toegang aan', contact: 'Neem contact op' },
     name: 'Naam',
     email: 'Zakelijk e-mailadres',
     org: 'Organisatie',
@@ -98,7 +99,11 @@ function sessionStore(): Storage | null {
 
 // Remembers how the visitor arrived; call once when the page loads.
 export function captureLandingSource() {
-  return rememberFirstSource(sessionStore(), window.location, document.referrer);
+  return rememberFirstSource(
+    sessionStore(),
+    window.location,
+    document.referrer,
+  );
 }
 
 type Status = 'idle' | 'sending' | 'success' | 'failure';
@@ -323,8 +328,8 @@ export function LeadFormDialog({
           <output aria-live="polite" className="lead-form-status">
             {status === 'failure' ? (
               <span className="lead-form-failure">
-                {t.failure}{' '}
-                <a href="mailto:info@anamata.ai">info@anamata.ai</a>.
+                {t.failure} <a href="mailto:info@anamata.ai">info@anamata.ai</a>
+                .
               </span>
             ) : null}
           </output>

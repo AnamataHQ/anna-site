@@ -213,6 +213,15 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.match(page, /Contact Anamata/);
   assert.match(page, /mailto:info@anamata\.ai/);
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
+  // The dialog opened by the early-access button carries the button's words.
+  const form = readFileSync(
+    new URL('../components/lead-form.tsx', import.meta.url),
+    'utf8',
+  );
+  assert.match(form, /demo: 'Request early access'/);
+  assert.match(form, /demo: 'Vraag vroege toegang aan'/);
+  assert.doesNotMatch(form, /Book a demo|Plan een demo/);
+  assert.match(page, /workflowTitle: 'Zie hoe het werk gebeurt\.'/);
 });
 
 test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
