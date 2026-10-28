@@ -207,6 +207,20 @@ test('makes Anna boundaries and recognisable team tasks concrete', () => {
   );
 });
 
+test('asks for what is due, never for what the asker forgot they promised', () => {
+  for (const line of [
+    "ask: 'Which customers are due a follow-up this week?'",
+    "ask: 'Welke klanten zijn deze week aan opvolging toe?'",
+    'Which customer follow-ups are still open this week? Draft them for me.',
+    'Welke klantopvolgingen staan deze week nog open? Schrijf ze alvast.',
+  ]) {
+    assert.ok(page.includes(line), `missing follow-up line: ${line}`);
+  }
+  // "What did we promise" tells the visitor they forget things (Ezra,
+  // 2026-10-28). Anna may still report the promises she found on the deals.
+  assert.doesNotMatch(page, /did we promise|hebben we .{0,40}beloofd/i);
+});
+
 test('offers early access and contact, with identical wording in hero and closing section', () => {
   assert.equal((page.match(/'Request early access'/g) ?? []).length, 1);
   assert.equal((page.match(/'Vraag vroege toegang aan'/g) ?? []).length, 1);

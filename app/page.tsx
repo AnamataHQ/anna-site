@@ -167,9 +167,9 @@ const content = {
       {
         tray: 3,
         title: 'Follow-ups in your CRM',
-        ask: 'Who did we promise a follow-up this week?',
+        ask: 'Which customers are due a follow-up this week?',
         outcome:
-          'Anna lists the open promises on your deals, drafts the follow-ups and logs what was sent.',
+          'Anna lists the open follow-ups on your deals, drafts them and logs what was sent.',
       },
     ],
     workflowKicker: 'One request, from start to finish',
@@ -305,13 +305,13 @@ const content = {
         label: 'Customer follow-ups',
         who: 'Daan',
         person:
-          'What did we promise customers this week that’s still open? Draft the follow-ups.',
+          'Which customer follow-ups are still open this week? Draft them for me.',
         answer:
           'I’ll go through this week’s deal notes and draft one message per open promise.',
         steps: [
           'Read this week’s notes on 12 active deals',
           'Found 4 open promises: a quote, two documents and a call',
-          'Drafted 4 follow-ups in your tone, with the promised item attached where we have it',
+          'Drafted 4 follow-ups in your tone, with the file each customer is waiting for attached where we have it',
           'Logged each promise as a task on its deal',
         ],
         sources: ['CRM', 'Mail'],
@@ -490,9 +490,9 @@ const content = {
       {
         tray: 3,
         title: 'Opvolging in je CRM',
-        ask: 'Wie hebben we deze week een opvolging beloofd?',
+        ask: 'Welke klanten zijn deze week aan opvolging toe?',
         outcome:
-          'Anna zet de open beloftes uit je deals op een rij, schrijft de opvolgingen en legt vast wat is verstuurd.',
+          'Anna zet de openstaande opvolgingen uit je deals op een rij, schrijft ze en legt vast wat is verstuurd.',
       },
     ],
     workflowKicker: 'Eén verzoek, van begin tot eind',
@@ -622,13 +622,13 @@ const content = {
         label: 'Klantopvolging',
         who: 'Daan',
         person:
-          'Wat hebben we klanten deze week beloofd dat nog openstaat? Schrijf de opvolgingen alvast.',
+          'Welke klantopvolgingen staan deze week nog open? Schrijf ze alvast.',
         answer:
           'Ik ga door de dealnotities van deze week en schrijf per open belofte één bericht.',
         steps: [
           'Notities van deze week gelezen op 12 actieve deals',
           '4 open beloftes gevonden: een offerte, twee documenten en een belafspraak',
-          '4 opvolgingen geschreven in jouw toon, met het beloofde stuk erbij waar we het hebben',
+          '4 opvolgingen geschreven in jouw toon, met het stuk waar de klant op wacht erbij waar we het hebben',
           'Elke belofte als taak op de deal gezet',
         ],
         sources: ['CRM', 'Mail'],
