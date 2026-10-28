@@ -4,6 +4,13 @@ name: Build, test and deploy
 # (a merge, or "Run workflow" from the Actions tab) then waits for a person to
 # approve the deploy: the production environment has a required reviewer and
 # only accepts main. Modelled on AnamataHQ/anamata-ai-website's deploy workflow.
+#
+# A push to any other branch lands on the preview site instead,
+# dev.anna-site.anamata.ai, automatically and behind a shared password. The
+# preview has its own server user and key that can write only the preview
+# folder; the production key never leaves the deploy job. Only collaborators
+# can push here, and a fork pull request runs without secrets, so nobody else
+# can reach either key (there is deliberately no pull_request trigger).
 
 on:
   push:
@@ -20,6 +27,8 @@ env:
   DEPLOY_HOST: 136.144.164.80 # vps-RGF
   DEPLOY_USER: anna-site-deploy
   DEPLOY_PATH: /var/www/anna-site
+  # The preview user's key is restricted with rrsync to /var/www/anna-site-dev.
+  PREVIEW_USER: anna-site-preview
 
 jobs:
   test:
@@ -80,3 +89,43 @@ jobs:
           rsync -rltz --delete --chmod=D755,F644 --exclude '.vite/' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes" \
             export/ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
+
+  preview:
+    name: Preview on dev.anna-site.anamata.ai
+    needs: test
+    if: github.ref_type == 'branch' && github.ref != 'refs/heads/main'
+    runs-on: ubuntu-latest
+    # No required reviewer on this environment: the preview is automatic. It
+    # gives the pull request a "deployed" link to the preview.
+    environment:
+      name: preview
+      url: https://dev.anna-site.anamata.ai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Built again without the site key: the production Turnstile key is
+      # bound to anna-site.anamata.ai and would only show an error on the
+      # preview hostname. The test key renders everywhere, and the preview
+      # form cannot reach the lead service anyway (deploy/Caddyfile.anna-site-dev).
+      - run: npm run build
+
+      - name: Upload to the preview folder
+        env:
+          PREVIEW_SSH_KEY: ${{ secrets.PREVIEW_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          test -f dist/client/index.html
+          test -n "$DEPLOY_KNOWN_HOSTS"
+          mkdir -p ~/.ssh
+          printf '%s\n' "$PREVIEW_SSH_KEY" > ~/.ssh/preview_key
+          chmod 600 ~/.ssh/preview_key
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # The server restricts this key with rrsync to /var/www/anna-site-dev,
+          # so "/" here is that folder and nothing else is reachable.
+          rsync -rltz --delete --chmod=D755,F644 --exclude '.vite/' \
+            -e "ssh -i ~/.ssh/preview_key -o StrictHostKeyChecking=yes" \
+            dist/client/ "${PREVIEW_USER}@${DEPLOY_HOST}:/"

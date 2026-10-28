@@ -129,6 +129,100 @@ vps-RGF, check on the server with
 `curl -sk --resolve anna-site.anamata.ai:443:127.0.0.1 https://anna-site.anamata.ai/ -o /dev/null -w '%{http_code}\n'`
 (the certificate is only issued once DNS resolves).
 
+## Preview site: dev.anna-site.anamata.ai
+
+Every push to a branch other than `main` lands on
+https://dev.anna-site.anamata.ai, automatically, behind one shared password.
+The last push wins; with two open branches the later push replaces the earlier
+one. The preview job in `deploy.yml` builds the branch again without the
+Turnstile site key (the production key is bound to the production hostname) and
+rsyncs the export to `/var/www/anna-site-dev` with its own user and key. The
+preview vhost (`deploy/Caddyfile.anna-site-dev`) has no lead service, so a test
+submission shows the form's mail fallback, and it sends `noindex` plus a
+`robots.txt` that disallows everything.
+
+Why this cannot touch production: only collaborators can push to the repo, a
+fork pull request runs without secrets (and there is no `pull_request`
+trigger), and the preview key is restricted on the server with `rrsync` to the
+preview folder. The production user, key and approval gate are not involved.
+
+### 1. Create the preview key (on your machine)
+
+```sh
+ssh-keygen -t ed25519 -N '' -C 'anna-site-ci-preview' -f ./anna_site_preview_key
+gh secret set PREVIEW_SSH_KEY -R AnamataHQ/anna-site < ./anna_site_preview_key
+cat ./anna_site_preview_key.pub
+```
+
+Keep the printed public key for step 2, then delete the private key file. The
+host key is already pinned (`DEPLOY_KNOWN_HOSTS`, same server).
+
+### 2. Preview user, folder and restricted key (on vps-RGF)
+
+`rrsync` is the restricted rsync shell that ships with rsync; the key may then
+run nothing but an rsync into the preview folder. Replace `<public key>` with
+the single line from step 1.
+
+```sh
+sudo useradd -m -s /bin/bash anna-site-preview
+sudo install -d -m 755 -o anna-site-preview -g anna-site-preview /var/www/anna-site-dev
+command -v rrsync || { sudo gunzip -c /usr/share/doc/rsync/scripts/rrsync.gz | sudo tee /usr/local/bin/rrsync >/dev/null && sudo chmod 755 /usr/local/bin/rrsync; }
+sudo install -d -m 700 -o anna-site-preview -g anna-site-preview /home/anna-site-preview/.ssh
+echo "command=\"$(command -v rrsync) -wo /var/www/anna-site-dev\",restrict <public key>" | sudo tee /home/anna-site-preview/.ssh/authorized_keys >/dev/null
+sudo chown anna-site-preview:anna-site-preview /home/anna-site-preview/.ssh/authorized_keys
+sudo chmod 600 /home/anna-site-preview/.ssh/authorized_keys
+```
+
+`-wo` makes the folder write-only for the key: it can upload, never read.
+
+### 3. Password and Caddy vhost (on vps-RGF)
+
+Pick the shared password, hash it, and put the hash in the vhost. The password
+itself is stored nowhere; you hand it to the people who may look.
+
+```sh
+caddy version
+caddy hash-password
+```
+
+Copy `deploy/Caddyfile.anna-site-dev` to the server, then with the printed
+hash:
+
+```sh
+sed -i 's|REPLACE_WITH_HASH|<hash>|' Caddyfile.anna-site-dev
+sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.bak-$(date +%Y%m%d)
+cat Caddyfile.anna-site-dev | sudo tee -a /etc/caddy/Caddyfile >/dev/null
+sudo caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+sudo systemctl reload caddy
+```
+
+If `caddy validate` fails, restore the backup instead of reloading. On a Caddy
+older than 2.8 the directive is spelled `basicauth`; older than 2.7 has no
+heredoc, so write the `robots.txt` response on one line instead.
+
+To change the password later: `caddy hash-password` again, replace the hash
+line in `/etc/caddy/Caddyfile`, validate, reload, and tell the people who
+should keep access.
+
+### 4. Fork pull requests need your approval (GitHub)
+
+Settings → Actions → General → "Fork pull request workflows from outside
+collaborators" → "Require approval for all external contributors". Fork pull
+requests never get secrets anyway; this also stops their build from running
+until you say so.
+
+### 5. Check
+
+```sh
+curl -sI https://dev.anna-site.anamata.ai/ | head -1
+curl -sI -u viewer:<password> https://dev.anna-site.anamata.ai/ | head -1
+curl -s https://dev.anna-site.anamata.ai/robots.txt
+```
+
+Expect `HTTP/2 401`, then `HTTP/2 200`, then `Disallow: /`. Push any branch and
+the "Preview on dev.anna-site.anamata.ai" job uploads it; the pull request
+shows the preview link under its deployments.
+
 ## Local preview
 
 ```sh
