@@ -1215,12 +1215,16 @@ footer {
 }
 .scenario-controls {
   display: flex;
+  /* Five chips plus replay and pause do not fit one row just above the
+     tablet width; the buttons drop to a second line instead of spilling out. */
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1.4rem;
 }
 .scenario-tabs {
   display: flex;
+  flex-wrap: wrap;
   width: auto;
   height: auto;
   gap: 0.45rem;
@@ -1477,7 +1481,9 @@ footer {
     margin 300ms ease;
 }
 .work-steps li[data-visible='true'] {
-  max-height: 80px;
+  /* A ceiling for the reveal transition only; the longest step on a 360px
+     phone needs about 110px, so this must never clip. */
+  max-height: 12rem;
   margin-bottom: 0.35rem;
   opacity: 1;
 }
@@ -2051,7 +2057,7 @@ footer > a:last-child {
     opacity: 1;
   }
   .work-steps li {
-    max-height: 80px;
+    max-height: none;
     margin-bottom: 0.35rem;
     opacity: 1;
   }

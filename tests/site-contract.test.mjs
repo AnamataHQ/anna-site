@@ -450,6 +450,19 @@ test('on phones the situations are one scrollable row of chips and the playback 
   assert.match(phone, /\.scenario-shell\.paper-panel \{[^}]*padding: 0\.75rem/);
 });
 
+test('the demo never clips: controls wrap above the tablet width and steps may grow', () => {
+  // Codex review, 2026-10-28: at 820-1000px the replay and pause buttons ran
+  // past the panel; at 360px steps of 90-107px were cut off at 80px.
+  // Un-indented rules are the base rules, outside any media block.
+  assert.match(styles, /\n\.scenario-controls \{[^}]*flex-wrap: wrap/);
+  assert.match(styles, /\n\.scenario-tabs \{[^}]*flex-wrap: wrap/);
+  assert.match(
+    styles,
+    /\.work-steps li\[data-visible='true'\] \{[^}]*max-height: 12rem/,
+  );
+  assert.doesNotMatch(styles, /max-height: 80px/);
+});
+
 test('includes transparency and accessibility essentials', () => {
   assert.match(page, /EXAMPLE · NOT A LIVE RECORD/);
   assert.match(page, /aria-label=/);
