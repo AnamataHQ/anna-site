@@ -681,3 +681,193 @@ test('includes transparency and accessibility essentials', () => {
   assert.match(layout, /Anna \| Anamata/);
   assert.match(layout, /description:/);
 });
+
+// Share layer and small navigation (plan step 2, 2026-10-28).
+const SHARE_DESCRIPTION =
+  'Anna is the digital AI assistant from Anamata that finishes recurring administration in the systems your team already uses, in Teams or Slack, and asks when a decision is yours.';
+const contentBlock = (language) =>
+  language === 'en'
+    ? page.slice(page.indexOf('  en: {'), page.indexOf('  nl: {'))
+    : page.slice(page.indexOf('  nl: {'), page.indexOf('} as const;'));
+
+test('a shared link shows a card: production image, title and one English sentence', () => {
+  assert.match(
+    layout,
+    /metadataBase: new URL\('https:\/\/anna-site\.anamata\.ai'\)/,
+  );
+  assert.ok(layout.includes(`'${SHARE_DESCRIPTION}'`), 'description string');
+  assert.doesNotMatch(layout, /Meet Anna, your digital AI assistant/);
+  assert.ok(layout.includes('openGraph: {'), 'no openGraph block');
+  const og = layout.slice(
+    layout.indexOf('openGraph: {'),
+    layout.indexOf('twitter: {'),
+  );
+  for (const field of [
+    /type: 'website'/,
+    /siteName: 'Anamata'/,
+    /locale: 'en_NL'/,
+    /url: '\/'/,
+    /images: \[/,
+  ]) {
+    assert.match(og, field);
+  }
+  for (const field of [
+    /url: '\/share\/anna-1200x630\.png'/,
+    /width: 1200/,
+    /height: 630/,
+    /alt: 'Anna by Anamata'/,
+  ]) {
+    assert.match(layout, field);
+  }
+  assert.match(
+    layout,
+    /twitter: \{[\s\S]*card: 'summary_large_image'[\s\S]*images: \[/,
+  );
+  assert.match(layout, /title: SHARE_TITLE|title: 'Anna \| Anamata'/);
+  // Both URLs serve English HTML, so an alternate-language link would lie.
+  assert.doesNotMatch(layout, /hreflang|alternates|languages:/);
+});
+
+test('the share image exists, is 1200 by 630 and at most 150 KB', () => {
+  assert.ok(
+    existsSync(new URL('../design/share/anna-share.html', import.meta.url)),
+    'missing the share image template',
+  );
+  assert.ok(
+    existsSync(new URL('../design/share/README.md', import.meta.url)),
+    'missing the share image README',
+  );
+  const png = new URL('../public/share/anna-1200x630.png', import.meta.url);
+  assert.ok(
+    existsSync(png),
+    'render design/share/anna-share.html to public/share/anna-1200x630.png',
+  );
+  const bytes = readFileSync(png);
+  assert.ok(bytes.length <= 150 * 1024, `share image is ${bytes.length} bytes`);
+  // PNG signature, then the IHDR width and height.
+  assert.equal(bytes.toString('latin1', 1, 4), 'PNG');
+  assert.equal(bytes.readUInt32BE(16), 1200);
+  assert.equal(bytes.readUInt32BE(20), 630);
+});
+
+test('a ?lang=nl link opens the page in Dutch and the switch keeps the link in step', () => {
+  assert.match(
+    page,
+    /new URLSearchParams\(window\.location\.search\)\.get\('lang'\) === 'nl'/,
+  );
+  assert.match(page, /setLanguage\('nl'\)/);
+  assert.match(page, /window\.history\.replaceState\(/);
+  assert.match(page, /searchParams\.set\('lang', 'nl'\)/);
+  assert.match(page, /searchParams\.delete\('lang'\)/);
+  // The html lang attribute still follows the language.
+  assert.match(page, /document\.documentElement\.lang = language/);
+});
+
+test('the footer has a second row: contact, LinkedIn once known, anamata.ai, the language switch', () => {
+  for (const [language, other] of [
+    ['en', 'Nederlands'],
+    ['nl', 'English'],
+  ]) {
+    const block = contentBlock(language);
+    for (const label of [
+      "contact: 'Contact'",
+      "linkedin: 'LinkedIn'",
+      "site: 'anamata.ai'",
+      `otherLanguage: '${other}'`,
+    ]) {
+      assert.ok(block.includes(label), `${language} footer label: ${label}`);
+    }
+  }
+  const links = readFileSync(
+    new URL('../lib/site-links.ts', import.meta.url),
+    'utf8',
+  );
+  // No invented URL: empty until the real company page is known.
+  assert.match(
+    links,
+    /export const ANAMATA_LINKEDIN_URL: string =\s*'(https:\/\/www\.linkedin\.com\/[^']+)?';/,
+  );
+  const start = page.indexOf('className="footer-links"');
+  assert.ok(
+    start > page.indexOf('<footer>'),
+    'no footer-links row in the footer',
+  );
+  const row = page.slice(start, page.indexOf('</footer>'));
+  assert.match(
+    row,
+    /onClick=\{leadOpener\('contact'\)\}[\s\S]*?\{t\.footerLinks\.contact\}/,
+  );
+  assert.match(
+    row,
+    /ANAMATA_LINKEDIN_URL &&[\s\S]*?href=\{ANAMATA_LINKEDIN_URL\}[\s\S]*?\{t\.footerLinks\.linkedin\}/,
+  );
+  assert.match(
+    row,
+    /href="https:\/\/anamata\.ai"[\s\S]*?\{t\.footerLinks\.site\}/,
+  );
+  assert.match(
+    row,
+    /className="language-switch"[\s\S]*?onClick=\{switchLanguage\}[\s\S]*?\{t\.otherLanguage\}/,
+  );
+  assert.match(styles, /\n\.footer-links \{[^}]*grid-column: 1 \/ -1/);
+});
+
+test('early access is offered five times, each opening the lead dialog', () => {
+  const uses = [...page.matchAll(/\{t\.earlyAccess\}/g)];
+  assert.ok(uses.length >= 5, `t.earlyAccess used ${uses.length} times`);
+  for (const use of uses) {
+    const before = page.slice(Math.max(0, use.index - 400), use.index);
+    assert.match(before, /onClick=\{leadOpener\('demo'\)\}/);
+  }
+  // A quiet link under the demo window, a ghost button after the use cases.
+  const demoLink = page.indexOf('demo-cta-link');
+  assert.ok(demoLink > page.indexOf('className="demo-window"'));
+  assert.ok(demoLink < page.indexOf('className="use-case-section"'));
+  const ghost = page.indexOf('use-case-cta');
+  assert.ok(ghost > page.indexOf('className="use-case-grid"'));
+  assert.ok(ghost < page.indexOf('className="capability-section"'));
+  assert.match(page, /className="button button-ghost use-case-cta"/);
+  assert.match(styles, /\n\.demo-cta-link \{/);
+  assert.match(styles, /\n\.use-case-cta \{/);
+});
+
+test('each use case opens its own conversation in the demo', () => {
+  const examples = [...page.matchAll(/examples: \[([\s\S]*?)\n\s{4}\],/g)];
+  assert.equal(examples.length, 2);
+  for (const [language, watch] of [
+    ['en', "watchThisOne: 'Watch this one'"],
+    ['nl', "watchThisOne: 'Bekijk deze'"],
+  ]) {
+    const block = contentBlock(language);
+    assert.ok(block.includes(watch), `${language}: ${watch}`);
+    const ids = [...block.matchAll(/\n\s{8}id: '([a-z-]+)'/g)].map((m) => m[1]);
+    const list = block.slice(block.indexOf('examples: ['));
+    const linked = [
+      ...list
+        .slice(0, list.indexOf('\n    ],'))
+        .matchAll(/scenario: '([a-z-]+)'/g),
+    ].map((m) => m[1]);
+    assert.deepEqual(linked, ['week', 'leave', 'follow-up']);
+    for (const id of linked) assert.ok(ids.includes(id), `no scenario ${id}`);
+  }
+  const card = page.slice(
+    page.indexOf('<article className="use-case"'),
+    page.indexOf('</article>', page.indexOf('<article className="use-case"')),
+  );
+  assert.match(card, /<button[\s\S]*?className="use-case-watch"/);
+  assert.match(card, /data-scenario=\{example\.scenario\}/);
+  assert.match(card, /\{t\.watchThisOne\}/);
+  // A visually hidden scenario name gives each button its own accessible name.
+  assert.match(card, /className="sr-only"[\s\S]*?\.label/);
+  // Selects the scenario, brings the demo into view, focuses the tab.
+  assert.match(page, /changeScenario\(id\)/);
+  assert.match(page, /getElementById\('demo'\)/);
+  assert.match(page, /behavior: reduceMotion \? 'instant' : 'smooth'/);
+  assert.match(
+    page,
+    /tabRefs\.current\[id\]\?\.focus\(\{ preventScroll: true \}\)/,
+  );
+  assert.match(styles, /\n\.use-case-watch \{/);
+  // The sticky header is 74px; the demo must land below it, not under it.
+  assert.match(styles, /\.workflow-section \{[^}]*scroll-margin-top: (8|9)\d?px/);
+});

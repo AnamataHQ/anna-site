@@ -22,6 +22,7 @@ import { type MouseEvent, useEffect, useRef, useState } from 'react';
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
 import { ClearedDay, type DayCopy } from '@/components/cleared-day';
 import type { LeadKind } from '@/lib/lead-capture';
+import { ANAMATA_LINKEDIN_URL } from '@/lib/site-links';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -149,9 +150,11 @@ const content = {
     ],
     examplesKicker: 'Where to start',
     examplesTitle: 'Three things to hand to Anna first.',
+    watchThisOne: 'Watch this one',
     examples: [
       {
         tray: 1,
+        scenario: 'week',
         title: 'Hours in your time tracking',
         ask: 'Log my hours for this week.',
         outcome:
@@ -159,6 +162,7 @@ const content = {
       },
       {
         tray: 2,
+        scenario: 'leave',
         title: 'Leave in your HR system',
         ask: 'Can I take next Friday off?',
         outcome:
@@ -166,6 +170,7 @@ const content = {
       },
       {
         tray: 3,
+        scenario: 'follow-up',
         title: 'Follow-ups in your CRM',
         ask: 'Which customers are due a follow-up this week?',
         outcome:
@@ -350,6 +355,11 @@ const content = {
     ctaBody:
       'In a short conversation, we map one real workflow and show where Anna can help safely and practically.',
     footerLine: 'Anna is your digital AI assistant by Anamata.',
+    footerLinks: {
+      contact: 'Contact',
+      linkedin: 'LinkedIn',
+      site: 'anamata.ai',
+    },
     transparency:
       'Anna is AI. She identifies herself as such, and people remain in control of what she may do.',
   },
@@ -472,9 +482,11 @@ const content = {
     ],
     examplesKicker: 'Om mee te beginnen',
     examplesTitle: 'Drie taken om meteen aan Anna te geven.',
+    watchThisOne: 'Bekijk deze',
     examples: [
       {
         tray: 1,
+        scenario: 'week',
         title: 'Uren in je urenregistratie',
         ask: 'Boek mijn uren voor deze week.',
         outcome:
@@ -482,6 +494,7 @@ const content = {
       },
       {
         tray: 2,
+        scenario: 'leave',
         title: 'Verlof in je HR-systeem',
         ask: 'Kan ik volgende vrijdag vrij nemen?',
         outcome:
@@ -489,6 +502,7 @@ const content = {
       },
       {
         tray: 3,
+        scenario: 'follow-up',
         title: 'Opvolging in je CRM',
         ask: 'Welke klanten zijn deze week aan opvolging toe?',
         outcome:
@@ -667,6 +681,11 @@ const content = {
     ctaBody:
       'In een kort gesprek brengen we één echt werkproces in kaart en laten we zien waar Anna veilig en praktisch kan helpen.',
     footerLine: 'Anna is jouw digitale AI-assistent van Anamata.',
+    footerLinks: {
+      contact: 'Contact',
+      linkedin: 'LinkedIn',
+      site: 'anamata.ai',
+    },
     transparency:
       'Anna is AI. Ze maakt dat altijd duidelijk en mensen houden de regie over wat ze mag doen.',
   },
@@ -729,6 +748,7 @@ export default function Home() {
   const [replayKey, setReplayKey] = useState(0);
   const [reduceMotion, setReduceMotion] = useState(false);
   const executionTimerRef = useRef<number | null>(null);
+  const tabRefs = useRef<Record<string, HTMLElement | null>>({});
   const [heroRef, , heroHasEntered] = useElementVisibility<HTMLDivElement>(0.3);
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
@@ -747,6 +767,16 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = language;
   }, [language]);
+
+  // A Dutch link (`?lang=nl`) opens the page in Dutch. The HTML is English
+  // first, so it switches once after load.
+  useEffect(() => {
+    const dutchLink =
+      new URLSearchParams(window.location.search).get('lang') === 'nl';
+    if (!dutchLink) return;
+    const timer = window.setTimeout(() => setLanguage('nl'), 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     captureLandingSource();
@@ -811,8 +841,14 @@ export default function Home() {
     setIsExecuting(false);
   };
 
-  const switchLanguage = () =>
-    setLanguage((current) => (current === 'en' ? 'nl' : 'en'));
+  const switchLanguage = () => {
+    const next: Language = language === 'en' ? 'nl' : 'en';
+    setLanguage(next);
+    const url = new URL(window.location.href);
+    if (next === 'nl') url.searchParams.set('lang', 'nl');
+    else url.searchParams.delete('lang');
+    window.history.replaceState(window.history.state, '', url);
+  };
   const restartDemo = () => {
     clearExecutionTimer();
     setIsPaused(false);
@@ -824,6 +860,16 @@ export default function Home() {
     setScenarioId(value);
     setIsPaused(false);
     setDemoStep(reduceMotion ? finalStepOf(value) : 0);
+  };
+  // A use-case card plays its conversation: select it, bring the demo into
+  // view, and put focus on its tab so keyboard users land where it plays.
+  const watchScenario = (id: string) => {
+    changeScenario(id);
+    document.getElementById('demo')?.scrollIntoView({
+      behavior: reduceMotion ? 'instant' : 'smooth',
+      block: 'start',
+    });
+    tabRefs.current[id]?.focus({ preventScroll: true });
   };
   // The viewer sends the colleague's reply; Anna works, then reports.
   const sendReply = () => {
@@ -964,7 +1010,13 @@ export default function Home() {
                   aria-label={t.chooseSituation}
                 >
                   {t.scenarios.map((item) => (
-                    <TabsTrigger value={item.id} key={item.id}>
+                    <TabsTrigger
+                      value={item.id}
+                      key={item.id}
+                      ref={(element: HTMLElement | null) => {
+                        tabRefs.current[item.id] = element;
+                      }}
+                    >
                       {item.label}
                     </TabsTrigger>
                   ))}
@@ -1125,6 +1177,15 @@ export default function Home() {
               </div>
             </div>
           </div>
+          <a
+            className="text-link demo-cta-link"
+            href="mailto:info@anamata.ai?subject=Early%20access%20to%20Anna"
+            onClick={leadOpener('demo')}
+            aria-haspopup="dialog"
+          >
+            {t.earlyAccess}
+            <ArrowRight size={17} aria-hidden="true" />
+          </a>
         </section>
 
         <section
@@ -1150,9 +1211,34 @@ export default function Home() {
                 <h3>{example.title}</h3>
                 <p className="use-case-ask">“{example.ask}”</p>
                 <p>{example.outcome}</p>
+                <button
+                  type="button"
+                  className="use-case-watch"
+                  data-scenario={example.scenario}
+                  onClick={() => watchScenario(example.scenario)}
+                >
+                  <Play size={14} aria-hidden="true" />
+                  {t.watchThisOne}
+                  <span className="sr-only">
+                    {' '}
+                    {
+                      t.scenarios.find((item) => item.id === example.scenario)
+                        ?.label
+                    }
+                  </span>
+                </button>
               </article>
             ))}
           </div>
+          <a
+            className="button button-ghost use-case-cta"
+            href="mailto:info@anamata.ai?subject=Early%20access%20to%20Anna"
+            onClick={leadOpener('demo')}
+            aria-haspopup="dialog"
+          >
+            {t.earlyAccess}
+            <ArrowRight size={18} aria-hidden="true" />
+          </a>
         </section>
 
         <section
@@ -1321,9 +1407,32 @@ export default function Home() {
             </a>
           </p>
         </div>
-        <a href="https://anamata.ai">
-          anamata.ai <ArrowRight size={15} aria-hidden="true" />
-        </a>
+        <div className="footer-links">
+          <a
+            href="mailto:info@anamata.ai"
+            onClick={leadOpener('contact')}
+            aria-haspopup="dialog"
+          >
+            {t.footerLinks.contact}
+          </a>
+          {ANAMATA_LINKEDIN_URL && (
+            <a href={ANAMATA_LINKEDIN_URL} rel="noopener">
+              {t.footerLinks.linkedin}
+            </a>
+          )}
+          <a href="https://anamata.ai">
+            {t.footerLinks.site} <ArrowRight size={15} aria-hidden="true" />
+          </a>
+          <button
+            className="language-switch"
+            type="button"
+            onClick={switchLanguage}
+            aria-label={`Switch to ${t.otherLanguage}`}
+          >
+            <Languages size={15} aria-hidden="true" />
+            {t.otherLanguage}
+          </button>
+        </div>
       </footer>
 
       <LeadFormDialog

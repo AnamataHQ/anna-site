@@ -140,14 +140,14 @@ button {
 .desktop-nav a,
 .language-switch,
 .text-link,
-footer > a:last-child {
+.footer-links a {
   transition:
     color 160ms ease,
     opacity 160ms ease;
 }
 .desktop-nav a:hover,
 .language-switch:hover,
-footer > a:last-child:hover {
+.footer-links a:hover {
   color: var(--blue);
 }
 .header-actions {
@@ -945,7 +945,9 @@ footer > a:last-child:hover {
   margin-top: clamp(3rem, 6vw, 5rem);
 }
 .use-case {
+  display: flex;
   min-width: 0;
+  flex-direction: column;
   border: 1px solid var(--line);
   border-radius: 1.2rem;
   background: white;
@@ -972,10 +974,30 @@ footer > a:last-child:hover {
   font-size: 0.96rem;
   font-weight: 620;
 }
-.use-case p:last-child {
-  margin: 0;
+.use-case p:last-of-type {
+  margin: 0 0 1.2rem;
   color: #626a78;
   font-size: 0.9rem;
+}
+/* Plays this card's conversation in the demo; sits on the card's bottom
+   edge so the three links line up. */
+.use-case-watch {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: auto;
+  border: 0;
+  background: transparent;
+  padding: 0.3rem 0;
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 680;
+  transition: color 160ms ease;
+}
+.use-case-watch:hover {
+  color: var(--ink);
 }
 .paper-panel {
   border: 1px solid var(--line);
@@ -1226,6 +1248,7 @@ footer {
 
 .workflow-section {
   padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
+  scroll-margin-top: 90px;
   background: var(--secondary);
   color: var(--ink);
 }
@@ -1796,6 +1819,16 @@ footer {
 .text-link:hover {
   color: var(--blue);
 }
+/* Mid-page early access: quiet, centred under the demo window. */
+.demo-cta-link {
+  display: flex;
+  width: fit-content;
+  margin: 1.4rem auto 0;
+  color: #4b5670;
+}
+.use-case-cta {
+  margin-top: 2rem;
+}
 footer {
   display: grid;
   grid-template-columns: 0.8fr 1.4fr 0.8fr;
@@ -1816,11 +1849,22 @@ footer {
   color: #8f9db8;
   font-size: 0.72rem;
 }
-footer > a:last-child {
+/* Second footer row: contact, LinkedIn once known, anamata.ai, language. */
+.footer-links {
   display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  gap: 0.6rem 1.8rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.footer-links a,
+.footer-links .language-switch {
+  display: inline-flex;
+  align-items: center;
   gap: 0.4rem;
+  padding: 0;
   color: #b4c0d6;
   font-size: 0.78rem;
   font-weight: 620;
@@ -1944,9 +1988,6 @@ footer > a:last-child {
   footer {
     grid-template-columns: 1fr;
     padding: 2.5rem 1.25rem;
-  }
-  footer > a:last-child {
-    justify-content: flex-start;
   }
 }
 
