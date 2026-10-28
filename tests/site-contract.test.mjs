@@ -238,6 +238,15 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.match(page, /workflowTitle: 'Zie hoe het werk gebeurt\.'/);
 });
 
+test('the demo window is labelled Teams · Slack · Anna and carries no single-vendor logo', () => {
+  const toolbar = page.slice(
+    page.indexOf('className="demo-toolbar"'),
+    page.indexOf('className="demo-thread"'),
+  );
+  assert.match(toolbar, /<AnnaMark size="avatar" \/>/);
+  assert.doesNotMatch(toolbar, /microsoft-teams\.svg|slack\.svg/);
+});
+
 test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
@@ -325,7 +334,7 @@ test("the connectors are a still paper string map tied to Anna's knot, fading at
   assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
   assert.match(
     page,
-    /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/,
+    /className="connector-knot"[\s\S]{0,400}<AnnaMark size="hub"/,
   );
   assert.match(page, /<svg className="connector-threads"/);
   assert.match(
@@ -873,4 +882,128 @@ test('each use case opens its own conversation in the demo', () => {
   assert.match(styles, /\n\.use-case-watch \{/);
   // The sticky header is 74px; the demo must land below it, not under it.
   assert.match(styles, /\.workflow-section \{[^}]*scroll-margin-top: (8|9)\d?px/);
+});
+
+// Anna as a character (plan step 3, 2026-10-28): one mark everywhere, a
+// working state with generic system glyphs, a done check, the tab icon on navy.
+const annaMarkUrl = new URL('../components/anna-mark.tsx', import.meta.url);
+
+test('one Anna: the gradient mark on a paper disc at three sizes, wherever she appears', () => {
+  assert.ok(existsSync(annaMarkUrl), 'components/anna-mark.tsx is missing');
+  const mark = readFileSync(annaMarkUrl, 'utf8');
+  for (const name of ['avatar', 'opener', 'hub', 'idle', 'working', 'done']) {
+    assert.match(mark, new RegExp(`'${name}'`), `AnnaMark lacks ${name}`);
+  }
+  assert.match(mark, /from 'next\/image'/);
+  assert.match(mark, /src="\/brands\/anna-color-transparent\.svg"/);
+  assert.match(mark, /aria-hidden="true"/);
+  assert.match(mark, /className="typing-dots"/);
+  assert.match(mark, /className="anna-mark-check"/);
+  assert.match(page, /from '@\/components\/anna-mark'/);
+  assert.match(hero, /from '@\/components\/anna-mark'/);
+  // Every other mark goes: the eyebrow keeps the 14 px mono mark, too small for a disc.
+  assert.doesNotMatch(page, /anna-mono-dark\.svg/);
+  assert.doesNotMatch(hero, /anna-mono-dark\.svg/);
+  assert.equal([...page.matchAll(/anna-mono-light\.svg/g)].length, 1);
+  assert.match(
+    page,
+    /className="eyebrow light hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
+  );
+  assert.doesNotMatch(page, /anna-color-navy\.svg/);
+  assert.doesNotMatch(page, /anna-color-transparent\.svg/);
+  // Where she appears.
+  assert.match(
+    page,
+    /className="site-header"[\s\S]{0,200}<AnnaMark size="avatar"/,
+  );
+  assert.match(
+    page,
+    /className="brand footer-brand"[\s\S]{0,80}<AnnaMark size="avatar"/,
+  );
+  assert.match(page, /function DemoMessage[\s\S]*?<AnnaMark size="avatar"/);
+  assert.match(
+    page,
+    /className="capability-section"[\s\S]{0,240}<AnnaMark size="opener"/,
+  );
+  assert.match(
+    page,
+    /className="control-statement">\s*<AnnaMark size="opener"/,
+  );
+  // One shared set of rules: a paper disc, three sizes, the dots, the coral check.
+  assert.match(
+    styles,
+    /\.anna-mark \{[^}]*border-radius: 50%;[^}]*background: var\(--paper-light\)/,
+  );
+  for (const size of ['avatar', 'opener', 'hub']) {
+    assert.match(styles, new RegExp(`\\.anna-mark\\[data-size='${size}'\\]`));
+  }
+  assert.match(styles, /\.anna-mark-check \{[^}]*background: var\(--coral\)/);
+  assert.ok(
+    styles.indexOf('.typing-dots {') < styles.indexOf('.demo-toolbar {'),
+    'the typing dots still live in the demo CSS',
+  );
+  assert.equal([...styles.matchAll(/^\.typing-dots \{/gm)].length, 1);
+  assert.doesNotMatch(styles, /\.brand-mark|\.anna-tray-mark|\.avatar\.anna/);
+});
+
+test('while Anna carries out the reply, a row of generic system glyphs names her sources', () => {
+  const executing = page.slice(
+    page.indexOf('className="executing-line"'),
+    page.indexOf('className="record-list"'),
+  );
+  assert.match(executing, /isExecuting && \(/);
+  assert.match(executing, /className="working-sources"/);
+  assert.match(executing, /scenario\.sources\.map\(/);
+  assert.equal([...executing.matchAll(/\.map\(/g)].length, 1);
+  assert.match(page, /state=\{\s*isExecuting\s*\?\s*'working'/);
+  // A glyph per kind of system, mapped from the strings already in the data,
+  // with a neutral dot for anything unmapped. No new copy.
+  const glyphs = page.slice(
+    page.indexOf('const SOURCE_GLYPHS'),
+    page.indexOf('];', page.indexOf('const SOURCE_GLYPHS')),
+  );
+  assert.ok(glyphs.length > 0, 'SOURCE_GLYPHS is missing');
+  const sources = new Set();
+  for (const [, list] of page.matchAll(/sources: \[([^\]]*)\]/g)) {
+    for (const [, name] of list.matchAll(/'([^']+)'/g)) sources.add(name);
+  }
+  assert.ok(sources.size >= 15, `only ${sources.size} source names found`);
+  for (const name of sources) {
+    assert.ok(glyphs.includes(`'${name}'`), `no glyph for source: ${name}`);
+  }
+  assert.match(page, /className="source-dot"/);
+  // No vendor logos while she works: nothing from /brands/ in the conversation.
+  const thread = page.slice(
+    page.indexOf('className="demo-thread"'),
+    page.indexOf('className="record-list"'),
+  );
+  assert.doesNotMatch(thread, /\/brands\//);
+  assert.doesNotMatch(glyphs, /\/brands\/|ClockWise|Loket|HubSpot|Jira|Notion/);
+});
+
+test('the demo toolbar names both channels: Teams · Slack · Anna', () => {
+  assert.equal(
+    [...page.matchAll(/demoChannel: 'Teams · Slack · Anna'/g)].length,
+    2,
+  );
+  assert.doesNotMatch(page, /demoChannel: 'Microsoft Teams · Anna'/);
+});
+
+test('the browser tab shows the same mark on a navy rounded tile', () => {
+  assert.match(favicon, /<rect[^>]*rx="\d+"[^>]*fill="#08152e"/i);
+  const glyph = annaColourTransparent.match(/<path[^>]*\sd="([^"]+)"/);
+  assert.ok(glyph, 'no mark path in anna-color-transparent.svg');
+  assert.ok(
+    favicon.includes(`d="${glyph[1]}"`),
+    'favicon mark geometry changed',
+  );
+  assert.match(favicon, /fill="url\(#relay-gradient\)"/);
+});
+
+test('the character step adds at most 4 KB to index.html', () => {
+  const index = new URL('../dist/client/index.html', import.meta.url);
+  if (!existsSync(index)) return;
+  // 64 010 bytes on main at ba508d6, before step 3.
+  const size = readFileSync(index).length;
+  assert.ok(size <= 64_010 + 4_096, `index.html is ${size} bytes`);
 });

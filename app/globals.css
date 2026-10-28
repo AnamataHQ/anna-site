@@ -107,18 +107,97 @@ button {
   gap: 0.55rem;
   width: fit-content;
 }
-.brand-mark {
-  display: block;
-  width: 33px;
-  height: 33px;
-  overflow: hidden;
-  border-radius: 0;
+/* Anna, one mark everywhere: the gradient mark on a paper disc, at three
+   sizes, idle, working (typing dots) or done (the coral check). */
+.anna-mark {
+  position: relative;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: var(--anna-mark-size);
+  height: var(--anna-mark-size);
+  border-radius: 50%;
+  background: var(--paper-light);
+  box-shadow: inset 0 0 0 1px var(--line);
 }
-.brand-mark img {
+.anna-mark[data-size='avatar'] {
+  --anna-mark-size: 32px;
+}
+.anna-mark[data-size='opener'] {
+  --anna-mark-size: 60px;
+}
+.anna-mark[data-size='hub'] {
+  --anna-mark-size: 100%;
+}
+.anna-mark > img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+}
+.anna-mark-working,
+.anna-mark-check {
+  position: absolute;
+  right: -3px;
+  bottom: -3px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--paper-light);
+}
+.anna-mark-working {
+  padding: 3px 4px;
+  background: white;
+}
+.anna-mark-working .typing-dots {
+  gap: 2px;
+  margin: 0;
+}
+.anna-mark-working .typing-dots i {
+  width: 3px;
+  height: 3px;
+}
+.anna-mark-check {
+  width: 42%;
+  aspect-ratio: 1;
+  background: var(--coral);
+  color: var(--navy);
+}
+.anna-mark-check svg {
+  width: 72%;
+  height: 72%;
+}
+.section-intro .anna-mark,
+.control-statement .anna-mark {
+  margin-bottom: 1.25rem;
+}
+.typing-dots {
+  display: inline-flex;
+  gap: 0.2rem;
+  margin-left: 0.1rem;
+}
+.typing-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--blue);
+  animation: typing 900ms ease-in-out infinite;
+}
+.typing-dots i:nth-child(2) {
+  animation-delay: 120ms;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 240ms;
+}
+@keyframes typing {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
 }
 .brand-name {
   font-size: 1.08rem;
@@ -645,18 +724,25 @@ button {
     transform: translateY(0);
   }
 }
-.anna-tray-mark {
-  display: block;
-  width: 32px;
-  height: 32px;
-  overflow: hidden;
-  border-radius: 0;
+/* Anna's mark in the tray turns done with the after state: the same 10.4 s
+   timeline as the expanded day (76–88 %), held once played. */
+.anna-tray .anna-mark-check {
+  opacity: 0;
+  transform: scale(0.4);
+  animation: anna-mark-done 10.4s ease forwards;
+  animation-play-state: paused;
 }
-.anna-tray-mark img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+@keyframes anna-mark-done {
+  0%,
+  76% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  88%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 .anna-tray > div {
   display: flex;
@@ -760,6 +846,7 @@ button {
 .hero-visual[data-in-view='true'] .anchor-compact,
 .hero-visual[data-in-view='true'] .anchor-expanded,
 .hero-visual[data-in-view='true'] .anna-tray,
+.hero-visual[data-in-view='true'] .anna-tray .anna-mark-check,
 .hero-visual[data-in-view='true'] .handled-task {
   animation-play-state: running;
 }
@@ -870,20 +957,11 @@ button {
 .connector-knot {
   position: absolute;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   width: var(--knot);
   aspect-ratio: 1;
-  border: 1px solid rgba(11, 22, 48, 0.22);
   border-radius: 50%;
-  background: var(--paper-light);
   transform: translate(-50%, -50%);
   box-shadow: 0 0.5cqw 1.2cqw rgba(11, 22, 48, 0.16);
-}
-.connector-knot img {
-  width: 56%;
-  height: auto;
 }
 .connector-disc {
   position: absolute;
@@ -1413,16 +1491,6 @@ footer {
   background: #dbe3f8;
   color: #2f477a;
 }
-.avatar.anna {
-  overflow: hidden;
-  border-radius: 0;
-  background: transparent;
-}
-.avatar.anna img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 .message-bubble {
   max-width: min(84%, 720px);
   border-radius: 0.25rem 1rem 1rem;
@@ -1474,35 +1542,6 @@ footer {
   color: #69758c;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.57rem;
-}
-.typing-dots {
-  display: inline-flex;
-  gap: 0.2rem;
-  margin-left: 0.1rem;
-}
-.typing-dots i {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--blue);
-  animation: typing 900ms ease-in-out infinite;
-}
-.typing-dots i:nth-child(2) {
-  animation-delay: 120ms;
-}
-.typing-dots i:nth-child(3) {
-  animation-delay: 240ms;
-}
-@keyframes typing {
-  0%,
-  100% {
-    opacity: 0.28;
-    transform: translateY(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateY(-2px);
-  }
 }
 .message-body {
   display: flex;
@@ -1601,6 +1640,33 @@ footer {
   gap: 0.4rem;
   margin: 0;
   color: #76570a;
+}
+/* While she works: the scenario's systems as generic glyphs, no vendor logos. */
+.working-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.85rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  color: #69758c;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  list-style: none;
+}
+.working-sources li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.working-sources svg {
+  flex: 0 0 auto;
+  color: var(--blue);
+}
+.source-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .result-message {
   display: flex;
@@ -2098,7 +2164,8 @@ footer {
   .message-row {
     gap: 0.5rem;
   }
-  .avatar {
+  .avatar,
+  .message-row .anna-mark {
     width: 29px;
     height: 29px;
   }
@@ -2166,6 +2233,11 @@ footer {
     animation: none;
   }
   .anna-tray {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .anna-tray .anna-mark-check {
     opacity: 1;
     transform: none;
     animation: none;
