@@ -398,9 +398,21 @@ test('tells the story in the agreed order', () => {
 });
 
 test('on phones the situations are one scrollable row of chips and the playback buttons are icon-only', () => {
-  // The first 500px block styles the page; a later one styles the lead dialog.
-  const start = styles.indexOf('@media (max-width: 500px)');
+  // Large phones report more than 500 CSS px (a Pixel 10 Pro XL about 512),
+  // so the compact demo controls live in a 640px block of their own, placed
+  // before the 500px page block.
+  const start = styles.indexOf('@media (max-width: 640px)');
+  assert.ok(start >= 0, 'no 640px block for the demo controls');
+  assert.ok(start < styles.indexOf('@media (max-width: 500px)'));
   const phone = styles.slice(start, styles.indexOf('@media', start + 1));
+  // Between phone and tablet widths the chips wrap instead of spilling out
+  // of a centred row on both sides.
+  const tablet = [...styles.matchAll(/@media \(max-width: 820px\)/g)]
+    .map((m) => styles.slice(m.index, styles.indexOf('@media', m.index + 1)))
+    .find((block) => block.includes('\n  .scenario-tabs {'));
+  assert.ok(tablet, 'no 820px block styles the demo tabs');
+  assert.match(tablet, /\.scenario-tabs \{[^}]*flex-wrap: wrap/);
+  assert.match(tablet, /\.scenario-tabs \{[^}]*justify-content: flex-start/);
   // One row that scrolls sideways, never a stack of five tall rows.
   assert.match(phone, /\.scenario-tabs \{[^}]*overflow-x: auto/);
   assert.match(phone, /\.scenario-tabs \{[^}]*flex-wrap: nowrap/);

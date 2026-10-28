@@ -1862,6 +1862,10 @@ footer > a:last-child {
   }
   .scenario-tabs {
     width: 100%;
+    /* The base tab list centres its chips; wrapped rows that start at the
+       left stay inside the panel at every width. */
+    flex-wrap: wrap;
+    justify-content: flex-start;
     border-radius: 1rem;
   }
   .scenario-tabs [data-slot='tabs-trigger'] {
@@ -1896,50 +1900,9 @@ footer > a:last-child {
   }
 }
 
-@media (max-width: 500px) {
-  .hero-actions,
-  .cta-actions {
-    align-items: stretch;
-    flex-direction: column;
-    width: 100%;
-  }
-  .button {
-    width: 100%;
-  }
-  .day-header {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 0.9rem;
-  }
-  .day-body {
-    min-height: 410px;
-  }
-  .calendar-controls {
-    flex-wrap: wrap;
-  }
-  .calendar-event {
-    font-size: 0.56rem;
-  }
-  .anchor-expanded {
-    padding: 1rem;
-  }
-  .anchor-expanded .focus-dot {
-    top: 1rem;
-    left: 1rem;
-  }
-  .anchor-time {
-    top: 0.9rem;
-    right: 1rem;
-  }
-  .anchor-expanded strong {
-    font-size: 1.25rem;
-  }
-  .anna-tray {
-    padding: 0.65rem;
-  }
-  .anna-tray strong {
-    white-space: normal;
-  }
+/* Large phones report more than 500 CSS px (a Pixel 10 Pro XL about 512),
+   so the compact demo controls get a block of their own. */
+@media (max-width: 640px) {
   /* The situations: one row of chips that scrolls sideways; replay and
      pause as icons beside it. The chat gets the width of the phone. */
   .scenario-shell.paper-panel {
@@ -1993,6 +1956,52 @@ footer > a:last-child {
   }
   .demo-thread {
     min-height: 420px;
+  }
+}
+
+@media (max-width: 500px) {
+  .hero-actions,
+  .cta-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+  }
+  .button {
+    width: 100%;
+  }
+  .day-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 0.9rem;
+  }
+  .day-body {
+    min-height: 410px;
+  }
+  .calendar-controls {
+    flex-wrap: wrap;
+  }
+  .calendar-event {
+    font-size: 0.56rem;
+  }
+  .anchor-expanded {
+    padding: 1rem;
+  }
+  .anchor-expanded .focus-dot {
+    top: 1rem;
+    left: 1rem;
+  }
+  .anchor-time {
+    top: 0.9rem;
+    right: 1rem;
+  }
+  .anchor-expanded strong {
+    font-size: 1.25rem;
+  }
+  .anna-tray {
+    padding: 0.65rem;
+  }
+  .anna-tray strong {
+    white-space: normal;
   }
   .message-row {
     gap: 0.5rem;
