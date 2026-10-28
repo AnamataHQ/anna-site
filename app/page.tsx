@@ -48,7 +48,7 @@ const content = {
     trust: 'Early access, 2026',
     facts: [
       'Works inside Microsoft Teams and Slack',
-      'Connects over OAuth to the systems you already use',
+      'Connects to the systems you already use',
       'Asks before she acts, within the rights you grant',
     ],
     day: {
@@ -119,7 +119,7 @@ const content = {
     connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
-      'Anna works through MCP connectors that sign in with OAuth. You grant the rights, she works within them.',
+      'Connect Anna to the systems your work lives in, and she can read and act in them. You decide which rights she gets.',
     ringLabel: 'Among thousands of connectors',
     ringAria:
       "A paper disc with Anna's mark, with twelve smaller paper discs pinned around it, each with the mark and name of one system, and a paper thread from Anna's disc to every one of them. A few threads run on past the edge of the picture.",
@@ -371,7 +371,7 @@ const content = {
     trust: 'Vroege toegang, 2026',
     facts: [
       'Werkt in Microsoft Teams en Slack',
-      'Koppelt via OAuth met de systemen die je al gebruikt',
+      'Koppelt met de systemen die je al gebruikt',
       'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
     ],
     day: {
@@ -442,7 +442,7 @@ const content = {
     connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
-      'Anna werkt via MCP-koppelingen die inloggen met OAuth. Jij geeft de rechten, zij werkt daarbinnen.',
+      'Koppel Anna aan de systemen waar je werk in staat, en ze kan erin lezen en handelen. Jij bepaalt welke rechten ze krijgt.',
     ringLabel: 'Een greep uit duizenden koppelingen',
     ringAria:
       "Een papieren schijf met het merk van Anna, met daaromheen twaalf kleinere papieren schijfjes, elk met het merk en de naam van één systeem, en een papieren draad van Anna's schijf naar elk schijfje. Een paar draden lopen door tot voorbij de rand van het beeld.",

@@ -242,15 +242,16 @@ test('the connectors: twelve marks tied to Anna, thousands available, no tested-
     (match) => match[1],
   );
   assert.deepEqual(sections.slice(0, 2), ['top', 'demo']);
-  assert.match(page, /OAuth/);
-  assert.match(page, /MCP/);
+  // Outcome, not mechanism: the visitor reads what connecting gives them,
+  // never the protocol names (Ezra, 2026-10-28).
+  assert.doesNotMatch(page, /OAuth|MCP/);
   assert.match(
     page,
-    /'Anna works through MCP connectors that sign in with OAuth\. You grant the rights, she works within them\.'/,
+    /'Connect Anna to the systems your work lives in, and she can read and act in them\. You decide which rights she gets\.'/,
   );
   assert.match(
     page,
-    /'Anna werkt via MCP-koppelingen die inloggen met OAuth\. Jij geeft de rechten, zij werkt daarbinnen\.'/,
+    /'Koppel Anna aan de systemen waar je werk in staat, en ze kan erin lezen en handelen\. Jij bepaalt welke rechten ze krijgt\.'/,
   );
   assert.match(page, /Among thousands of connectors/);
   assert.match(page, /Een greep uit duizenden koppelingen/);

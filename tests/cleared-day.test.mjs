@@ -68,7 +68,8 @@ test('headline, sub and actions are verbatim in English and Dutch', () => {
 test('three true facts under the actions, no hours, prices or certifications anywhere', () => {
   for (const fact of [
     'Works inside Microsoft Teams and Slack',
-    'Connects over OAuth to the systems you already use',
+    'Connects to the systems you already use',
+    'Koppelt met de systemen die je al gebruikt',
     'Asks before she acts, within the rights you grant',
     'Werkt in Microsoft Teams en Slack',
   ]) {
