@@ -126,25 +126,25 @@ const content = {
     customBody:
       'If it has a workable API, Anamata can build a connector for it during onboarding.',
     requestConnector: 'Request a connector',
-    problemKicker: 'Useful work. Wrong use of your time.',
-    problemTitle: 'Anna handles the work around the work.',
+    problemKicker: 'How Anna works',
+    problemTitle: 'One request in Teams. Finished work in your systems.',
     problemBody:
-      'The small tasks that interrupt a day are often essential. They are also predictable, repeatable and ready to be handled differently.',
+      'Anna picks up the request, gathers what she needs from your systems, asks when something is missing and does the work. You see exactly what she did.',
     capabilities: [
       {
         number: '01',
-        title: 'Answers',
-        body: 'Gives colleagues clear answers using the information and rules your organisation already trusts.',
+        title: 'You ask',
+        body: 'In Teams or Slack, in your own words. No new tool to learn.',
       },
       {
         number: '02',
-        title: 'Prepares',
-        body: 'Collects context, checks what is needed and gets the next action ready for review.',
+        title: 'Anna prepares',
+        body: 'She collects the context from your systems, checks the rules and asks you when a decision is needed.',
       },
       {
         number: '03',
-        title: 'Executes',
-        body: 'Completes approved actions in connected systems and reports what happened.',
+        title: 'Anna finishes',
+        body: 'She does the approved work in the system itself and reports back what she did.',
       },
     ],
     examplesKicker: 'Where to start',
@@ -449,25 +449,25 @@ const content = {
     customBody:
       'Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen.',
     requestConnector: 'Vraag een koppeling aan',
-    problemKicker: 'Nuttig werk. Verkeerd gebruik van je tijd.',
-    problemTitle: 'Anna doet het werk rondom het werk.',
+    problemKicker: 'Zo werkt Anna',
+    problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.',
     problemBody:
-      'De kleine taken die je dag onderbreken zijn vaak essentieel. Ze zijn ook voorspelbaar, herhaalbaar en klaar om anders te worden uitgevoerd.',
+      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, vraagt als iets ontbreekt en doet het werk. Je ziet precies wat ze heeft gedaan.',
     capabilities: [
       {
         number: '01',
-        title: 'Beantwoordt',
-        body: 'Geeft collega’s duidelijke antwoorden met de informatie en regels die je organisatie al vertrouwt.',
+        title: 'Jij vraagt',
+        body: 'In Teams of Slack, in je eigen woorden. Geen nieuw programma om te leren.',
       },
       {
         number: '02',
-        title: 'Bereidt voor',
-        body: 'Verzamelt context, controleert wat nodig is en zet de volgende actie klaar voor beoordeling.',
+        title: 'Anna bereidt voor',
+        body: 'Ze verzamelt de context uit je systemen, controleert de regels en vraagt het jou als er een beslissing nodig is.',
       },
       {
         number: '03',
-        title: 'Voert uit',
-        body: 'Rondt goedgekeurde acties af in gekoppelde systemen en rapporteert wat er is gebeurd.',
+        title: 'Anna rondt af',
+        body: 'Ze doet het goedgekeurde werk in het systeem zelf en koppelt terug wat ze heeft gedaan.',
       },
     ],
     examplesKicker: 'Om mee te beginnen',

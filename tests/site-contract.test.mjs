@@ -147,6 +147,39 @@ test('shows Anna working briefly after the reply before reporting completion', (
   assert.match(page, /window\.setTimeout\([\s\S]*EXECUTION_DELAY_MS/);
 });
 
+test('explains how Anna works as the three steps the demo just showed', () => {
+  for (const line of [
+    "problemKicker: 'How Anna works'",
+    "problemTitle: 'One request in Teams. Finished work in your systems.'",
+    "problemKicker: 'Zo werkt Anna'",
+    "problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.'",
+    "title: 'You ask'",
+    "title: 'Anna prepares'",
+    "title: 'Anna finishes'",
+    "title: 'Jij vraagt'",
+    "title: 'Anna bereidt voor'",
+    "title: 'Anna rondt af'",
+    'You see exactly what she did.',
+    'Je ziet precies wat ze heeft gedaan.',
+  ]) {
+    assert.ok(page.includes(line), `missing how-it-works line: ${line}`);
+  }
+  // The section is a "how", not a problem statement, and no longer lists
+  // answering as a separate capability.
+  assert.doesNotMatch(
+    page,
+    /Wrong use of your time|work around the work|Verkeerd gebruik van je tijd|werk rondom het werk|title: 'Answers'|title: 'Beantwoordt'/,
+  );
+  const lists = [...page.matchAll(/capabilities: \[([\s\S]*?)\n\s{4}\],/g)];
+  assert.equal(lists.length, 2, 'one step list per language');
+  for (const [, block] of lists) {
+    assert.deepEqual(
+      [...block.matchAll(/number: '(\d\d)'/g)].map((m) => m[1]),
+      ['01', '02', '03'],
+    );
+  }
+});
+
 test('makes Anna boundaries and recognisable team tasks concrete', () => {
   for (const phrase of [
     'Anna does',
