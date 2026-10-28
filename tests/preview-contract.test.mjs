@@ -58,6 +58,8 @@ test('the preview key is its own secret and writes only the preview folder', () 
     /DEPLOY_KNOWN_HOSTS: \$\{\{ vars\.DEPLOY_KNOWN_HOSTS \}\}/,
   );
   assert.match(preview, /rsync [^\n]*--delete/);
+  // rrsync's allow-list has no --chmod; the server umask sets 644/755.
+  assert.doesNotMatch(preview, /--chmod/);
   assert.match(preview, /--exclude '\.vite\/'/);
 });
 

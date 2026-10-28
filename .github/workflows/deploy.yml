@@ -125,7 +125,9 @@ jobs:
           chmod 600 ~/.ssh/preview_key
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
           # The server restricts this key with rrsync to /var/www/anna-site-dev,
-          # so "/" here is that folder and nothing else is reachable.
-          rsync -rltz --delete --chmod=D755,F644 --exclude '.vite/' \
+          # so "/" here is that folder and nothing else is reachable. Unlike
+          # the deploy job this sets no permissions: rrsync does not allow
+          # that option, and the server's umask gives 644 files, 755 folders.
+          rsync -rltz --delete --exclude '.vite/' \
             -e "ssh -i ~/.ssh/preview_key -o StrictHostKeyChecking=yes" \
             dist/client/ "${PREVIEW_USER}@${DEPLOY_HOST}:/"
