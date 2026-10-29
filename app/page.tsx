@@ -5,7 +5,6 @@ import {
   BookOpen,
   Check,
   CheckCircle2,
-  ChevronRight,
   CircleCheck,
   Clock,
   Contact,
@@ -782,6 +781,9 @@ export default function Home() {
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
   const t = content[language];
+  // The step cards in "How Anna works" mirror the first conversation.
+  const demo = t.scenarios[0];
+  const first = t.examples[0];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
   // Steps of the replay: 0 the ask, 1 Anna's answer, 2 the work card, then one
@@ -1292,14 +1294,60 @@ export default function Home() {
             <p>{t.problemBody}</p>
           </div>
           <div className="capability-grid">
-            {t.capabilities.map((capability) => (
+            {t.capabilities.map((capability, index) => (
               <article className="capability-card" key={capability.number}>
                 <div className="capability-number">{capability.number}</div>
-                <div>
+                <figure className="capability-artefact" aria-hidden="true">
+                  {index === 0 && (
+                    <div className="artefact-row">
+                      <div className="avatar person">{demo.who[0]}</div>
+                      <div className="message-body">
+                        <span className="message-who">{demo.who}</span>
+                        <div className="message-bubble">{first.ask}</div>
+                      </div>
+                    </div>
+                  )}
+                  {index === 1 && (
+                    <>
+                      <div className="context-card-title">
+                        <AnnaMark size="avatar" state="working" />
+                        <strong>{t.working}</strong>
+                        <span className="typing-dots">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                      </div>
+                      <ul className="working-sources">
+                        {demo.sources.map((source) => (
+                          <li key={source}>
+                            <SourceGlyph source={source} />
+                            {source}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {index === 2 && (
+                    <div className="artefact-row">
+                      <AnnaMark size="avatar" state="done" />
+                      <div className="record-list">
+                        <strong>
+                          <LockKeyhole size={14} /> {t.record}
+                        </strong>
+                        <ul>
+                          {demo.record.slice(1).map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </figure>
+                <div className="capability-text">
                   <h3>{capability.title}</h3>
                   <p>{capability.body}</p>
                 </div>
-                <ChevronRight aria-hidden="true" />
               </article>
             ))}
           </div>

@@ -1007,3 +1007,126 @@ test('the character step adds at most 4 KB to index.html', () => {
   const size = readFileSync(index).length;
   assert.ok(size <= 64_010 + 4_096, `index.html is ${size} bytes`);
 });
+
+// "How Anna works" filled (plan step 4, 2026-10-29): each step card carries a
+// small artefact that mirrors the demo, built only from copy already on the page.
+const capabilityMap = () => {
+  const start = page.indexOf('{t.capabilities.map(');
+  assert.ok(
+    start > 0,
+    'the capability cards are not a map over t.capabilities',
+  );
+  const end = page.indexOf('</article>', start);
+  assert.ok(end > start, 'the capability map renders no article');
+  return page.slice(start, end);
+};
+const capabilityArtefact = () => {
+  const body = capabilityMap();
+  const start = body.indexOf('<figure className="capability-artefact"');
+  assert.ok(start > 0, 'no capability-artefact figure in the card');
+  return body.slice(start, body.indexOf('</figure>', start));
+};
+
+test('each step card shows a decorative artefact between its number and its text', () => {
+  const body = capabilityMap();
+  assert.match(body, /<article className="capability-card"/);
+  assert.match(
+    body,
+    /className="capability-number"[\s\S]*?<figure className="capability-artefact" aria-hidden="true"[\s\S]*?<\/figure>[\s\S]*?<h3>\{capability\.title\}<\/h3>/,
+  );
+  assert.match(page, /const demo = t\.scenarios\[0\];/);
+  assert.match(page, /const first = t\.examples\[0\];/);
+  // The artefacts follow the "week" scenario in both languages.
+  for (const [, id] of page.matchAll(/scenarios: \[\s*\{\s*id: '([^']+)'/g)) {
+    assert.equal(id, 'week');
+  }
+  for (const [, id] of page.matchAll(
+    /examples: \[\s*\{\s*tray: \d,\s*scenario: '([^']+)'/g,
+  )) {
+    assert.equal(id, 'week');
+  }
+});
+
+test('the step artefacts add no new copy: no JSX text, and quoted strings only as class names or state tokens', () => {
+  // Between a tag's ">" and the next "<" there is only whitespace or a
+  // {expression}; arrows ("=>") are removed first so they do not read as tags.
+  const artefact = capabilityArtefact().replace(/=>/g, '');
+  const text = artefact.match(/>\s*[^<>{}\s][^<>{}]*</);
+  assert.equal(text, null, `JSX text in the artefact: ${text?.[0]}`);
+  // Every quoted string is the value of a non-readable attribute (className,
+  // aria-hidden, size, state, data-*) and a lowercase token list; no other
+  // string literal, template literal or readable attribute (alt, title, aria-label).
+  const attributes = [...artefact.matchAll(/([\w-]+)=("[^"]*"|'[^']*')/g)];
+  for (const [, name, value] of attributes) {
+    assert.match(name, /^(className|aria-hidden|size|state|data-[\w-]+)$/);
+    assert.match(value, /^["'][a-z0-9-]+( [a-z0-9-]+)*["']$/);
+  }
+  const rest = artefact.replace(/([\w-]+)=("[^"]*"|'[^']*')/g, '');
+  assert.doesNotMatch(rest, /["'`]/, 'a string literal outside an attribute');
+  // The words come from existing translation keys.
+  for (const expression of [
+    /\{demo\.who\}/,
+    /\{demo\.who\[0\]\}/,
+    /\{first\.ask\}/,
+    /\{t\.working\}/,
+    /\{t\.record\}/,
+  ]) {
+    assert.match(artefact, expression);
+  }
+});
+
+test('step 01 is the ask, 02 Anna working on generic glyphs, 03 her record without an hours figure', () => {
+  const artefact = capabilityArtefact();
+  // 01: the person's message, as in the demo.
+  assert.match(
+    artefact,
+    /className="avatar person"[^>]*>\s*\{demo\.who\[0\]\}/,
+  );
+  assert.match(artefact, /className="message-bubble"[^>]*>\s*\{first\.ask\}/);
+  // 02: the working mark, the working line with dots, the sources as glyphs.
+  assert.match(artefact, /<AnnaMark size="avatar" state="working" \/>/);
+  assert.match(
+    artefact,
+    /\{t\.working\}[\s\S]{0,120}className="typing-dots"[^>]*>\s*<i \/>\s*<i \/>\s*<i \/>/,
+  );
+  assert.match(
+    artefact,
+    /<ul className="working-sources">\s*\{demo\.sources\.map\(\(source\) => \(\s*<li key=\{source\}>\s*<SourceGlyph source=\{source\} \/>\s*\{source\}/,
+  );
+  // 03: the done mark and "What Anna did", minus the line with the hours.
+  assert.match(artefact, /<AnnaMark size="avatar" state="done" \/>/);
+  assert.match(artefact, /<LockKeyhole[^>]*\/>\s*\{t\.record\}/);
+  assert.match(artefact, /\{demo\.record\.slice\(1\)\.map\(/);
+  assert.doesNotMatch(artefact, /demo\.record\.map|record\[0\]/);
+  // The line left out is the only one with an hours figure, in both languages.
+  const weeks = [
+    ...page.matchAll(/id: 'week',[\s\S]*?record: \[([\s\S]*?)\]/g),
+  ].map(([, list]) => [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]));
+  assert.equal(weeks.length, 2);
+  for (const lines of weeks) {
+    assert.match(lines[0], /\d+ [hu]\b/);
+    for (const line of lines.slice(1)) assert.doesNotMatch(line, /\d+ [hu]\b/);
+  }
+});
+
+test('the step cards take their own height and lose the trailing chevron', () => {
+  const minHeight = (rule) => {
+    const match = rule?.match(/min-height: (\d+)px/);
+    return match ? Number(match[1]) : 0;
+  };
+  assert.ok(
+    minHeight(baseRule('.capability-card')) <= 280,
+    'capability-card min-height',
+  );
+  const phone = mediaBlocks('max-width: 820px').match(
+    /\n {2}\.capability-card \{([^}]*)\}/,
+  );
+  assert.ok(minHeight(phone?.[1]) <= 280, 'phone capability-card min-height');
+  assert.doesNotMatch(styles, /\.capability-card > svg/);
+  assert.doesNotMatch(capabilityMap(), /ChevronRight/);
+  // The artefact is a paper panel with a hairline border, not a picture.
+  const artefact = baseRule('.capability-artefact');
+  assert.match(artefact, /background: var\(--paper-light\)/);
+  assert.match(artefact, /border: 1px solid var\(--line\)/);
+  assert.doesNotMatch(capabilityArtefact(), /<Image|<img|\/hero\/|\.webp/);
+});
