@@ -37,7 +37,7 @@ const TEXT = {
     close: 'Close',
   },
   nl: {
-    heading: { demo: 'Vraag vroege toegang aan', contact: 'Neem contact op' },
+    heading: { demo: 'Vraag early access aan', contact: 'Neem contact op' },
     note: 'We reageren per e-mail binnen twee werkdagen.',
     name: 'Naam',
     email: 'Zakelijk e-mailadres',

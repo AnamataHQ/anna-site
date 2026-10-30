@@ -851,28 +851,45 @@ button {
   animation-play-state: running;
 }
 
-/* Eyebrow, trust line and facts on the navy. */
+/* Descriptor, early-access pill and facts on the navy. Sans, sentence
+   case: mono stays inside the windows. */
 .hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 1.3rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   padding: 0.42rem 0.85rem 0.42rem 0.65rem;
-  color: #dfe6f5;
+  color: #aab8d4;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1.4;
 }
 .hero-eyebrow img {
   width: 14px;
   height: 14px;
 }
 .hero-trust {
+  display: inline-flex;
   margin: 1.1rem 0 0;
-  color: #96a5c2;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.3rem 0.75rem;
+  color: #dfe6f5;
   font-family: var(--font-geist-mono), monospace;
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 680;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
+  line-height: 1.4;
 }
-/* One line under the badge; muted for the navy, as the light eyebrow. */
+/* One line under the badge; muted for the navy. */
 .hero-note {
   margin: 0.35rem 0 0;
   color: #aab8d4;
@@ -1096,9 +1113,11 @@ button {
 
 /* Everything below the fold renders when it is about to be seen. */
 .capability-section,
+.contrast-section,
 .use-case-section,
 .workflow-section,
 .control-section,
+.faq-section,
 .cta-section,
 .connectors,
 footer {
@@ -1187,22 +1206,6 @@ footer {
   }
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 0 0 1.3rem;
-  color: #586172;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.74rem;
-  font-weight: 680;
-  letter-spacing: 0.13em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-.eyebrow.light {
-  color: #aab8d4;
-}
 .hero-actions,
 .cta-actions {
   display: flex;
@@ -1265,6 +1268,8 @@ footer {
   gap: 4rem;
   align-items: end;
 }
+.contrast-section h2,
+.faq-section h2,
 .section-intro h2,
 .workflow-heading h2,
 .control-statement h2,
@@ -1275,9 +1280,30 @@ footer {
   font-weight: 560;
   letter-spacing: -0.058em;
   line-height: 0.98;
+  text-wrap: balance;
+}
+/* A heading's sentences each take their own line; see Sentences in page.tsx. */
+.sentence {
+  display: block;
 }
 .section-intro > p {
   max-width: 580px;
+  margin: 0;
+  color: #596273;
+  font-size: 1.08rem;
+}
+/* What sets Anna apart from a chat window: a quiet band, title beside body. */
+.contrast-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+  padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
+  border-top: 1px solid var(--line);
+  background: var(--paper-light);
+}
+.contrast-section p {
+  max-width: 620px;
   margin: 0;
   color: #596273;
   font-size: 1.08rem;
@@ -1372,10 +1398,6 @@ footer {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem 4rem;
   align-items: end;
-}
-.workflow-heading .eyebrow {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
 }
 .workflow-heading > p:last-child {
   max-width: 560px;
@@ -1936,6 +1958,61 @@ footer {
   border-color: var(--ink);
 }
 
+/* Buyer questions: native details, one answer opens at a time on click. */
+/* Heading left, the list right, as the other two-column sections. */
+.faq-section {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem clamp(4rem, 9vw, 9rem);
+  align-items: start;
+  padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
+  background: var(--paper);
+}
+.faq-list {
+  max-width: 780px;
+  border-top: 1px solid var(--line);
+}
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+.faq-item summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  cursor: pointer;
+  font-size: 1.08rem;
+  font-weight: 560;
+  line-height: 1.4;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary::after {
+  content: '+';
+  flex: none;
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 170ms ease;
+}
+.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+.faq-item summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+.faq-answer {
+  max-width: 62ch;
+  margin: 0;
+  padding: 0 0 1.25rem;
+  color: #596273;
+}
+
 .cta-section {
   padding: clamp(4.5rem, 8vw, 8rem) max(4vw, calc((100vw - 1120px) / 2));
   background:
@@ -1949,6 +2026,23 @@ footer {
 }
 .cta-section h2 {
   max-width: 900px;
+}
+/* The same early-access pill as in the hero, ink on paper. */
+.cta-kicker {
+  display: flex;
+  width: fit-content;
+  margin: 0 0 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  padding: 0.3rem 0.75rem;
+  color: var(--ink);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  line-height: 1.4;
 }
 .cta-section > p:nth-of-type(2) {
   max-width: 650px;
@@ -2055,6 +2149,11 @@ footer {
   .site-header {
     grid-template-columns: 1fr auto;
   }
+  /* After the base rule, so the one-column layout wins below 1181 px. */
+  .contrast-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
   .desktop-nav {
     display: none;
   }
@@ -2069,6 +2168,12 @@ footer {
   }
   .boundary-grid {
     grid-column: 1 / -1;
+  }
+  .faq-section {
+    grid-template-columns: 1fr;
+  }
+  .faq-list {
+    margin-top: 0.5rem;
   }
   /* The example spans the section like the cards; bubbles stay readable. */
   .control-example {
@@ -2100,7 +2205,9 @@ footer {
   .use-case-section,
   .workflow-section,
   .control-section,
-  .cta-section {
+  .cta-section,
+  .contrast-section,
+  .faq-section {
     padding: 5rem 1.25rem;
   }
   .section-intro,
@@ -2108,15 +2215,14 @@ footer {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+  .contrast-section h2,
+  .faq-section h2,
   .section-intro h2,
   .workflow-heading h2,
   .control-statement h2,
   .use-case-heading h2,
   .cta-section h2 {
     font-size: clamp(2.2rem, 9vw, 3.3rem);
-  }
-  .workflow-heading .eyebrow {
-    grid-column: 1;
   }
   .workflow-heading > p:last-child {
     margin-top: 0.25rem;
