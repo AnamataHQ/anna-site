@@ -1130,3 +1130,157 @@ test('the step cards take their own height and lose the trailing chevron', () =>
   assert.match(artefact, /border: 1px solid var\(--line\)/);
   assert.doesNotMatch(capabilityArtefact(), /<Image|<img|\/hero\/|\.webp/);
 });
+
+// Early access defined (plan step 5, copy approved 2026-10-30).
+const EARLY_ACCESS = {
+  en: {
+    trust: 'Now in early access · 2026',
+    ctaKicker: 'Now in early access · 2026',
+    ctaBody:
+      "Anna is in early access. We are starting with a small group of companies. Tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on.",
+    ctaSteps: [
+      'You name the tasks',
+      'We go through them with you and show how Anna handles them',
+      'Together we decide whether Anna is a fit, and where she starts',
+    ],
+    ctaAsk:
+      'What we ask of you: a conversation, and one person who knows the work.',
+    ctaGet:
+      'What you get: a clear view of what Anna would do in your week, before anything is connected.',
+    heroNote: 'Reply within two working days.',
+    footerLine:
+      'Anna is built in the Netherlands by Anamata, a quality engineering and testing company from Utrecht.',
+  },
+  nl: {
+    trust: 'Nu in vroege toegang · 2026',
+    ctaKicker: 'Nu in vroege toegang · 2026',
+    ctaBody:
+      'Anna is in vroege toegang. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
+    ctaSteps: [
+      'Jij noemt de taken',
+      'We lopen ze met je door en laten zien hoe Anna ze aanpakt',
+      'Samen bepalen we of Anna past, en waar ze begint',
+    ],
+    ctaAsk:
+      'Wat we van jou vragen: een gesprek, en één collega die het werk kent.',
+    ctaGet:
+      'Wat je krijgt: een helder beeld van wat Anna in jouw week zou doen, voordat er iets gekoppeld wordt.',
+    heroNote: 'Antwoord binnen twee werkdagen.',
+    footerLine:
+      'Anna wordt in Nederland gebouwd door Anamata, een bedrijf voor quality engineering en softwaretesten uit Utrecht.',
+  },
+};
+
+// Every quoted string literal in a piece of source, unescaped. Keys
+// (`demoLabel:`) are not quoted, so they never appear here.
+const STRING_LITERAL =
+  /'((?:[^'\\\n]|\\.)*)'|"((?:[^"\\\n]|\\.)*)"|`((?:[^`\\]|\\.)*)`/g;
+const stringValues = (source) =>
+  [...source.matchAll(STRING_LITERAL)].map(([, single, double, template]) =>
+    (single ?? double ?? template).replace(/\\(.)/g, '$1'),
+  );
+// The value of a top-level copy key (four-space indent) in one language: its
+// source runs up to the next top-level key or the end of the language object.
+const copyValue = (language, key) => {
+  const block = contentBlock(language);
+  const start = block.search(new RegExp(`\\n {4}${key}:`));
+  if (start < 0) return undefined;
+  const rest = block.slice(start + 1);
+  const end = rest.slice(1).search(/\n {4}[A-Za-z]+:|\n {2}\}/);
+  return rest.slice(0, end < 0 ? undefined : end + 1);
+};
+const withoutKeys = (language, keys) => {
+  let block = contentBlock(language);
+  for (const key of keys) {
+    const value = copyValue(language, key);
+    if (value) block = block.replace(value, '');
+  }
+  return block;
+};
+const ctaSection = () =>
+  page.slice(
+    page.indexOf('<section className="cta-section"'),
+    page.indexOf(
+      '</section>',
+      page.indexOf('<section className="cta-section"'),
+    ),
+  );
+
+test('early access is defined: badge, kicker, body, three steps, what we ask and give', () => {
+  for (const [language, copy] of Object.entries(EARLY_ACCESS)) {
+    for (const [key, expected] of Object.entries(copy)) {
+      const source = copyValue(language, key);
+      assert.ok(source, `${language}: no ${key}`);
+      const values = stringValues(source);
+      if (Array.isArray(expected))
+        assert.deepEqual(values, expected, `${language}: ${key}`);
+      else assert.deepEqual(values, [expected], `${language}: ${key}`);
+    }
+  }
+});
+
+test('the hero note sits right under the badge, the steps and the ask in the closing section', () => {
+  assert.match(
+    page,
+    /<p className="hero-trust">\{t\.trust\}<\/p>\s*<p className="hero-note">\{t\.heroNote\}<\/p>/,
+  );
+  const cta = ctaSection();
+  const body = cta.indexOf('<p>{t.ctaBody}</p>');
+  const steps = cta.indexOf('<ol className="cta-steps">');
+  const actions = cta.indexOf('className="cta-actions"');
+  const note = cta.indexOf('<p className="cta-note">');
+  assert.ok(body >= 0, 'body paragraph');
+  assert.ok(steps > body, 'steps follow the body');
+  assert.ok(actions > steps, 'buttons follow the steps');
+  assert.ok(note > actions, 'the note follows the buttons');
+  const list = cta.slice(steps, cta.indexOf('</ol>', steps));
+  assert.match(list, /t\.ctaSteps\.map\(/);
+  assert.match(list, /<li className="cta-step"/);
+  // The numbers are presentation, zero-padded from the index, not copy.
+  assert.match(list, /<span className="cta-step-number"/);
+  assert.match(list, /String\(index \+ 1\)\.padStart\(2, '0'\)/);
+  assert.match(
+    cta,
+    /<p className="cta-note">\s*\{t\.ctaAsk\} \{t\.ctaGet\}\s*<\/p>/,
+  );
+  assert.match(page, /<strong>\{t\.footerLine\}<\/strong>/);
+});
+
+test('the closing section stacks the steps on phones and uses the coral step numbers', () => {
+  assert.match(
+    baseRule('.cta-steps'),
+    /grid-template-columns: repeat\(3, 1fr\)/,
+  );
+  assert.match(
+    mediaBlocks('max-width: 640px'),
+    /\n {2}\.cta-steps \{[^}]*grid-template-columns: 1fr/,
+  );
+  assert.match(
+    styles,
+    /\.capability-number,\n\.cta-step-number \{[^}]*color: #c23a22/,
+  );
+  assert.match(baseRule('.hero-note'), /font-size: 0\.85rem/);
+  assert.match(baseRule('.cta-note'), /max-width: 56ch/);
+});
+
+test('no hours-saved figure in the copy outside the demo scenarios and the control example', () => {
+  for (const language of ['en', 'nl']) {
+    const rest = withoutKeys(language, ['scenarios', 'controlExample']);
+    assert.ok(!rest.includes('scenarios: ['), `${language}: scenarios sliced`);
+    assert.doesNotMatch(rest, /\d+\s?(h|u|hours|hour|uur)\b/, language);
+  }
+});
+
+test('no demo or booking wording in the copy values', () => {
+  const values = [
+    ...stringValues(contentBlock('en')),
+    ...stringValues(contentBlock('nl')),
+  ];
+  assert.ok(values.length > 100, 'copy values found');
+  for (const value of values) {
+    for (const word of [/\bdemo\b/i, /\bbooking\b/i, /\bbook a\b/i])
+      assert.doesNotMatch(value, word);
+  }
+  // The guard reads values, not words that merely contain "book".
+  assert.ok(!/\bbook a\b/i.test('handbook and'));
+});

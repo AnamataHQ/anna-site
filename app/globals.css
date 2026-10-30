@@ -872,6 +872,13 @@ button {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+/* One line under the badge; muted for the navy, as the light eyebrow. */
+.hero-note {
+  margin: 0.35rem 0 0;
+  color: #aab8d4;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
 .hero-facts {
   position: relative;
   z-index: 2;
@@ -1298,7 +1305,8 @@ footer {
   background: var(--paper-light);
   transform: translateY(-4px);
 }
-.capability-number {
+.capability-number,
+.cta-step-number {
   color: #c23a22;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.72rem;
@@ -1900,6 +1908,34 @@ footer {
   color: #596273;
   font-size: 1.05rem;
 }
+/* What early access is, in three steps; numbered as the step cards are. */
+.cta-steps {
+  display: grid;
+  max-width: 900px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cta-step {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.cta-note {
+  max-width: 56ch;
+  margin: 1.4rem 0 0;
+  color: #626a78;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -2093,6 +2129,10 @@ footer {
 /* Large phones report more than 500 CSS px (a Pixel 10 Pro XL about 512),
    so the compact demo controls get a block of their own. */
 @media (max-width: 640px) {
+  .cta-steps {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
   /* The situations: one row of chips that scrolls sideways; replay and
      pause as icons beside it. The chat gets the width of the phone. */
   .scenario-shell.paper-panel {
@@ -2339,6 +2379,11 @@ footer {
   font-size: 1.55rem;
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+.lead-dialog-note {
+  margin: 0.4rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
 }
 .lead-dialog-close {
   display: inline-flex;

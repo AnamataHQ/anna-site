@@ -20,10 +20,11 @@ const SITE_KEY =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || TURNSTILE_TEST_SITE_KEY;
 
 // Approved form text (Taiga #344, 2026-10-07; early-access heading approved
-// 2026-10-28). Change only with approval.
+// 2026-10-28; note approved 2026-10-30). Change only with approval.
 const TEXT = {
   en: {
     heading: { demo: 'Request early access', contact: 'Contact Anamata' },
+    note: 'We reply by email within two working days.',
     name: 'Name',
     email: 'Work email',
     org: 'Organisation',
@@ -37,6 +38,7 @@ const TEXT = {
   },
   nl: {
     heading: { demo: 'Vraag vroege toegang aan', contact: 'Neem contact op' },
+    note: 'We reageren per e-mail binnen twee werkdagen.',
     name: 'Naam',
     email: 'Zakelijk e-mailadres',
     org: 'Organisatie',
@@ -235,19 +237,26 @@ export function LeadFormDialog({
   }
 
   const headingId = `${id}-heading`;
+  const noteId = `${id}-note`;
 
   return (
     <dialog
       ref={dialogRef}
       className="lead-dialog"
       aria-labelledby={headingId}
+      aria-describedby={noteId}
       onClose={() => {
         openingsRef.current.close();
         onClose();
       }}
     >
       <div className="lead-dialog-head">
-        <h2 id={headingId}>{t.heading[shownKind]}</h2>
+        <div className="lead-dialog-title">
+          <h2 id={headingId}>{t.heading[shownKind]}</h2>
+          <p id={noteId} className="lead-dialog-note">
+            {t.note}
+          </p>
+        </div>
         <button
           type="button"
           className="lead-dialog-close"

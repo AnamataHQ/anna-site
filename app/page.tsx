@@ -58,7 +58,8 @@ const content = {
     heroTitle: 'Your agenda. Finally decluttered.',
     heroBody:
       'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.',
-    trust: 'Early access, 2026',
+    trust: 'Now in early access · 2026',
+    heroNote: 'Reply within two working days.',
     facts: [
       'Works inside Microsoft Teams and Slack',
       'Connects to the systems you already use',
@@ -362,11 +363,21 @@ const content = {
         body: 'Takes big decisions on her own, goes beyond the access you gave her, or acts without leaving a record.',
       },
     ],
-    ctaKicker: 'Give time back to the work that needs you',
+    ctaKicker: 'Now in early access · 2026',
     ctaTitle: 'Show us the tasks that keep getting in the way.',
     ctaBody:
-      'In a short conversation, we map one real workflow and show where Anna can help safely and practically.',
-    footerLine: 'Anna is your digital AI assistant by Anamata.',
+      "Anna is in early access. We are starting with a small group of companies. Tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on.",
+    ctaSteps: [
+      'You name the tasks',
+      'We go through them with you and show how Anna handles them',
+      'Together we decide whether Anna is a fit, and where she starts',
+    ],
+    ctaAsk:
+      'What we ask of you: a conversation, and one person who knows the work.',
+    ctaGet:
+      'What you get: a clear view of what Anna would do in your week, before anything is connected.',
+    footerLine:
+      'Anna is built in the Netherlands by Anamata, a quality engineering and testing company from Utrecht.',
     footerLinks: {
       contact: 'Contact',
       linkedin: 'LinkedIn',
@@ -390,7 +401,8 @@ const content = {
     heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.',
-    trust: 'Vroege toegang, 2026',
+    trust: 'Nu in vroege toegang · 2026',
+    heroNote: 'Antwoord binnen twee werkdagen.',
     facts: [
       'Werkt in Microsoft Teams en Slack',
       'Koppelt met de systemen die je al gebruikt',
@@ -688,11 +700,21 @@ const content = {
         body: 'Zelf grote besluiten nemen, verder gaan dan de toegang die jij gaf, of handelen zonder een verslag achter te laten.',
       },
     ],
-    ctaKicker: 'Geef tijd terug aan het werk dat jou nodig heeft',
+    ctaKicker: 'Nu in vroege toegang · 2026',
     ctaTitle: 'Laat ons zien welke taken steeds in de weg zitten.',
     ctaBody:
-      'In een kort gesprek brengen we één echt werkproces in kaart en laten we zien waar Anna veilig en praktisch kan helpen.',
-    footerLine: 'Anna is jouw digitale AI-assistent van Anamata.',
+      'Anna is in vroege toegang. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
+    ctaSteps: [
+      'Jij noemt de taken',
+      'We lopen ze met je door en laten zien hoe Anna ze aanpakt',
+      'Samen bepalen we of Anna past, en waar ze begint',
+    ],
+    ctaAsk:
+      'Wat we van jou vragen: een gesprek, en één collega die het werk kent.',
+    ctaGet:
+      'Wat je krijgt: een helder beeld van wat Anna in jouw week zou doen, voordat er iets gekoppeld wordt.',
+    footerLine:
+      'Anna wordt in Nederland gebouwd door Anamata, een bedrijf voor quality engineering en softwaretesten uit Utrecht.',
     footerLinks: {
       contact: 'Contact',
       linkedin: 'LinkedIn',
@@ -990,6 +1012,7 @@ export default function Home() {
               </a>
             </div>
             <p className="hero-trust">{t.trust}</p>
+            <p className="hero-note">{t.heroNote}</p>
           </div>
           <div
             className="hero-visual"
@@ -1444,6 +1467,16 @@ export default function Home() {
           <p className="eyebrow">{t.ctaKicker}</p>
           <h2 id="cta-title">{t.ctaTitle}</h2>
           <p>{t.ctaBody}</p>
+          <ol className="cta-steps">
+            {t.ctaSteps.map((step, index) => (
+              <li className="cta-step" key={step}>
+                <span className="cta-step-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                {step}
+              </li>
+            ))}
+          </ol>
           <div className="cta-actions">
             <a
               className="button button-primary"
@@ -1464,6 +1497,9 @@ export default function Home() {
               <ArrowRight size={17} aria-hidden="true" />
             </a>
           </div>
+          <p className="cta-note">
+            {t.ctaAsk} {t.ctaGet}
+          </p>
         </section>
       </div>
 
