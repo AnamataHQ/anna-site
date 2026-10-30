@@ -11,6 +11,7 @@ import {
   FileText,
   Folder,
   GitBranch,
+  KeyRound,
   Languages,
   Library,
   LockKeyhole,
@@ -348,7 +349,7 @@ const content = {
     controlKicker: 'Initiative, with boundaries',
     controlTitle: 'Anna can move work forward. You decide how far.',
     controlBody:
-      'Set the rules once. Anna works within them, asks when judgement is needed and keeps a clear record of every completed action.',
+      'Your admin decides, per person or per role, which systems Anna may use and what she may do in them. Anna works within that, asks when a judgement is yours, and leaves a record of every completed action.',
     boundaryCards: [
       {
         title: 'Anna does',
@@ -356,17 +357,43 @@ const content = {
       },
       {
         title: 'Anna asks',
-        body: 'When something is missing, when a call is yours to make, or when an action needs your approval first.',
+        body: 'When something is missing, when a call is yours to make, when she is not sure, or when an action cannot be undone.',
       },
       {
         title: 'Anna never',
-        body: 'Takes big decisions on her own, goes beyond the access you gave her, or acts without leaving a record.',
+        body: 'Takes a decision that is yours, goes beyond the access your admin gave her, or acts without leaving a record.',
+      },
+      {
+        title: 'Access is set by your admin',
+        body: 'Per person or per role. A licence never gives Anna more than your admin granted.',
+      },
+    ],
+    controlFacts: [
+      'Rights per system, set by your admin',
+      'Every completed action in a record',
+      'Sends every message in her own name, never as you',
+    ],
+    controlPrivacy:
+      'What you discuss with Anna stays yours. Your colleagues have their own Anna and do not see your requests, your hours or your leave.',
+    controlExample: [
+      {
+        sender: 'colleague',
+        text: 'Can you move last week’s Tuesday hours from the Rotterdam project to the Utrecht one?',
+      },
+      {
+        sender: 'anna',
+        text: 'Last week has 6 h on Rotterdam on Tuesday. That week is already approved, so moving them changes an approved sheet and your manager sees a correction. That call is yours. Shall I move the 6 h and resubmit the week?',
+      },
+      { sender: 'colleague', text: 'Yes, do it.' },
+      {
+        sender: 'anna',
+        text: 'Done. Week resubmitted with the correction; it is in the record.',
       },
     ],
     ctaKicker: 'Now in early access · 2026',
     ctaTitle: 'Show us the tasks that keep getting in the way.',
     ctaBody:
-      "Anna is in early access. We are starting with a small group of companies. Tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on.",
+      'Anna is in early access. We are starting with a small group of companies. Tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on.',
     ctaSteps: [
       'You name the tasks',
       'We go through them with you and show how Anna handles them',
@@ -685,7 +712,7 @@ const content = {
     controlKicker: 'Initiatief, met grenzen',
     controlTitle: 'Anna kan werk vooruitbrengen. Jij bepaalt hoe ver.',
     controlBody:
-      'Stel de regels één keer in. Anna werkt erbinnen, vraagt om hulp wanneer menselijk oordeel nodig is en houdt elke afgeronde actie duidelijk bij.',
+      'Je beheerder bepaalt per persoon of per rol welke systemen Anna mag gebruiken en wat ze erin mag doen. Daarbinnen werkt Anna, vraagt ze het jou als een oordeel van jou is, en laat ze van elke afgeronde actie een verslag achter.',
     boundaryCards: [
       {
         title: 'Anna doet',
@@ -693,11 +720,37 @@ const content = {
       },
       {
         title: 'Anna vraagt',
-        body: 'Als iets ontbreekt, als een keuze aan jou is, of als een actie eerst jouw goedkeuring nodig heeft.',
+        body: 'Als iets ontbreekt, als een keuze aan jou is, als ze het niet zeker weet, of als een actie niet terug te draaien is.',
       },
       {
         title: 'Anna doet nooit',
-        body: 'Zelf grote besluiten nemen, verder gaan dan de toegang die jij gaf, of handelen zonder een verslag achter te laten.',
+        body: 'Een besluit nemen dat van jou is, verder gaan dan de toegang die je beheerder gaf, of handelen zonder een verslag achter te laten.',
+      },
+      {
+        title: 'Toegang stelt je beheerder in',
+        body: 'Per persoon of per rol. Een licentie geeft Anna nooit meer dan je beheerder heeft toegestaan.',
+      },
+    ],
+    controlFacts: [
+      'Rechten per systeem, ingesteld door je beheerder',
+      'Elke afgeronde actie in een verslag',
+      'Verstuurt elk bericht onder haar eigen naam, nooit als jij',
+    ],
+    controlPrivacy:
+      'Wat jij met Anna bespreekt, blijft van jou. Je collega’s hebben hun eigen Anna en zien jouw verzoeken, uren of verlof niet.',
+    controlExample: [
+      {
+        sender: 'colleague',
+        text: 'Kun je de uren van vorige week dinsdag van het Rotterdam-project naar Utrecht zetten?',
+      },
+      {
+        sender: 'anna',
+        text: 'Vorige week staat 6 u op Rotterdam op dinsdag. Die week is al goedgekeurd, dus verplaatsen wijzigt een goedgekeurde staat en je manager ziet een correctie. Die keuze is aan jou. Zal ik de 6 u verplaatsen en de week opnieuw indienen?',
+      },
+      { sender: 'colleague', text: 'Ja, doe maar.' },
+      {
+        sender: 'anna',
+        text: 'Gedaan. Week opnieuw ingediend met de correctie; het staat in het verslag.',
       },
     ],
     ctaKicker: 'Nu in vroege toegang · 2026',
@@ -1446,6 +1499,40 @@ export default function Home() {
             <h2 id="control-title">{t.controlTitle}</h2>
             <p>{t.controlBody}</p>
           </div>
+          <figure className="control-example" aria-label={t.demoLabel}>
+            <div className="demo-toolbar" aria-hidden="true">
+              <span>{t.demoLabel}</span>
+            </div>
+            <div className="control-thread">
+              {t.controlExample.map((m, index) => (
+                <div
+                  className="control-message"
+                  data-sender={m.sender}
+                  key={m.text}
+                >
+                  {m.sender === 'anna' ? (
+                    index === t.controlExample.length - 1 ? (
+                      <AnnaMark size="avatar" state="done" />
+                    ) : (
+                      <AnnaMark size="avatar" />
+                    )
+                  ) : (
+                    <div className="avatar person" aria-hidden="true">
+                      {demo.who[0]}
+                    </div>
+                  )}
+                  <div className="message-body">
+                    <span className="message-who">
+                      {m.sender === 'anna' ? 'Anna' : demo.who}
+                    </span>
+                    <div className="message-bubble">
+                      <p>{m.text}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </figure>
           <div className="boundary-grid">
             {t.boundaryCards.map((card, index) => (
               <article className="boundary-card" key={card.title}>
@@ -1453,13 +1540,26 @@ export default function Home() {
                   <CheckCircle2 aria-hidden="true" />
                 ) : index === 1 ? (
                   <UserRoundCheck aria-hidden="true" />
-                ) : (
+                ) : index === 2 ? (
                   <ShieldCheck aria-hidden="true" />
+                ) : (
+                  <KeyRound aria-hidden="true" />
                 )}
                 <h3>{card.title}</h3>
                 <p>{card.body}</p>
               </article>
             ))}
+          </div>
+          <div className="control-notes">
+            <ul className="control-facts">
+              {t.controlFacts.map((fact) => (
+                <li key={fact}>
+                  <Check size={14} aria-hidden="true" />
+                  {fact}
+                </li>
+              ))}
+            </ul>
+            <p className="control-privacy">{t.controlPrivacy}</p>
           </div>
         </section>
 

@@ -189,10 +189,10 @@ test('makes Anna boundaries and recognisable team tasks concrete', () => {
     "title: 'Anna vraagt'",
     "title: 'Anna doet nooit'",
     'carries out the actions you have allowed.',
-    'when an action needs your approval first.',
+    'when an action cannot be undone.',
     'acts without leaving a record.',
     'de acties uitvoeren die jij hebt toegestaan.',
-    'eerst jouw goedkeuring nodig heeft.',
+    'niet terug te draaien is.',
     'zonder een verslag achter te laten.',
   ]) {
     assert.ok(
@@ -529,15 +529,19 @@ test('hierarchy: the hero promise is the loudest line', () => {
   const thread = baseRule('.demo-thread').match(/min-height: (\d+)px/);
   assert.ok(thread && Number(thread[1]) <= 500, 'demo-thread min-height');
 
-  // The control cards fill the right column instead of leaving it empty, and
-  // span the section again where it is one column.
-  assert.match(baseRule('.boundary-grid'), /grid-column: 2;/);
-  assert.match(baseRule('.boundary-grid'), /grid-template-columns: 1fr;/);
+  // The control cards sit two by two under the statement, and span the
+  // section again where it is one column.
+  assert.match(baseRule('.boundary-grid'), /grid-area: cards;/);
+  assert.match(
+    baseRule('.boundary-grid'),
+    /grid-template-columns: repeat\(2, 1fr\);/,
+  );
   const wide = mediaBlocks('max-width: 1180px');
   assert.match(wide, /\.boundary-grid \{[^}]*grid-column: 1 \/ -1/);
-  // The statement is centred against the card stack so the section does not
-  // read as a short text at the top left beside a tall column on the right.
-  assert.match(baseRule('.control-statement'), /align-self: center;/);
+  // The example is centred against the statement and cards, as the hero's
+  // calendar against its copy, so neither column reads as a short block.
+  assert.match(baseRule('.control-example'), /align-self: center;/);
+  assert.doesNotMatch(baseRule('.control-statement'), /align-self/);
 
   // The hero facts are a child of the hero grid, not of the copy, so on one
   // column they can sit under the calendar.
@@ -622,9 +626,10 @@ test('hierarchy: the hero promise is the loudest line', () => {
     mediaBlocks('max-width: 500px'),
     /\.day-body \{[^}]*min-height: 360px/,
   );
-  // Stacked beside the statement, the control cards take their own height.
+  // Two per row at every width above phones, the control cards take their
+  // own height (the 235px floor from step 1 went with the stacked column).
   assert.doesNotMatch(baseRule('.boundary-card'), /min-height: \d/);
-  assert.match(wide, /\.boundary-card \{[^}]*min-height: 235px/);
+  assert.doesNotMatch(wide, /\.boundary-card \{[^}]*min-height: \d/);
 
   // The connector map: Anna's knot clearly the centre, names readable.
   const stage = baseRule('.connector-stage');
@@ -1000,12 +1005,14 @@ test('the browser tab shows the same mark on a navy rounded tile', () => {
   assert.match(favicon, /fill="url\(#relay-gradient\)"/);
 });
 
-test('the character step adds at most 4 KB to index.html', () => {
+test('steps 3 to 8 together add at most 16 KB to index.html', () => {
   const index = new URL('../dist/client/index.html', import.meta.url);
   if (!existsSync(index)) return;
-  // 64 010 bytes on main at ba508d6, before step 3.
+  // 64 010 bytes on main at ba508d6, before step 3. Step 3 +1.2 KB, step 4
+  // +1.9 KB, step 5 +1.0 KB, step 6 +4.0 KB (72 095). The 90 KB budget is
+  // asserted in cleared-day.test.mjs; this keeps the copy steps honest below it.
   const size = readFileSync(index).length;
-  assert.ok(size <= 64_010 + 4_096, `index.html is ${size} bytes`);
+  assert.ok(size <= 64_010 + 16_384, `index.html is ${size} bytes`);
 });
 
 // "How Anna works" filled (plan step 4, 2026-10-29): each step card carries a
@@ -1283,4 +1290,222 @@ test('no demo or booking wording in the copy values', () => {
   }
   // The guard reads values, not words that merely contain "book".
   assert.ok(!/\bbook a\b/i.test('handbook and'));
+});
+
+// Step 6, "You stay in control" (approved copy, step6-gate.md, 2026-10-30).
+const CONTROL = {
+  en: {
+    controlBody:
+      'Your admin decides, per person or per role, which systems Anna may use and what she may do in them. Anna works within that, asks when a judgement is yours, and leaves a record of every completed action.',
+    boundaryCards: [
+      'Anna does',
+      'Collects what is needed, prepares the work and carries out the actions you have allowed.',
+      'Anna asks',
+      'When something is missing, when a call is yours to make, when she is not sure, or when an action cannot be undone.',
+      'Anna never',
+      'Takes a decision that is yours, goes beyond the access your admin gave her, or acts without leaving a record.',
+      'Access is set by your admin',
+      'Per person or per role. A licence never gives Anna more than your admin granted.',
+    ],
+    controlFacts: [
+      'Rights per system, set by your admin',
+      'Every completed action in a record',
+      'Sends every message in her own name, never as you',
+    ],
+    controlPrivacy:
+      'What you discuss with Anna stays yours. Your colleagues have their own Anna and do not see your requests, your hours or your leave.',
+    controlExample: [
+      'colleague',
+      'Can you move last week’s Tuesday hours from the Rotterdam project to the Utrecht one?',
+      'anna',
+      'Last week has 6 h on Rotterdam on Tuesday. That week is already approved, so moving them changes an approved sheet and your manager sees a correction. That call is yours. Shall I move the 6 h and resubmit the week?',
+      'colleague',
+      'Yes, do it.',
+      'anna',
+      'Done. Week resubmitted with the correction; it is in the record.',
+    ],
+  },
+  nl: {
+    controlBody:
+      'Je beheerder bepaalt per persoon of per rol welke systemen Anna mag gebruiken en wat ze erin mag doen. Daarbinnen werkt Anna, vraagt ze het jou als een oordeel van jou is, en laat ze van elke afgeronde actie een verslag achter.',
+    boundaryCards: [
+      'Anna doet',
+      'Verzamelen wat nodig is, het werk voorbereiden en de acties uitvoeren die jij hebt toegestaan.',
+      'Anna vraagt',
+      'Als iets ontbreekt, als een keuze aan jou is, als ze het niet zeker weet, of als een actie niet terug te draaien is.',
+      'Anna doet nooit',
+      'Een besluit nemen dat van jou is, verder gaan dan de toegang die je beheerder gaf, of handelen zonder een verslag achter te laten.',
+      'Toegang stelt je beheerder in',
+      'Per persoon of per rol. Een licentie geeft Anna nooit meer dan je beheerder heeft toegestaan.',
+    ],
+    controlFacts: [
+      'Rechten per systeem, ingesteld door je beheerder',
+      'Elke afgeronde actie in een verslag',
+      'Verstuurt elk bericht onder haar eigen naam, nooit als jij',
+    ],
+    controlPrivacy:
+      'Wat jij met Anna bespreekt, blijft van jou. Je collega’s hebben hun eigen Anna en zien jouw verzoeken, uren of verlof niet.',
+    controlExample: [
+      'colleague',
+      'Kun je de uren van vorige week dinsdag van het Rotterdam-project naar Utrecht zetten?',
+      'anna',
+      'Vorige week staat 6 u op Rotterdam op dinsdag. Die week is al goedgekeurd, dus verplaatsen wijzigt een goedgekeurde staat en je manager ziet een correctie. Die keuze is aan jou. Zal ik de 6 u verplaatsen en de week opnieuw indienen?',
+      'colleague',
+      'Ja, doe maar.',
+      'anna',
+      'Gedaan. Week opnieuw ingediend met de correctie; het staat in het verslag.',
+    ],
+  },
+};
+const controlSection = () => {
+  const start = page.indexOf('className="control-section"');
+  return page.slice(start, page.indexOf('</section>', start));
+};
+const controlExampleMarkup = () => {
+  const section = controlSection();
+  const start = section.indexOf('<figure className="control-example"');
+  return section.slice(start, section.indexOf('</figure>', start));
+};
+
+test('control copy is the approved text: body, four cards, checklist, privacy line, example', () => {
+  for (const [language, copy] of Object.entries(CONTROL)) {
+    for (const [key, expected] of Object.entries(copy)) {
+      const source = copyValue(language, key);
+      assert.ok(source, `${language}: no ${key}`);
+      const values = stringValues(source);
+      if (Array.isArray(expected))
+        assert.deepEqual(values, expected, `${language}: ${key}`);
+      else assert.deepEqual(values, [expected], `${language}: ${key}`);
+    }
+    assert.match(
+      copyValue(language, 'controlBody'),
+      language === 'en' ? /admin/ : /beheerder/,
+    );
+  }
+});
+
+test('the control example: colleague and Anna in turn, Anna asks before she acts, no colleague status', () => {
+  for (const language of ['en', 'nl']) {
+    const values = stringValues(copyValue(language, 'controlExample'));
+    const senders = values.filter((_, index) => index % 2 === 0);
+    const texts = values.filter((_, index) => index % 2 === 1);
+    assert.deepEqual(senders, ['colleague', 'anna', 'colleague', 'anna']);
+    assert.equal(texts.length, 4);
+    // Her first message asks; nothing is done or resubmitted yet.
+    assert.doesNotMatch(
+      texts[1],
+      /\bDone\b|\bGedaan\b|resubmitted|opnieuw ingediend/,
+    );
+    assert.match(texts[1], language === 'en' ? /Shall I/ : /Zal ik/);
+    // No sentence about any colleague's status anywhere in the control copy.
+    for (const key of [
+      'controlBody',
+      'boundaryCards',
+      'controlFacts',
+      'controlPrivacy',
+      'controlExample',
+    ])
+      assert.doesNotMatch(
+        copyValue(language, key),
+        /team is off|team is vrij/,
+        `${language}: ${key}`,
+      );
+  }
+  assert.doesNotMatch(controlSection(), /team is off|team is vrij/);
+});
+
+test('the control example renders as a static labelled figure with the demo bubbles', () => {
+  const figure = controlExampleMarkup();
+  assert.ok(figure, 'no control-example figure');
+  assert.match(
+    figure,
+    /<figure className="control-example" aria-label=\{t\.demoLabel\}>/,
+  );
+  // The same label the demo carries, so it never reads as a real record.
+  assert.match(figure, /<span>\{t\.demoLabel\}<\/span>/);
+  assert.match(figure, /\{t\.controlExample\.map\(/);
+  assert.match(
+    figure,
+    /<div\s+className="control-message"\s+data-sender=\{m\.sender\}/,
+  );
+  assert.match(figure, /className="message-bubble"/);
+  // The colleague is the demo's first asker; no name is typed here.
+  assert.match(page, /const demo = t\.scenarios\[0\];/);
+  assert.match(figure, /className="avatar person"[^>]*>\s*\{demo\.who\[0\]\}/);
+  assert.match(figure, /className="message-who">[^<]*\bdemo\.who\}/);
+  for (const name of [...page.matchAll(/who: '([^']+)'/g)].map((m) => m[1]))
+    assert.ok(!figure.includes(`'${name}'`), `name literal: ${name}`);
+  assert.doesNotMatch(figure, /'(?!Anna')[A-Z][a-z]+'/);
+  // Anna's mark beside her messages; the done check on the last one only.
+  assert.match(figure, /<AnnaMark size="avatar" \/>/);
+  assert.equal([...figure.matchAll(/state="done"/g)].length, 1);
+  assert.match(
+    figure,
+    /index === t\.controlExample\.length - 1 \? \(\s*<AnnaMark size="avatar" state="done" \/>/,
+  );
+  // Static: no animation state, no typing dots, no working mark.
+  assert.doesNotMatch(figure, /typing-dots|state="working"|data-visible/);
+});
+
+test('control layout: example under the statement, four cards, then checklist and privacy line', () => {
+  const section = controlSection();
+  const statement = section.indexOf('className="control-statement"');
+  const example = section.indexOf('<figure className="control-example"');
+  const grid = section.indexOf('className="boundary-grid"');
+  const facts = section.indexOf('<ul className="control-facts">');
+  const privacy = section.indexOf('<p className="control-privacy">');
+  assert.ok(statement >= 0 && example > statement, 'example after statement');
+  assert.ok(grid > example, 'cards after the example');
+  assert.ok(facts > grid, 'checklist after the cards');
+  assert.ok(privacy > facts, 'privacy line after the checklist');
+  const list = section.slice(facts, section.indexOf('</ul>', facts));
+  assert.match(list, /t\.controlFacts\.map\(/);
+  assert.match(
+    list,
+    /<li key=\{fact\}>\s*<Check size=\{14\} aria-hidden="true" \/>/,
+  );
+  assert.match(
+    section,
+    /<p className="control-privacy">\{t\.controlPrivacy\}<\/p>/,
+  );
+  // A fourth icon for the fourth card.
+  assert.match(
+    section,
+    /index === 2 \? \(\s*<ShieldCheck aria-hidden="true" \/>\s*\) : \(\s*<KeyRound aria-hidden="true" \/>/,
+  );
+
+  // Statement over the cards on the left, the example beside both, notes
+  // under both; the DOM order (statement, example, cards, notes) is what
+  // phones see.
+  assert.match(
+    baseRule('.control-section'),
+    /grid-template-areas:\s*'statement example'\s*'cards example'\s*'notes notes';/,
+  );
+  assert.match(baseRule('.control-statement'), /grid-area: statement;/);
+  assert.match(baseRule('.boundary-grid'), /align-self: start;/);
+  assert.match(baseRule('.control-example'), /grid-area: example;/);
+  assert.match(baseRule('.control-example'), /max-width: 590px;/);
+  assert.match(baseRule('.control-notes'), /grid-area: notes;/);
+  // Two by two, no single card darker than the others.
+  assert.doesNotMatch(styles, /\.boundary-card:last-child/);
+  // The checklist shares the hero facts' coral check.
+  assert.match(
+    styles,
+    /\.hero-facts svg,\n\.control-facts svg \{[^}]*color: var\(--coral\)/,
+  );
+  // Light text on the navy section.
+  assert.match(baseRule('.control-facts'), /color: #c7d0e2;/);
+  assert.match(baseRule('.control-privacy'), /color: #aab8d4;/);
+  const wide = mediaBlocks('max-width: 1180px');
+  // One column in DOM order on the tablet width, cards still two by two;
+  // one card per row on phones.
+  assert.match(
+    wide,
+    /\.control-section \{[^}]*grid-template-areas:\s*'statement'\s*'example'\s*'cards'\s*'notes';/,
+  );
+  assert.doesNotMatch(wide, /\.boundary-grid \{[^}]*grid-template-columns/);
+  assert.match(
+    mediaBlocks('max-width: 820px'),
+    /\.boundary-grid \{[^}]*grid-template-columns: 1fr/,
+  );
 });
