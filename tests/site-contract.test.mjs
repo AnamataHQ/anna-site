@@ -238,6 +238,15 @@ test('offers early access and contact, with identical wording in hero and closin
   assert.match(page, /workflowTitle: 'Zie hoe het werk gebeurt\.'/);
 });
 
+test('the demo window is labelled Teams · Slack · Anna and carries no single-vendor logo', () => {
+  const toolbar = page.slice(
+    page.indexOf('className="demo-toolbar"'),
+    page.indexOf('className="demo-thread"'),
+  );
+  assert.match(toolbar, /<AnnaMark size="avatar" \/>/);
+  assert.doesNotMatch(toolbar, /microsoft-teams\.svg|slack\.svg/);
+});
+
 test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
@@ -325,7 +334,7 @@ test("the connectors are a still paper string map tied to Anna's knot, fading at
   assert.match(page, /className="connector-stage"[^>]*aria-hidden="true"/);
   assert.match(
     page,
-    /className="connector-knot"[\s\S]{0,400}src="\/brands\/anna-mono-dark\.svg"/,
+    /className="connector-knot"[\s\S]{0,400}<AnnaMark size="hub"/,
   );
   assert.match(page, /<svg className="connector-threads"/);
   assert.match(
@@ -873,4 +882,251 @@ test('each use case opens its own conversation in the demo', () => {
   assert.match(styles, /\n\.use-case-watch \{/);
   // The sticky header is 74px; the demo must land below it, not under it.
   assert.match(styles, /\.workflow-section \{[^}]*scroll-margin-top: (8|9)\d?px/);
+});
+
+// Anna as a character (plan step 3, 2026-10-28): one mark everywhere, a
+// working state with generic system glyphs, a done check, the tab icon on navy.
+const annaMarkUrl = new URL('../components/anna-mark.tsx', import.meta.url);
+
+test('one Anna: the gradient mark on a paper disc at three sizes, wherever she appears', () => {
+  assert.ok(existsSync(annaMarkUrl), 'components/anna-mark.tsx is missing');
+  const mark = readFileSync(annaMarkUrl, 'utf8');
+  for (const name of ['avatar', 'opener', 'hub', 'idle', 'working', 'done']) {
+    assert.match(mark, new RegExp(`'${name}'`), `AnnaMark lacks ${name}`);
+  }
+  assert.match(mark, /from 'next\/image'/);
+  assert.match(mark, /src="\/brands\/anna-color-transparent\.svg"/);
+  assert.match(mark, /aria-hidden="true"/);
+  assert.match(mark, /className="typing-dots"/);
+  assert.match(mark, /className="anna-mark-check"/);
+  assert.match(page, /from '@\/components\/anna-mark'/);
+  assert.match(hero, /from '@\/components\/anna-mark'/);
+  // Every other mark goes: the eyebrow keeps the 14 px mono mark, too small for a disc.
+  assert.doesNotMatch(page, /anna-mono-dark\.svg/);
+  assert.doesNotMatch(hero, /anna-mono-dark\.svg/);
+  assert.equal([...page.matchAll(/anna-mono-light\.svg/g)].length, 1);
+  assert.match(
+    page,
+    /className="eyebrow light hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
+  );
+  assert.doesNotMatch(page, /anna-color-navy\.svg/);
+  assert.doesNotMatch(page, /anna-color-transparent\.svg/);
+  // Where she appears.
+  assert.match(
+    page,
+    /className="site-header"[\s\S]{0,200}<AnnaMark size="avatar"/,
+  );
+  assert.match(
+    page,
+    /className="brand footer-brand"[\s\S]{0,80}<AnnaMark size="avatar"/,
+  );
+  assert.match(page, /function DemoMessage[\s\S]*?<AnnaMark size="avatar"/);
+  assert.match(
+    page,
+    /className="capability-section"[\s\S]{0,240}<AnnaMark size="opener"/,
+  );
+  assert.match(
+    page,
+    /className="control-statement">\s*<AnnaMark size="opener"/,
+  );
+  // One shared set of rules: a paper disc, three sizes, the dots, the coral check.
+  assert.match(
+    styles,
+    /\.anna-mark \{[^}]*border-radius: 50%;[^}]*background: var\(--paper-light\)/,
+  );
+  for (const size of ['avatar', 'opener', 'hub']) {
+    assert.match(styles, new RegExp(`\\.anna-mark\\[data-size='${size}'\\]`));
+  }
+  assert.match(styles, /\.anna-mark-check \{[^}]*background: var\(--coral\)/);
+  assert.ok(
+    styles.indexOf('.typing-dots {') < styles.indexOf('.demo-toolbar {'),
+    'the typing dots still live in the demo CSS',
+  );
+  assert.equal([...styles.matchAll(/^\.typing-dots \{/gm)].length, 1);
+  assert.doesNotMatch(styles, /\.brand-mark|\.anna-tray-mark|\.avatar\.anna/);
+});
+
+test('while Anna carries out the reply, a row of generic system glyphs names her sources', () => {
+  const executing = page.slice(
+    page.indexOf('className="executing-line"'),
+    page.indexOf('className="record-list"'),
+  );
+  assert.match(executing, /isExecuting && \(/);
+  assert.match(executing, /className="working-sources"/);
+  assert.match(executing, /scenario\.sources\.map\(/);
+  assert.equal([...executing.matchAll(/\.map\(/g)].length, 1);
+  assert.match(page, /state=\{\s*isExecuting\s*\?\s*'working'/);
+  // A glyph per kind of system, mapped from the strings already in the data,
+  // with a neutral dot for anything unmapped. No new copy.
+  const glyphs = page.slice(
+    page.indexOf('const SOURCE_GLYPHS'),
+    page.indexOf('];', page.indexOf('const SOURCE_GLYPHS')),
+  );
+  assert.ok(glyphs.length > 0, 'SOURCE_GLYPHS is missing');
+  const sources = new Set();
+  for (const [, list] of page.matchAll(/sources: \[([^\]]*)\]/g)) {
+    for (const [, name] of list.matchAll(/'([^']+)'/g)) sources.add(name);
+  }
+  assert.ok(sources.size >= 15, `only ${sources.size} source names found`);
+  for (const name of sources) {
+    assert.ok(glyphs.includes(`'${name}'`), `no glyph for source: ${name}`);
+  }
+  assert.match(page, /className="source-dot"/);
+  // No vendor logos while she works: nothing from /brands/ in the conversation.
+  const thread = page.slice(
+    page.indexOf('className="demo-thread"'),
+    page.indexOf('className="record-list"'),
+  );
+  assert.doesNotMatch(thread, /\/brands\//);
+  assert.doesNotMatch(glyphs, /\/brands\/|ClockWise|Loket|HubSpot|Jira|Notion/);
+});
+
+test('the demo toolbar names both channels: Teams · Slack · Anna', () => {
+  assert.equal(
+    [...page.matchAll(/demoChannel: 'Teams · Slack · Anna'/g)].length,
+    2,
+  );
+  assert.doesNotMatch(page, /demoChannel: 'Microsoft Teams · Anna'/);
+});
+
+test('the browser tab shows the same mark on a navy rounded tile', () => {
+  assert.match(favicon, /<rect[^>]*rx="\d+"[^>]*fill="#08152e"/i);
+  const glyph = annaColourTransparent.match(/<path[^>]*\sd="([^"]+)"/);
+  assert.ok(glyph, 'no mark path in anna-color-transparent.svg');
+  assert.ok(
+    favicon.includes(`d="${glyph[1]}"`),
+    'favicon mark geometry changed',
+  );
+  assert.match(favicon, /fill="url\(#relay-gradient\)"/);
+});
+
+test('the character step adds at most 4 KB to index.html', () => {
+  const index = new URL('../dist/client/index.html', import.meta.url);
+  if (!existsSync(index)) return;
+  // 64 010 bytes on main at ba508d6, before step 3.
+  const size = readFileSync(index).length;
+  assert.ok(size <= 64_010 + 4_096, `index.html is ${size} bytes`);
+});
+
+// "How Anna works" filled (plan step 4, 2026-10-29): each step card carries a
+// small artefact that mirrors the demo, built only from copy already on the page.
+const capabilityMap = () => {
+  const start = page.indexOf('{t.capabilities.map(');
+  assert.ok(
+    start > 0,
+    'the capability cards are not a map over t.capabilities',
+  );
+  const end = page.indexOf('</article>', start);
+  assert.ok(end > start, 'the capability map renders no article');
+  return page.slice(start, end);
+};
+const capabilityArtefact = () => {
+  const body = capabilityMap();
+  const start = body.indexOf('<figure className="capability-artefact"');
+  assert.ok(start > 0, 'no capability-artefact figure in the card');
+  return body.slice(start, body.indexOf('</figure>', start));
+};
+
+test('each step card shows a decorative artefact between its number and its text', () => {
+  const body = capabilityMap();
+  assert.match(body, /<article className="capability-card"/);
+  assert.match(
+    body,
+    /className="capability-number"[\s\S]*?<figure className="capability-artefact" aria-hidden="true"[\s\S]*?<\/figure>[\s\S]*?<h3>\{capability\.title\}<\/h3>/,
+  );
+  assert.match(page, /const demo = t\.scenarios\[0\];/);
+  assert.match(page, /const first = t\.examples\[0\];/);
+  // The artefacts follow the "week" scenario in both languages.
+  for (const [, id] of page.matchAll(/scenarios: \[\s*\{\s*id: '([^']+)'/g)) {
+    assert.equal(id, 'week');
+  }
+  for (const [, id] of page.matchAll(
+    /examples: \[\s*\{\s*tray: \d,\s*scenario: '([^']+)'/g,
+  )) {
+    assert.equal(id, 'week');
+  }
+});
+
+test('the step artefacts add no new copy: no JSX text, and quoted strings only as class names or state tokens', () => {
+  // Between a tag's ">" and the next "<" there is only whitespace or a
+  // {expression}; arrows ("=>") are removed first so they do not read as tags.
+  const artefact = capabilityArtefact().replace(/=>/g, '');
+  const text = artefact.match(/>\s*[^<>{}\s][^<>{}]*</);
+  assert.equal(text, null, `JSX text in the artefact: ${text?.[0]}`);
+  // Every quoted string is the value of a non-readable attribute (className,
+  // aria-hidden, size, state, data-*) and a lowercase token list; no other
+  // string literal, template literal or readable attribute (alt, title, aria-label).
+  const attributes = [...artefact.matchAll(/([\w-]+)=("[^"]*"|'[^']*')/g)];
+  for (const [, name, value] of attributes) {
+    assert.match(name, /^(className|aria-hidden|size|state|data-[\w-]+)$/);
+    assert.match(value, /^["'][a-z0-9-]+( [a-z0-9-]+)*["']$/);
+  }
+  const rest = artefact.replace(/([\w-]+)=("[^"]*"|'[^']*')/g, '');
+  assert.doesNotMatch(rest, /["'`]/, 'a string literal outside an attribute');
+  // The words come from existing translation keys.
+  for (const expression of [
+    /\{demo\.who\}/,
+    /\{demo\.who\[0\]\}/,
+    /\{first\.ask\}/,
+    /\{t\.working\}/,
+    /\{t\.record\}/,
+  ]) {
+    assert.match(artefact, expression);
+  }
+});
+
+test('step 01 is the ask, 02 Anna working on generic glyphs, 03 her record without an hours figure', () => {
+  const artefact = capabilityArtefact();
+  // 01: the person's message, as in the demo.
+  assert.match(
+    artefact,
+    /className="avatar person"[^>]*>\s*\{demo\.who\[0\]\}/,
+  );
+  assert.match(artefact, /className="message-bubble"[^>]*>\s*\{first\.ask\}/);
+  // 02: the working mark, the working line with dots, the sources as glyphs.
+  assert.match(artefact, /<AnnaMark size="avatar" state="working" \/>/);
+  assert.match(
+    artefact,
+    /\{t\.working\}[\s\S]{0,120}className="typing-dots"[^>]*>\s*<i \/>\s*<i \/>\s*<i \/>/,
+  );
+  assert.match(
+    artefact,
+    /<ul className="working-sources">\s*\{demo\.sources\.map\(\(source\) => \(\s*<li key=\{source\}>\s*<SourceGlyph source=\{source\} \/>\s*\{source\}/,
+  );
+  // 03: the done mark and "What Anna did", minus the line with the hours.
+  assert.match(artefact, /<AnnaMark size="avatar" state="done" \/>/);
+  assert.match(artefact, /<LockKeyhole[^>]*\/>\s*\{t\.record\}/);
+  assert.match(artefact, /\{demo\.record\.slice\(1\)\.map\(/);
+  assert.doesNotMatch(artefact, /demo\.record\.map|record\[0\]/);
+  // The line left out is the only one with an hours figure, in both languages.
+  const weeks = [
+    ...page.matchAll(/id: 'week',[\s\S]*?record: \[([\s\S]*?)\]/g),
+  ].map(([, list]) => [...list.matchAll(/'([^']+)'/g)].map((m) => m[1]));
+  assert.equal(weeks.length, 2);
+  for (const lines of weeks) {
+    assert.match(lines[0], /\d+ [hu]\b/);
+    for (const line of lines.slice(1)) assert.doesNotMatch(line, /\d+ [hu]\b/);
+  }
+});
+
+test('the step cards take their own height and lose the trailing chevron', () => {
+  const minHeight = (rule) => {
+    const match = rule?.match(/min-height: (\d+)px/);
+    return match ? Number(match[1]) : 0;
+  };
+  assert.ok(
+    minHeight(baseRule('.capability-card')) <= 280,
+    'capability-card min-height',
+  );
+  const phone = mediaBlocks('max-width: 820px').match(
+    /\n {2}\.capability-card \{([^}]*)\}/,
+  );
+  assert.ok(minHeight(phone?.[1]) <= 280, 'phone capability-card min-height');
+  assert.doesNotMatch(styles, /\.capability-card > svg/);
+  assert.doesNotMatch(capabilityMap(), /ChevronRight/);
+  // The artefact is a paper panel with a hairline border, not a picture.
+  const artefact = baseRule('.capability-artefact');
+  assert.match(artefact, /background: var\(--paper-light\)/);
+  assert.match(artefact, /border: 1px solid var\(--line\)/);
+  assert.doesNotMatch(capabilityArtefact(), /<Image|<img|\/hero\/|\.webp/);
 });

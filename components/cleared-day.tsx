@@ -1,8 +1,9 @@
 'use client';
 
 import { CalendarDays, Check, ChevronRight, RotateCcw } from 'lucide-react';
-import Image from 'next/image';
 import { type CSSProperties, useEffect, useState } from 'react';
+
+import { AnnaMark } from '@/components/anna-mark';
 
 // The hero picture: one working day in a familiar calendar. Seven routine
 // tasks leave the day and reappear, ticked, in Anna's list; the work that
@@ -260,14 +261,7 @@ export function ClearedDay({
         </div>
       </div>
       <div className="anna-tray calendar-summary">
-        <span className="anna-tray-mark" aria-hidden="true">
-          <Image
-            src="/brands/anna-mono-dark.svg"
-            alt=""
-            width={32}
-            height={32}
-          />
-        </span>
+        <AnnaMark size="avatar" state="done" />
         <div>
           <small>{copy.handled}</small>
           <strong>

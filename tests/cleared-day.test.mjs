@@ -228,3 +228,35 @@ test('lower sections render lazily and the shell stays small', () => {
   const index = statSync(new URL('index.html', exportDir)).size;
   assert.ok(index <= 90_000, `index.html is ${index} bytes`);
 });
+
+test("Anna's mark in the tray shows the coral done check once the day has cleared", () => {
+  assert.match(hero, /from '@\/components\/anna-mark'/);
+  assert.match(
+    hero,
+    /className="anna-tray calendar-summary">\s*<AnnaMark size="avatar" state="done" \/>/,
+  );
+  assert.doesNotMatch(hero, /anna-mono-dark/);
+  // A keyframe on the same 10.4 s timeline as the after state (the expanded
+  // day, 76–88 %), no delay and no React timing; held once played.
+  assert.match(
+    styles,
+    /\.anna-tray \.anna-mark-check \{[^}]*animation: anna-mark-done 10\.4s ease forwards;[^}]*animation-play-state: paused/,
+  );
+  assert.match(
+    styles,
+    /@keyframes anna-mark-done \{\s*0%,\s*76% \{[^}]*opacity: 0[^}]*\}\s*88%,\s*100% \{[^}]*opacity: 1/,
+  );
+  assert.doesNotMatch(styles, /animation: anna-mark-done [^;]*infinite/);
+  assert.match(
+    styles,
+    /\.hero-visual\[data-in-view='true'\] \.anna-tray \.anna-mark-check,[\s\S]*?\{\s*animation-play-state: running/,
+  );
+  // Static under reduced motion: the check simply shows.
+  const reduced = styles.slice(
+    styles.indexOf('@media (prefers-reduced-motion: reduce)'),
+  );
+  assert.match(
+    reduced,
+    /\.anna-tray \.anna-mark-check \{[^}]*opacity: 1;[^}]*animation: none/,
+  );
+});

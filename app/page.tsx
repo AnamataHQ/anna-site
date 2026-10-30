@@ -2,23 +2,35 @@
 
 import {
   ArrowRight,
+  BookOpen,
   Check,
   CheckCircle2,
-  ChevronRight,
   CircleCheck,
+  Clock,
+  Contact,
+  FileText,
+  Folder,
+  GitBranch,
   Languages,
+  Library,
   LockKeyhole,
+  type LucideIcon,
+  Mail,
+  MessagesSquare,
   Pause,
   Play,
   RotateCcw,
   Search,
   SendHorizontal,
   ShieldCheck,
+  SquareKanban,
   UserRoundCheck,
+  Users,
 } from 'lucide-react';
 import Image from 'next/image';
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
 
+import { AnnaMark, type AnnaMarkState } from '@/components/anna-mark';
 import { captureLandingSource, LeadFormDialog } from '@/components/lead-form';
 import { ClearedDay, type DayCopy } from '@/components/cleared-day';
 import type { LeadKind } from '@/lib/lead-capture';
@@ -182,7 +194,7 @@ const content = {
     workflowIntro:
       'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, asks when a decision is yours, and reports back in the same conversation.',
     demoLabel: 'EXAMPLE · NOT A LIVE RECORD',
-    demoChannel: 'Microsoft Teams · Anna',
+    demoChannel: 'Teams · Slack · Anna',
     working: 'Anna is working',
     ready: 'Checked',
     executing: 'Anna is carrying this out…',
@@ -514,7 +526,7 @@ const content = {
     workflowIntro:
       'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, vraagt het jou als een beslissing van jou is en koppelt terug in hetzelfde gesprek.',
     demoLabel: 'VOORBEELD · GEEN ECHT DOSSIER',
-    demoChannel: 'Microsoft Teams · Anna',
+    demoChannel: 'Teams · Slack · Anna',
     working: 'Anna is bezig',
     ready: 'Gecontroleerd',
     executing: 'Anna voert dit nu uit…',
@@ -732,6 +744,22 @@ const LOOSE_THREADS = [
 
 // The tray sprites of the hero double as the use-case pictograms, so they
 // cost nothing extra to load.
+// While Anna works, each source in the scenario shows as a generic glyph for
+// its kind of system, never a vendor logo; unmapped names get a neutral dot.
+const SOURCE_GLYPHS: readonly (readonly [LucideIcon, readonly string[]])[] = [
+  [Clock, ['Time tracking', 'Urenregistratie']],
+  [SquareKanban, ['Ticket board', 'Ticketbord']],
+  [Folder, ['HR system', 'HR-systeem']],
+  [FileText, ['Leave policy', 'Verlofbeleid']],
+  [Users, ['Team directory', 'Personeelsoverzicht']],
+  [BookOpen, ['Handbook', 'Handboek']],
+  [GitBranch, ['Code repository', 'Coderepository']],
+  [Library, ['Wiki']],
+  [MessagesSquare, ['Teams']],
+  [Contact, ['CRM']],
+  [Mail, ['Mail']],
+];
+
 const traySizes = {
   1: { width: 320, height: 217 },
   2: { width: 320, height: 206 },
@@ -753,6 +781,9 @@ export default function Home() {
   const [workflowRef, workflowVisible, workflowHasEntered] =
     useElementVisibility<HTMLElement>(0.28);
   const t = content[language];
+  // The step cards in "How Anna works" mirror the first conversation.
+  const demo = t.scenarios[0];
+  const first = t.examples[0];
   const scenario =
     t.scenarios.find((item) => item.id === scenarioId) ?? t.scenarios[0];
   // Steps of the replay: 0 the ask, 1 Anna's answer, 2 the work card, then one
@@ -891,14 +922,7 @@ export default function Home() {
 
       <header className="site-header">
         <a className="brand" href="#top" aria-label="Anna by Anamata, home">
-          <span className="brand-mark" aria-hidden="true">
-            <Image
-              src="/brands/anna-color-transparent.svg"
-              alt=""
-              width={33}
-              height={33}
-            />
-          </span>
+          <AnnaMark size="avatar" />
           <span className="brand-name">Anna</span>
           <span className="brand-by">by anamata.ai</span>
         </a>
@@ -1052,14 +1076,7 @@ export default function Home() {
             <div className="demo-window" key={`${scenarioId}-${replayKey}`}>
               <div className="demo-toolbar">
                 <div className="demo-channel">
-                  <Image
-                    className="teams-mini"
-                    src="/brands/microsoft-teams.svg"
-                    alt=""
-                    width={25}
-                    height={25}
-                    aria-hidden="true"
-                  />
+                  <AnnaMark size="avatar" />
                   <strong>{t.demoChannel}</strong>
                 </div>
                 <span>{t.demoLabel}</span>
@@ -1143,21 +1160,43 @@ export default function Home() {
                 >
                   <p>{scenario.reply}</p>
                 </DemoMessage>
-                <DemoMessage visible={demoStep >= replyStep} kind="anna">
+                <DemoMessage
+                  visible={demoStep >= replyStep}
+                  kind="anna"
+                  state={
+                    isExecuting
+                      ? 'working'
+                      : demoStep >= doneStep
+                        ? 'done'
+                        : 'idle'
+                  }
+                >
                   {demoStep >= doneStep ? (
                     <div className="result-message">
                       <CheckCircle2 size={18} aria-hidden="true" />
                       <p>{scenario.result}</p>
                     </div>
                   ) : (
-                    <p className="executing-line">
-                      {t.executing}
-                      <span className="typing-dots" aria-hidden="true">
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                    </p>
+                    <>
+                      <p className="executing-line">
+                        {t.executing}
+                        <span className="typing-dots" aria-hidden="true">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                      </p>
+                      {isExecuting && (
+                        <ul className="working-sources">
+                          {scenario.sources.map((source) => (
+                            <li key={source}>
+                              <SourceGlyph source={source} />
+                              {source}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </>
                   )}
                 </DemoMessage>
                 <div
@@ -1248,20 +1287,67 @@ export default function Home() {
         >
           <div className="section-intro">
             <div>
+              <AnnaMark size="opener" />
               <p className="eyebrow">{t.problemKicker}</p>
               <h2 id="capability-title">{t.problemTitle}</h2>
             </div>
             <p>{t.problemBody}</p>
           </div>
           <div className="capability-grid">
-            {t.capabilities.map((capability) => (
+            {t.capabilities.map((capability, index) => (
               <article className="capability-card" key={capability.number}>
                 <div className="capability-number">{capability.number}</div>
-                <div>
+                <figure className="capability-artefact" aria-hidden="true">
+                  {index === 0 && (
+                    <div className="artefact-row">
+                      <div className="avatar person">{demo.who[0]}</div>
+                      <div className="message-body">
+                        <span className="message-who">{demo.who}</span>
+                        <div className="message-bubble">{first.ask}</div>
+                      </div>
+                    </div>
+                  )}
+                  {index === 1 && (
+                    <>
+                      <div className="context-card-title">
+                        <AnnaMark size="avatar" state="working" />
+                        <strong>{t.working}</strong>
+                        <span className="typing-dots">
+                          <i />
+                          <i />
+                          <i />
+                        </span>
+                      </div>
+                      <ul className="working-sources">
+                        {demo.sources.map((source) => (
+                          <li key={source}>
+                            <SourceGlyph source={source} />
+                            {source}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {index === 2 && (
+                    <div className="artefact-row">
+                      <AnnaMark size="avatar" state="done" />
+                      <div className="record-list">
+                        <strong>
+                          <LockKeyhole size={14} /> {t.record}
+                        </strong>
+                        <ul>
+                          {demo.record.slice(1).map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+                </figure>
+                <div className="capability-text">
                   <h3>{capability.title}</h3>
                   <p>{capability.body}</p>
                 </div>
-                <ChevronRight aria-hidden="true" />
               </article>
             ))}
           </div>
@@ -1312,12 +1398,7 @@ export default function Home() {
                 className="connector-knot"
                 style={{ left: `${KNOT.x}%`, top: `${KNOT.y}%` }}
               >
-                <Image
-                  src="/brands/anna-mono-dark.svg"
-                  width={12}
-                  height={12}
-                  alt=""
-                />
+                <AnnaMark size="hub" />
               </div>
             </div>
             <p className="sr-only">{t.ringAria}</p>
@@ -1337,6 +1418,7 @@ export default function Home() {
           aria-labelledby="control-title"
         >
           <div className="control-statement">
+            <AnnaMark size="opener" />
             <p className="eyebrow light">{t.controlKicker}</p>
             <h2 id="control-title">{t.controlTitle}</h2>
             <p>{t.controlBody}</p>
@@ -1387,14 +1469,7 @@ export default function Home() {
 
       <footer>
         <a className="brand footer-brand" href="#top">
-          <span className="brand-mark" aria-hidden="true">
-            <Image
-              src="/brands/anna-mono-light.svg"
-              alt=""
-              width={33}
-              height={33}
-            />
-          </span>
+          <AnnaMark size="avatar" />
           <span className="brand-name">Anna</span>
         </a>
         <div className="footer-copy">
@@ -1444,15 +1519,26 @@ export default function Home() {
   );
 }
 
+function SourceGlyph({ source }: { source: string }) {
+  const Glyph = SOURCE_GLYPHS.find(([, names]) => names.includes(source))?.[0];
+  return Glyph ? (
+    <Glyph size={12} aria-hidden="true" />
+  ) : (
+    <span className="source-dot" aria-hidden="true" />
+  );
+}
+
 function DemoMessage({
   visible,
   who,
   kind,
+  state,
   children,
 }: {
   visible: boolean;
   who?: string;
   kind: 'person' | 'anna';
+  state?: AnnaMarkState;
   children: React.ReactNode;
 }) {
   return (
@@ -1462,18 +1548,13 @@ function DemoMessage({
       aria-hidden={!visible}
       inert={!visible}
     >
-      <div className={`avatar ${kind}`} aria-hidden="true">
-        {kind === 'anna' ? (
-          <Image
-            src="/brands/anna-color-navy.svg"
-            alt=""
-            width={34}
-            height={34}
-          />
-        ) : (
-          who?.[0]
-        )}
-      </div>
+      {kind === 'anna' ? (
+        <AnnaMark size="avatar" state={state} />
+      ) : (
+        <div className="avatar person" aria-hidden="true">
+          {who?.[0]}
+        </div>
+      )}
       <div className="message-body">
         <span className="message-who">{kind === 'anna' ? 'Anna' : who}</span>
         <div className="message-bubble">{children}</div>
