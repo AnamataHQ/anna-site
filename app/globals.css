@@ -863,9 +863,11 @@ button {
   background: rgba(255, 255, 255, 0.06);
   padding: 0.42rem 0.85rem 0.42rem 0.65rem;
   color: #aab8d4;
-  font-family: var(--font-geist-sans), sans-serif;
-  font-size: 0.9rem;
-  font-weight: 500;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
   line-height: 1.4;
 }
 .hero-eyebrow img {
@@ -880,9 +882,11 @@ button {
   background: rgba(255, 255, 255, 0.06);
   padding: 0.3rem 0.75rem;
   color: #dfe6f5;
-  font-family: var(--font-geist-sans), sans-serif;
-  font-size: 0.8rem;
-  font-weight: 560;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
   line-height: 1.4;
 }
 /* One line under the badge; muted for the navy. */
@@ -1276,6 +1280,11 @@ footer {
   font-weight: 560;
   letter-spacing: -0.058em;
   line-height: 0.98;
+  text-wrap: balance;
+}
+/* A heading's sentences each take their own line; see Sentences in page.tsx. */
+.sentence {
+  display: block;
 }
 .section-intro > p {
   max-width: 580px;
@@ -2028,9 +2037,11 @@ footer {
   background: var(--paper);
   padding: 0.3rem 0.75rem;
   color: var(--ink);
-  font-family: var(--font-geist-sans), sans-serif;
-  font-size: 0.8rem;
-  font-weight: 560;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.74rem;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
   line-height: 1.4;
 }
 .cta-section > p:nth-of-type(2) {

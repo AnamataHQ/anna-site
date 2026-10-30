@@ -50,7 +50,7 @@ test('headline, sub and actions are verbatim in English and Dutch', () => {
     "'Ask her in Teams or Slack. She does the recurring work in your systems, asks when a decision is yours, and reports back.'",
     "'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.'",
     "earlyAccess: 'Request early access'",
-    "earlyAccess: 'Vraag vroege toegang aan'",
+    "earlyAccess: 'Vraag early access aan'",
     "contact: 'Contact Anamata'",
     "contact: 'Neem contact op'",
   ]) {

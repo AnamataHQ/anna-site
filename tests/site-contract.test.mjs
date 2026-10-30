@@ -221,7 +221,7 @@ test('asks for what is due, never for what the asker forgot they promised', () =
 
 test('offers early access and contact, with identical wording in hero and closing section', () => {
   assert.equal((page.match(/'Request early access'/g) ?? []).length, 1);
-  assert.equal((page.match(/'Vraag vroege toegang aan'/g) ?? []).length, 1);
+  assert.equal((page.match(/'Vraag early access aan'/g) ?? []).length, 1);
   assert.match(page, /Contact Anamata/);
   assert.match(page, /mailto:info@anamata\.ai/);
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
@@ -231,7 +231,7 @@ test('offers early access and contact, with identical wording in hero and closin
     'utf8',
   );
   assert.match(form, /demo: 'Request early access'/);
-  assert.match(form, /demo: 'Vraag vroege toegang aan'/);
+  assert.match(form, /demo: 'Vraag early access aan'/);
   assert.doesNotMatch(form, /Book a demo|Plan een demo/);
   assert.match(page, /workflowTitle: 'Zie hoe het werk gebeurt\.'/);
 });
@@ -1166,10 +1166,10 @@ const EARLY_ACCESS = {
       'Anna is built in the Netherlands by Anamata, a quality engineering and testing company from Utrecht.',
   },
   nl: {
-    trust: 'Nu in vroege toegang · 2026',
-    ctaKicker: 'Nu in vroege toegang · 2026',
+    trust: 'Nu in early access · 2026',
+    ctaKicker: 'Nu in early access · 2026',
     ctaBody:
-      'Anna is in vroege toegang. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
+      'Anna is in early access. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
     ctaSteps: [
       'Jij noemt de taken',
       'We lopen ze met je door en laten zien hoe Anna ze aanpakt',
@@ -1569,8 +1569,8 @@ const STEP7 = {
       'Ze laat haar werk zien voordat iets wordt ingediend, zegt het als ze twijfelt, en zegt eerlijk wanneer een taak buiten haar kunnen valt. Elke afgeronde actie staat in het verslag, voor jou en voor je beheerder.',
       'Werkt ze in het Nederlands?',
       'Ja. Stel je vraag in het Nederlands of Engels; ze antwoordt in de taal die jij gebruikt.',
-      'Wat houdt vroege toegang in, en wat kost Anna?',
-      'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens de vroege toegang en delen we met je voordat er iets gekoppeld wordt.',
+      'Wat houdt early access in, en wat kost Anna?',
+      'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens early access en delen we met je voordat er iets gekoppeld wordt.',
     ],
   },
 };
@@ -1641,6 +1641,19 @@ test('step 7: no who-for line in the hero (Ezra, 2026-10-30: the size band is in
   }
 });
 
+test('two-sentence headings break after the first sentence (Ezra, 2026-10-30)', () => {
+  assert.match(page, /function Sentences\(\{ text \}: \{ text: string \}\)/);
+  for (const key of ['heroTitle', 'problemTitle', 'contrastTitle', 'controlTitle']) {
+    assert.match(page, new RegExp(`<Sentences text=\\{t\\.${key}\\} />`), key);
+  }
+  assert.match(baseRule('.sentence'), /display: block;/);
+  // Single-sentence headings balance their lines instead of leaving a widow.
+  assert.match(
+    styles,
+    /\.cta-section h2 \{\n  margin: 0;\n(?:.*\n){0,6}?  text-wrap: balance;/,
+  );
+});
+
 test('step 7: the contrast section one-column override comes after its base rule', () => {
   // Codex review 2026-10-30: the override sat in the first 1180 px block,
   // before the base rule, so the cascade kept two columns on phones.
@@ -1657,7 +1670,7 @@ test('step 7: the contrast section follows How Anna works, without a kicker', ()
     page,
     /<section\s+className="contrast-section"\s+aria-labelledby="contrast-title"\s*>/,
   );
-  assert.match(section, /<h2 id="contrast-title">\{t\.contrastTitle\}<\/h2>/);
+  assert.match(section, /<h2 id="contrast-title">\s*<Sentences text=\{t\.contrastTitle\} \/>\s*<\/h2>/);
   assert.match(section, /<p>\{t\.contrastBody\}<\/p>/);
   assert.doesNotMatch(section, /eyebrow|Kicker/);
   // Same heading scale as the other sections; a quiet paper band.
@@ -1970,19 +1983,16 @@ test('step 8: no mono section kickers; descriptor and early-access pills set in 
   assert.match(page, /<p className="hero-eyebrow">/);
   assert.match(page, /<p className="cta-kicker">\{t\.ctaKicker\}<\/p>/);
   assert.doesNotMatch(styles, /\.eyebrow\b/);
+  // Ezra, 2026-10-30: mono is fine where it differentiates a label (the
+  // badge and the two early-access pills), not as a kicker over a heading.
   for (const selector of ['.hero-eyebrow', '.hero-trust', '.cta-kicker']) {
     const rule = baseRule(selector);
-    assert.doesNotMatch(rule, /geist-mono|monospace/, selector);
-    assert.doesNotMatch(rule, /text-transform/, selector);
-    assert.doesNotMatch(rule, /letter-spacing: 0\.\d+em/, selector);
-    assert.match(rule, /font-family: var\(--font-geist-sans\)/, selector);
+    assert.match(rule, /font-family: var\(--font-geist-mono\)/, selector);
+    assert.match(rule, /text-transform: uppercase/, selector);
+    assert.match(rule, /letter-spacing: 0\.13em/, selector);
+    assert.match(rule, /font-size: 0\.74rem/, selector);
     assert.match(rule, /border: 1px solid/, selector);
     assert.match(rule, /border-radius: 999px/, selector);
-  }
-  assert.match(baseRule('.hero-eyebrow'), /font-size: 0\.9rem/);
-  for (const selector of ['.hero-trust', '.cta-kicker']) {
-    assert.match(baseRule(selector), /font-size: 0\.8rem/, selector);
-    assert.match(baseRule(selector), /font-weight: 560/, selector);
   }
   // Mono stays inside the windows.
   assert.match(baseRule('.cta-step-number'), /geist-mono/);

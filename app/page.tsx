@@ -456,13 +456,13 @@ const content = {
       control: 'Jij houdt de regie',
       connectors: 'Koppelingen',
     },
-    earlyAccess: 'Vraag vroege toegang aan',
+    earlyAccess: 'Vraag early access aan',
     contact: 'Neem contact op',
     eyebrow: 'Jouw digitale AI-assistent',
     heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.',
-    trust: 'Nu in vroege toegang · 2026',
+    trust: 'Nu in early access · 2026',
     heroNote: 'Antwoord binnen twee werkdagen.',
     facts: [
       'Werkt in Microsoft Teams en Slack',
@@ -817,14 +817,14 @@ const content = {
         a: 'Ja. Stel je vraag in het Nederlands of Engels; ze antwoordt in de taal die jij gebruikt.',
       },
       {
-        q: 'Wat houdt vroege toegang in, en wat kost Anna?',
-        a: 'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens de vroege toegang en delen we met je voordat er iets gekoppeld wordt.',
+        q: 'Wat houdt early access in, en wat kost Anna?',
+        a: 'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens early access en delen we met je voordat er iets gekoppeld wordt.',
       },
     ],
-    ctaKicker: 'Nu in vroege toegang · 2026',
+    ctaKicker: 'Nu in early access · 2026',
     ctaTitle: 'Laat ons zien welke taken steeds in de weg zitten.',
     ctaBody:
-      'Anna is in vroege toegang. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
+      'Anna is in early access. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
     ctaSteps: [
       'Jij noemt de taken',
       'We lopen ze met je door en laten zien hoe Anna ze aanpakt',
@@ -1112,7 +1112,7 @@ export default function Home() {
               />
               {t.eyebrow}
             </p>
-            <h1 id="hero-title">{t.heroTitle}</h1>
+            <h1 id="hero-title"><Sentences text={t.heroTitle} /></h1>
             <p className="hero-body">{t.heroBody}</p>
             <div className="hero-actions">
               <a
@@ -1431,7 +1431,7 @@ export default function Home() {
           <div className="section-intro">
             <div>
               <AnnaMark size="opener" />
-              <h2 id="capability-title">{t.problemTitle}</h2>
+              <h2 id="capability-title"><Sentences text={t.problemTitle} /></h2>
             </div>
             <p>{t.problemBody}</p>
           </div>
@@ -1496,7 +1496,7 @@ export default function Home() {
         </section>
 
         <section className="contrast-section" aria-labelledby="contrast-title">
-          <h2 id="contrast-title">{t.contrastTitle}</h2>
+          <h2 id="contrast-title"><Sentences text={t.contrastTitle} /></h2>
           <p>{t.contrastBody}</p>
         </section>
 
@@ -1565,7 +1565,7 @@ export default function Home() {
         >
           <div className="control-statement">
             <AnnaMark size="opener" />
-            <h2 id="control-title">{t.controlTitle}</h2>
+            <h2 id="control-title"><Sentences text={t.controlTitle} /></h2>
             <p>{t.controlBody}</p>
           </div>
           <figure className="control-example" aria-label={t.demoLabel}>
@@ -1733,6 +1733,23 @@ export default function Home() {
         onClose={() => setLeadKind(null)}
       />
     </main>
+  );
+}
+
+// Two-sentence headings break after the first sentence, never inside one
+// (Ezra, 2026-10-30: "One request in Teams. Finished work\nin your systems."
+// read badly). Each sentence is its own block; long ones still wrap inside.
+function Sentences({ text }: { text: string }) {
+  const parts = text.split('. ');
+  if (parts.length < 2) return <>{text}</>;
+  return (
+    <>
+      {parts.map((part, index) => (
+        <span className="sentence" key={part}>
+          {index < parts.length - 1 ? `${part}.` : part}
+        </span>
+      ))}
+    </>
   );
 }
 
