@@ -331,6 +331,14 @@ button {
   font-size: clamp(1.04rem, 1.35vw, 1.24rem);
   line-height: 1.58;
 }
+/* Who Anna is for: one quieter line under the body, muted as the hero note. */
+.hero-who {
+  max-width: 590px;
+  margin: 0.9rem 0 0;
+  color: #aab8d4;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
 
 .hero-visual {
   position: relative;
@@ -1096,9 +1104,11 @@ button {
 
 /* Everything below the fold renders when it is about to be seen. */
 .capability-section,
+.contrast-section,
 .use-case-section,
 .workflow-section,
 .control-section,
+.faq-section,
 .cta-section,
 .connectors,
 footer {
@@ -1137,6 +1147,10 @@ footer {
   }
   .use-case-grid {
     grid-template-columns: 1fr;
+  }
+  .contrast-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -1265,6 +1279,8 @@ footer {
   gap: 4rem;
   align-items: end;
 }
+.contrast-section h2,
+.faq-section h2,
 .section-intro h2,
 .workflow-heading h2,
 .control-statement h2,
@@ -1278,6 +1294,22 @@ footer {
 }
 .section-intro > p {
   max-width: 580px;
+  margin: 0;
+  color: #596273;
+  font-size: 1.08rem;
+}
+/* What sets Anna apart from a chat window: a quiet band, title beside body. */
+.contrast-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: start;
+  padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
+  border-top: 1px solid var(--line);
+  background: var(--paper-light);
+}
+.contrast-section p {
+  max-width: 620px;
   margin: 0;
   color: #596273;
   font-size: 1.08rem;
@@ -1936,6 +1968,61 @@ footer {
   border-color: var(--ink);
 }
 
+/* Buyer questions: native details, one answer opens at a time on click. */
+/* Heading left, the list right, as the other two-column sections. */
+.faq-section {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 2rem clamp(4rem, 9vw, 9rem);
+  align-items: start;
+  padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
+  background: var(--paper);
+}
+.faq-list {
+  max-width: 780px;
+  border-top: 1px solid var(--line);
+}
+.faq-item {
+  border-bottom: 1px solid var(--line);
+}
+.faq-item summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem 0;
+  cursor: pointer;
+  font-size: 1.08rem;
+  font-weight: 560;
+  line-height: 1.4;
+  list-style: none;
+}
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item summary::after {
+  content: '+';
+  flex: none;
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1;
+  transition: transform 170ms ease;
+}
+.faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+.faq-item summary:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+.faq-answer {
+  max-width: 62ch;
+  margin: 0;
+  padding: 0 0 1.25rem;
+  color: #596273;
+}
+
 .cta-section {
   padding: clamp(4.5rem, 8vw, 8rem) max(4vw, calc((100vw - 1120px) / 2));
   background:
@@ -2070,6 +2157,12 @@ footer {
   .boundary-grid {
     grid-column: 1 / -1;
   }
+  .faq-section {
+    grid-template-columns: 1fr;
+  }
+  .faq-list {
+    margin-top: 0.5rem;
+  }
   /* The example spans the section like the cards; bubbles stay readable. */
   .control-example {
     max-width: none;
@@ -2100,7 +2193,9 @@ footer {
   .use-case-section,
   .workflow-section,
   .control-section,
-  .cta-section {
+  .cta-section,
+  .contrast-section,
+  .faq-section {
     padding: 5rem 1.25rem;
   }
   .section-intro,
@@ -2108,6 +2203,8 @@ footer {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
+  .contrast-section h2,
+  .faq-section h2,
   .section-intro h2,
   .workflow-heading h2,
   .control-statement h2,

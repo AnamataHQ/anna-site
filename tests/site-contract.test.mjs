@@ -365,8 +365,10 @@ test('tells the story in the agreed order', () => {
     'workflow-section',
     'use-case-section',
     'capability-section',
+    'contrast-section',
     'connectors',
     'control-section',
+    'faq-section',
     'cta-section',
   ];
   const positions = order.map((name) => page.indexOf(`className="${name}"`));
@@ -1015,8 +1017,9 @@ test('steps 3 to 8 together add at most 16 KB to index.html', () => {
   const index = new URL('../dist/client/index.html', import.meta.url);
   if (!existsSync(index)) return;
   // 64 010 bytes on main at ba508d6, before step 3. Step 3 +1.2 KB, step 4
-  // +1.9 KB, step 5 +1.0 KB, step 6 +4.0 KB (72 095). The 90 KB budget is
-  // asserted in cleared-day.test.mjs; this keeps the copy steps honest below it.
+  // +1.9 KB, step 5 +1.0 KB, step 6 +4.0 KB (72 095), step 7 +4.0 KB
+  // (76 119). The 90 KB budget is asserted in cleared-day.test.mjs; this
+  // keeps the copy steps honest below it.
   const size = readFileSync(index).length;
   assert.ok(size <= 64_010 + 16_384, `index.html is ${size} bytes`);
 });
@@ -1513,5 +1516,228 @@ test('control layout: example under the statement, four cards, then checklist an
   assert.match(
     mediaBlocks('max-width: 820px'),
     /\.boundary-grid \{[^}]*grid-template-columns: 1fr/,
+  );
+});
+
+// Step 7, who it is for, the contrast block, repeat work and the FAQ
+// (approved copy, step7-gate.md, 2026-10-30).
+const STEP7 = {
+  en: {
+    heroWho:
+      'Built for Dutch companies of 10 to 75 people in business services, where the admin is done by the same people who do the work.',
+    contrastTitle: 'A chatbot tells you how. Anna does it, in your systems.',
+    contrastBody:
+      'Writing tools draft the email and leave the rest to you. Anna writes the hours in your time tracking, files the leave in your HR system and logs the follow-up on the deal. Only with the rights your admin gave her, and with a record of every action. You keep the tools you have. Anna finishes the admin in them.',
+    problemBodyEnd:
+      'Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+    faqTitle: 'Questions and answers',
+    faq: [
+      'Is Anna a chatbot?',
+      'No. You talk to her in Teams or Slack, but the work happens in your systems: she writes the hours, files the leave, logs the follow-up. A chat window gives you text. Anna gives you a finished task and a record of it.',
+      'Which systems does she work in today?',
+      'Today: ClockWise, Claim a Seat, Notion and HubSpot, plus systems with a standard sign-in. Loket and Microsoft 365 follow soon. Anything else with a workable API can follow: Anamata builds the connection during onboarding, with no developer needed on your side.',
+      'Who decides what Anna may access and do?',
+      'Your admin, per person or per role, per system. Your admin adds Anna to Teams or Slack through the Microsoft 365 admin centre or the Slack settings: a short configuration that needs their approval. They can cut a connection or switch Anna off at any moment; the record of what she did stays.',
+      'Which AI is behind Anna, and who can see our data?',
+      'The model setup behind Anna is agreed with your company; Anamata manages it, and your admin’s rights apply to everything Anna reads or does. Your data is not used to train models, not by Anamata and not by the model providers we contract. In group chats Anna reads along by default so she can pick up requests; she says so when she is added, and any group can switch that off. Your IT or security lead can ask us anything before a single system is connected; we answer in writing.',
+      'Can my colleagues see what I ask Anna?',
+      'No. Each person has their own Anna. Colleagues do not see your requests, your hours or your leave. What lands in a shared system, such as a submitted hoursheet, follows that system’s own rights, as it does today.',
+      'What happens when she is wrong or unsure, and where do I see what she did?',
+      'She shows her work before anything is submitted, says so when she is unsure, and tells you plainly when a task is outside what she can do. Every completed action is in the record, for you and for your admin.',
+      'Does she work in Dutch?',
+      'Yes. Ask her in Dutch or English; she answers in the language you use.',
+      'What does early access involve, and what does Anna cost?',
+      'You tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on. Together we decide whether she is a fit and where she starts. Pricing is agreed per company during early access and shared with you before anything is connected.',
+    ],
+  },
+  nl: {
+    heroWho:
+      'Gemaakt voor Nederlandse bedrijven van 10 tot 75 mensen in de zakelijke dienstverlening, waar de administratie wordt gedaan door dezelfde mensen die het werk doen.',
+    contrastTitle:
+      'Een chatbot vertelt je hoe. Anna doet het, in jouw systemen.',
+    contrastBody:
+      'Schrijfhulpen maken de mail en laten de rest aan jou. Anna boekt de uren in je urenregistratie, dient het verlof in je HR-systeem in en legt de opvolging vast op de deal. Alleen met de rechten die je beheerder haar gaf, en met een verslag van elke actie. Je houdt de programma’s die je hebt. Anna maakt de administratie erin af.',
+    problemBodyEnd:
+      'Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+    faqTitle: 'Vragen en antwoorden',
+    faq: [
+      'Is Anna een chatbot?',
+      'Nee. Je praat met haar in Teams of Slack, maar het werk gebeurt in jouw systemen: ze boekt de uren, dient het verlof in, legt de opvolging vast. Een chatvenster geeft je tekst. Anna geeft je een afgeronde taak en een verslag ervan.',
+      'In welke systemen werkt ze vandaag?',
+      'Vandaag: ClockWise, Claim a Seat, Notion en HubSpot, plus systemen met een standaard inlog. Loket en Microsoft 365 volgen binnenkort. Al het andere met een bruikbare API kan volgen: Anamata bouwt de koppeling tijdens de onboarding, zonder dat je er een ontwikkelaar voor nodig hebt.',
+      'Wie bepaalt waar Anna bij mag en wat ze mag doen?',
+      'Je beheerder, per persoon of per rol, per systeem. Je beheerder voegt Anna toe aan Teams of Slack via het Microsoft 365-beheercentrum of de Slack-instellingen: een korte configuratie waar hun goedkeuring voor nodig is. Ze kunnen een koppeling op elk moment verbreken of Anna uitzetten; het verslag van wat ze deed blijft.',
+      'Welke AI zit achter Anna, en wie kan onze gegevens zien?',
+      'De modelopstelling achter Anna spreken we met jullie bedrijf af; Anamata beheert die, en de rechten van je beheerder gelden voor alles wat Anna leest of doet. Jullie gegevens worden niet gebruikt om modellen te trainen, niet door Anamata en niet door de modelleveranciers waarmee wij werken. In groepsgesprekken leest Anna standaard mee zodat ze verzoeken kan oppakken; ze zegt dat als ze wordt toegevoegd, en elke groep kan dat uitzetten. Je IT’er of security-verantwoordelijke kan ons alles vragen voordat er één systeem gekoppeld wordt; we antwoorden schriftelijk.',
+      'Kunnen mijn collega’s zien wat ik Anna vraag?',
+      'Nee. Iedereen heeft een eigen Anna. Collega’s zien jouw verzoeken, uren of verlof niet. Wat in een gedeeld systeem terechtkomt, zoals een ingediende urenstaat, volgt de rechten van dat systeem, net als nu.',
+      'Wat gebeurt er als ze het mis heeft of twijfelt, en waar zie ik wat ze deed?',
+      'Ze laat haar werk zien voordat iets wordt ingediend, zegt het als ze twijfelt, en zegt eerlijk wanneer een taak buiten haar kunnen valt. Elke afgeronde actie staat in het verslag, voor jou en voor je beheerder.',
+      'Werkt ze in het Nederlands?',
+      'Ja. Stel je vraag in het Nederlands of Engels; ze antwoordt in de taal die jij gebruikt.',
+      'Wat houdt vroege toegang in, en wat kost Anna?',
+      'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens de vroege toegang en delen we met je voordat er iets gekoppeld wordt.',
+    ],
+  },
+};
+const sectionMarkup = (className) => {
+  const start = page.indexOf(`className="${className}"`);
+  assert.ok(start >= 0, `no ${className}`);
+  return page.slice(start, page.indexOf('</section>', start));
+};
+const faqAnswers = (language) =>
+  stringValues(copyValue(language, 'faq')).filter((_, i) => i % 2 === 1);
+
+test('step 7 copy is the approved text: who-for line, contrast, repeat work, FAQ', () => {
+  for (const [language, copy] of Object.entries(STEP7)) {
+    for (const key of [
+      'heroWho',
+      'contrastTitle',
+      'contrastBody',
+      'faqTitle',
+      'faq',
+    ]) {
+      const source = copyValue(language, key);
+      assert.ok(source, `${language}: no ${key}`);
+      const expected = Array.isArray(copy[key]) ? copy[key] : [copy[key]];
+      assert.deepEqual(stringValues(source), expected, `${language}: ${key}`);
+    }
+    // The two sentences close the "How Anna works" body, after a space.
+    const [body] = stringValues(copyValue(language, 'problemBody'));
+    assert.ok(
+      body.endsWith(` ${copy.problemBodyEnd}`),
+      `${language}: problemBody does not end with the repeat-work sentences`,
+    );
+  }
+});
+
+test('step 7: eight FAQ items per language, no price figure in the answers', () => {
+  for (const language of ['en', 'nl']) {
+    const faq = copyValue(language, 'faq');
+    assert.equal([...faq.matchAll(/\bq:\s+'/g)].length, 8, `${language}: q`);
+    assert.equal([...faq.matchAll(/\ba:\s+'/g)].length, 8, `${language}: a`);
+    const answers = faqAnswers(language);
+    assert.equal(answers.length, 8);
+    for (const answer of answers) {
+      assert.doesNotMatch(
+        answer,
+        /\d\s*(€|euro|per month|per maand)|€\s*\d/i,
+        `${language}: price in ${answer}`,
+      );
+    }
+  }
+});
+
+test('step 7: the contrast block names no vendor and never calls Anna a colleague', () => {
+  for (const language of ['en', 'nl']) {
+    const text = ['contrastTitle', 'contrastBody']
+      .map((key) => stringValues(copyValue(language, key)).join(' '))
+      .join(' ');
+    assert.ok(text.length > 100, `${language}: contrast copy found`);
+    assert.doesNotMatch(text, /Copilot|ChatGPT|Microsoft|OpenAI/i, language);
+    assert.doesNotMatch(text, /colleague|collega/i, language);
+  }
+});
+
+test('step 7: the who-for line names the 10 to 75 size band in both languages', () => {
+  for (const language of ['en', 'nl']) {
+    const [line] = stringValues(copyValue(language, 'heroWho'));
+    assert.match(line, /\b10\b/, language);
+    assert.match(line, /\b75\b/, language);
+  }
+  assert.match(
+    page,
+    /<p className="hero-body">\{t\.heroBody\}<\/p>\s*<p className="hero-who">\{t\.heroWho\}<\/p>/,
+  );
+  const who = baseRule('.hero-who');
+  assert.match(who, /color: #aab8d4;/);
+  assert.match(who, /font-size: 0\.95rem;/);
+  assert.match(who, /max-width: 590px;/);
+});
+
+test('step 7: the contrast section follows How Anna works, without a kicker', () => {
+  const section = sectionMarkup('contrast-section');
+  assert.match(
+    page,
+    /<section\s+className="contrast-section"\s+aria-labelledby="contrast-title"\s*>/,
+  );
+  assert.match(section, /<h2 id="contrast-title">\{t\.contrastTitle\}<\/h2>/);
+  assert.match(section, /<p>\{t\.contrastBody\}<\/p>/);
+  assert.doesNotMatch(section, /eyebrow|Kicker/);
+  // Same heading scale as the other sections; a quiet paper band.
+  assert.match(
+    styles,
+    /\n\.contrast-section h2,\n\.faq-section h2,\n\.section-intro h2,[^{]*\.cta-section h2 \{\n  margin: 0;\n  font-size: clamp\(2\.2rem, 3\.6vw, 3\.3rem\);/,
+  );
+  const base = baseRule('.contrast-section');
+  assert.match(base, /background: var\(--paper-light\);/);
+  assert.match(
+    base,
+    /padding: clamp\(4rem, 7vw, 7rem\) max\(4vw, calc\(\(100vw - 1440px\) \/ 2\)\);/,
+  );
+  assert.match(base, /grid-template-columns: 1fr 1fr;/);
+  assert.match(base, /align-items: start;/);
+  assert.match(baseRule('.contrast-section p'), /max-width: 620px;/);
+  assert.match(baseRule('.contrast-section p'), /color: #596273;/);
+  assert.match(
+    mediaBlocks('max-width: 1180px'),
+    /\.contrast-section \{[^}]*grid-template-columns: 1fr;/,
+  );
+  assert.match(
+    mediaBlocks('max-width: 820px'),
+    /\.contrast-section,\n\s*\.faq-section \{\s*padding: 5rem 1\.25rem;/,
+  );
+});
+
+test('step 7: the FAQ is native details and summary, no script, before the closing section', () => {
+  const section = sectionMarkup('faq-section');
+  assert.match(
+    page,
+    /<section\s+className="faq-section"\s+id="faq"\s+aria-labelledby="faq-title"\s*>/,
+  );
+  assert.match(section, /<h2 id="faq-title">\{t\.faqTitle\}<\/h2>/);
+  assert.doesNotMatch(section, /eyebrow|Kicker/);
+  assert.match(section, /t\.faq\.map\(/);
+  assert.match(page, /<details className="faq-item"/);
+  assert.match(section, /<summary>\{item\.q\}<\/summary>/);
+  assert.match(section, /<p className="faq-answer">\{item\.a\}<\/p>/);
+  assert.doesNotMatch(section, /onClick|useState|onToggle/);
+  assert.doesNotMatch(page, /useState[^\n]*[Ff]aq/);
+  // The nav keeps its three anchors.
+  assert.doesNotMatch(page, /<a href="#faq">/);
+  // Summary without the native marker; a CSS plus that turns into a cross.
+  assert.match(baseRule('.faq-item summary'), /list-style: none;/);
+  assert.match(
+    baseRule('.faq-item summary::-webkit-details-marker'),
+    /display: none;/,
+  );
+  assert.match(baseRule('.faq-item summary:focus-visible'), /outline: /);
+  assert.match(baseRule('.faq-item summary::after'), /content: '\+';/);
+  assert.match(
+    baseRule('.faq-item[open] summary::after'),
+    /transform: rotate\(45deg\);/,
+  );
+  assert.match(
+    baseRule('.faq-item'),
+    /border-bottom: 1px solid var\(--line\);/,
+  );
+  assert.match(baseRule('.faq-answer'), /color: #596273;/);
+  assert.match(baseRule('.faq-answer'), /max-width: 62ch;/);
+  assert.match(baseRule('.faq-section'), /background: var\(--paper\);/);
+  assert.match(baseRule('.faq-list'), /max-width: 780px;/);
+  // Heading left, list right at full width, so the section does not read as
+  // a half-empty page; one column below 1181 px with the list under the h2.
+  assert.match(baseRule('.faq-section'), /grid-template-columns: 1fr 1\.4fr;/);
+  assert.match(baseRule('.faq-section'), /align-items: start;/);
+  assert.match(
+    mediaBlocks('max-width: 1180px'),
+    /\.faq-section \{[^}]*grid-template-columns: 1fr/,
+  );
+});
+
+test('step 7: both new sections render lazily', () => {
+  assert.match(
+    styles,
+    /\.capability-section,\n\.contrast-section,[\s\S]{0,120}\.faq-section,[\s\S]{0,80}content-visibility: auto/,
   );
 });

@@ -59,6 +59,8 @@ const content = {
     heroTitle: 'Your agenda. Finally decluttered.',
     heroBody:
       'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.',
+    heroWho:
+      'Built for Dutch companies of 10 to 75 people in business services, where the admin is done by the same people who do the work.',
     trust: 'Now in early access · 2026',
     heroNote: 'Reply within two working days.',
     facts: [
@@ -144,7 +146,10 @@ const content = {
     problemKicker: 'How Anna works',
     problemTitle: 'One request in Teams. Finished work in your systems.',
     problemBody:
-      'Anna picks up the request, gathers what she needs from your systems, asks when something is missing and does the work. You see exactly what she did.',
+      'Anna picks up the request, gathers what she needs from your systems, asks when something is missing and does the work. You see exactly what she did. Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+    contrastTitle: 'A chatbot tells you how. Anna does it, in your systems.',
+    contrastBody:
+      'Writing tools draft the email and leave the rest to you. Anna writes the hours in your time tracking, files the leave in your HR system and logs the follow-up on the deal. Only with the rights your admin gave her, and with a record of every action. You keep the tools you have. Anna finishes the admin in them.',
     capabilities: [
       {
         number: '01',
@@ -390,6 +395,41 @@ const content = {
         text: 'Done. Week resubmitted with the correction; it is in the record.',
       },
     ],
+    faqTitle: 'Questions and answers',
+    faq: [
+      {
+        q: 'Is Anna a chatbot?',
+        a: 'No. You talk to her in Teams or Slack, but the work happens in your systems: she writes the hours, files the leave, logs the follow-up. A chat window gives you text. Anna gives you a finished task and a record of it.',
+      },
+      {
+        q: 'Which systems does she work in today?',
+        a: 'Today: ClockWise, Claim a Seat, Notion and HubSpot, plus systems with a standard sign-in. Loket and Microsoft 365 follow soon. Anything else with a workable API can follow: Anamata builds the connection during onboarding, with no developer needed on your side.',
+      },
+      {
+        q: 'Who decides what Anna may access and do?',
+        a: 'Your admin, per person or per role, per system. Your admin adds Anna to Teams or Slack through the Microsoft 365 admin centre or the Slack settings: a short configuration that needs their approval. They can cut a connection or switch Anna off at any moment; the record of what she did stays.',
+      },
+      {
+        q: 'Which AI is behind Anna, and who can see our data?',
+        a: 'The model setup behind Anna is agreed with your company; Anamata manages it, and your admin’s rights apply to everything Anna reads or does. Your data is not used to train models, not by Anamata and not by the model providers we contract. In group chats Anna reads along by default so she can pick up requests; she says so when she is added, and any group can switch that off. Your IT or security lead can ask us anything before a single system is connected; we answer in writing.',
+      },
+      {
+        q: 'Can my colleagues see what I ask Anna?',
+        a: 'No. Each person has their own Anna. Colleagues do not see your requests, your hours or your leave. What lands in a shared system, such as a submitted hoursheet, follows that system’s own rights, as it does today.',
+      },
+      {
+        q: 'What happens when she is wrong or unsure, and where do I see what she did?',
+        a: 'She shows her work before anything is submitted, says so when she is unsure, and tells you plainly when a task is outside what she can do. Every completed action is in the record, for you and for your admin.',
+      },
+      {
+        q: 'Does she work in Dutch?',
+        a: 'Yes. Ask her in Dutch or English; she answers in the language you use.',
+      },
+      {
+        q: 'What does early access involve, and what does Anna cost?',
+        a: 'You tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on. Together we decide whether she is a fit and where she starts. Pricing is agreed per company during early access and shared with you before anything is connected.',
+      },
+    ],
     ctaKicker: 'Now in early access · 2026',
     ctaTitle: 'Show us the tasks that keep getting in the way.',
     ctaBody:
@@ -428,6 +468,8 @@ const content = {
     heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.',
+    heroWho:
+      'Gemaakt voor Nederlandse bedrijven van 10 tot 75 mensen in de zakelijke dienstverlening, waar de administratie wordt gedaan door dezelfde mensen die het werk doen.',
     trust: 'Nu in vroege toegang · 2026',
     heroNote: 'Antwoord binnen twee werkdagen.',
     facts: [
@@ -513,7 +555,11 @@ const content = {
     problemKicker: 'Zo werkt Anna',
     problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.',
     problemBody:
-      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, vraagt als iets ontbreekt en doet het werk. Je ziet precies wat ze heeft gedaan.',
+      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, vraagt als iets ontbreekt en doet het werk. Je ziet precies wat ze heeft gedaan. Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+    contrastTitle:
+      'Een chatbot vertelt je hoe. Anna doet het, in jouw systemen.',
+    contrastBody:
+      'Schrijfhulpen maken de mail en laten de rest aan jou. Anna boekt de uren in je urenregistratie, dient het verlof in je HR-systeem in en legt de opvolging vast op de deal. Alleen met de rechten die je beheerder haar gaf, en met een verslag van elke actie. Je houdt de programma’s die je hebt. Anna maakt de administratie erin af.',
     capabilities: [
       {
         number: '01',
@@ -751,6 +797,41 @@ const content = {
       {
         sender: 'anna',
         text: 'Gedaan. Week opnieuw ingediend met de correctie; het staat in het verslag.',
+      },
+    ],
+    faqTitle: 'Vragen en antwoorden',
+    faq: [
+      {
+        q: 'Is Anna een chatbot?',
+        a: 'Nee. Je praat met haar in Teams of Slack, maar het werk gebeurt in jouw systemen: ze boekt de uren, dient het verlof in, legt de opvolging vast. Een chatvenster geeft je tekst. Anna geeft je een afgeronde taak en een verslag ervan.',
+      },
+      {
+        q: 'In welke systemen werkt ze vandaag?',
+        a: 'Vandaag: ClockWise, Claim a Seat, Notion en HubSpot, plus systemen met een standaard inlog. Loket en Microsoft 365 volgen binnenkort. Al het andere met een bruikbare API kan volgen: Anamata bouwt de koppeling tijdens de onboarding, zonder dat je er een ontwikkelaar voor nodig hebt.',
+      },
+      {
+        q: 'Wie bepaalt waar Anna bij mag en wat ze mag doen?',
+        a: 'Je beheerder, per persoon of per rol, per systeem. Je beheerder voegt Anna toe aan Teams of Slack via het Microsoft 365-beheercentrum of de Slack-instellingen: een korte configuratie waar hun goedkeuring voor nodig is. Ze kunnen een koppeling op elk moment verbreken of Anna uitzetten; het verslag van wat ze deed blijft.',
+      },
+      {
+        q: 'Welke AI zit achter Anna, en wie kan onze gegevens zien?',
+        a: 'De modelopstelling achter Anna spreken we met jullie bedrijf af; Anamata beheert die, en de rechten van je beheerder gelden voor alles wat Anna leest of doet. Jullie gegevens worden niet gebruikt om modellen te trainen, niet door Anamata en niet door de modelleveranciers waarmee wij werken. In groepsgesprekken leest Anna standaard mee zodat ze verzoeken kan oppakken; ze zegt dat als ze wordt toegevoegd, en elke groep kan dat uitzetten. Je IT’er of security-verantwoordelijke kan ons alles vragen voordat er één systeem gekoppeld wordt; we antwoorden schriftelijk.',
+      },
+      {
+        q: 'Kunnen mijn collega’s zien wat ik Anna vraag?',
+        a: 'Nee. Iedereen heeft een eigen Anna. Collega’s zien jouw verzoeken, uren of verlof niet. Wat in een gedeeld systeem terechtkomt, zoals een ingediende urenstaat, volgt de rechten van dat systeem, net als nu.',
+      },
+      {
+        q: 'Wat gebeurt er als ze het mis heeft of twijfelt, en waar zie ik wat ze deed?',
+        a: 'Ze laat haar werk zien voordat iets wordt ingediend, zegt het als ze twijfelt, en zegt eerlijk wanneer een taak buiten haar kunnen valt. Elke afgeronde actie staat in het verslag, voor jou en voor je beheerder.',
+      },
+      {
+        q: 'Werkt ze in het Nederlands?',
+        a: 'Ja. Stel je vraag in het Nederlands of Engels; ze antwoordt in de taal die jij gebruikt.',
+      },
+      {
+        q: 'Wat houdt vroege toegang in, en wat kost Anna?',
+        a: 'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens de vroege toegang en delen we met je voordat er iets gekoppeld wordt.',
       },
     ],
     ctaKicker: 'Nu in vroege toegang · 2026',
@@ -1045,6 +1126,7 @@ export default function Home() {
             </p>
             <h1 id="hero-title">{t.heroTitle}</h1>
             <p className="hero-body">{t.heroBody}</p>
+            <p className="hero-who">{t.heroWho}</p>
             <div className="hero-actions">
               <a
                 className="button button-primary"
@@ -1429,6 +1511,11 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="contrast-section" aria-labelledby="contrast-title">
+          <h2 id="contrast-title">{t.contrastTitle}</h2>
+          <p>{t.contrastBody}</p>
+        </section>
+
         <section
           className="connectors"
           id="connectors"
@@ -1560,6 +1647,18 @@ export default function Home() {
               ))}
             </ul>
             <p className="control-privacy">{t.controlPrivacy}</p>
+          </div>
+        </section>
+
+        <section className="faq-section" id="faq" aria-labelledby="faq-title">
+          <h2 id="faq-title">{t.faqTitle}</h2>
+          <div className="faq-list">
+            {t.faq.map((item) => (
+              <details className="faq-item" key={item.q}>
+                <summary>{item.q}</summary>
+                <p className="faq-answer">{item.a}</p>
+              </details>
+            ))}
           </div>
         </section>
 
