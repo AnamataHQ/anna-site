@@ -1519,12 +1519,10 @@ test('control layout: example under the statement, four cards, then checklist an
   );
 });
 
-// Step 7, who it is for, the contrast block, repeat work and the FAQ
+// Step 7, the contrast block, repeat work and the FAQ
 // (approved copy, step7-gate.md, 2026-10-30).
 const STEP7 = {
   en: {
-    heroWho:
-      'Built for Dutch companies of 10 to 75 people in business services, where the admin is done by the same people who do the work.',
     contrastTitle: 'A chatbot tells you how. Anna does it, in your systems.',
     contrastBody:
       'Writing tools draft the email and leave the rest to you. Anna writes the hours in your time tracking, files the leave in your HR system and logs the follow-up on the deal. Only with the rights your admin gave her, and with a record of every action. You keep the tools you have. Anna finishes the admin in them.',
@@ -1551,8 +1549,6 @@ const STEP7 = {
     ],
   },
   nl: {
-    heroWho:
-      'Gemaakt voor Nederlandse bedrijven van 10 tot 75 mensen in de zakelijke dienstverlening, waar de administratie wordt gedaan door dezelfde mensen die het werk doen.',
     contrastTitle:
       'Een chatbot vertelt je hoe. Anna doet het, in jouw systemen.',
     contrastBody:
@@ -1588,10 +1584,9 @@ const sectionMarkup = (className) => {
 const faqAnswers = (language) =>
   stringValues(copyValue(language, 'faq')).filter((_, i) => i % 2 === 1);
 
-test('step 7 copy is the approved text: who-for line, contrast, repeat work, FAQ', () => {
+test('step 7 copy is the approved text: contrast, repeat work, FAQ', () => {
   for (const [language, copy] of Object.entries(STEP7)) {
     for (const key of [
-      'heroWho',
       'contrastTitle',
       'contrastBody',
       'faqTitle',
@@ -1639,20 +1634,13 @@ test('step 7: the contrast block names no vendor and never calls Anna a colleagu
   }
 });
 
-test('step 7: the who-for line names the 10 to 75 size band in both languages', () => {
+test('step 7: no who-for line in the hero (Ezra, 2026-10-30: the size band is internal)', () => {
+  assert.doesNotMatch(page, /heroWho|hero-who/);
+  assert.doesNotMatch(styles, /\.hero-who/);
   for (const language of ['en', 'nl']) {
-    const [line] = stringValues(copyValue(language, 'heroWho'));
-    assert.match(line, /\b10\b/, language);
-    assert.match(line, /\b75\b/, language);
+    const [body] = stringValues(copyValue(language, 'heroBody'));
+    assert.doesNotMatch(body, /10 to 75|10 tot 75/, language);
   }
-  assert.match(
-    page,
-    /<p className="hero-body">\{t\.heroBody\}<\/p>\s*<p className="hero-who">\{t\.heroWho\}<\/p>/,
-  );
-  const who = baseRule('.hero-who');
-  assert.match(who, /color: #aab8d4;/);
-  assert.match(who, /font-size: 0\.95rem;/);
-  assert.match(who, /max-width: 590px;/);
 });
 
 test('step 7: the contrast section follows How Anna works, without a kicker', () => {

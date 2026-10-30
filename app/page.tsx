@@ -59,8 +59,6 @@ const content = {
     heroTitle: 'Your agenda. Finally decluttered.',
     heroBody:
       'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.',
-    heroWho:
-      'Built for Dutch companies of 10 to 75 people in business services, where the admin is done by the same people who do the work.',
     trust: 'Now in early access · 2026',
     heroNote: 'Reply within two working days.',
     facts: [
@@ -468,8 +466,6 @@ const content = {
     heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
       'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.',
-    heroWho:
-      'Gemaakt voor Nederlandse bedrijven van 10 tot 75 mensen in de zakelijke dienstverlening, waar de administratie wordt gedaan door dezelfde mensen die het werk doen.',
     trust: 'Nu in vroege toegang · 2026',
     heroNote: 'Antwoord binnen twee werkdagen.',
     facts: [
@@ -1126,7 +1122,6 @@ export default function Home() {
             </p>
             <h1 id="hero-title">{t.heroTitle}</h1>
             <p className="hero-body">{t.heroBody}</p>
-            <p className="hero-who">{t.heroWho}</p>
             <div className="hero-actions">
               <a
                 className="button button-primary"

@@ -331,14 +331,6 @@ button {
   font-size: clamp(1.04rem, 1.35vw, 1.24rem);
   line-height: 1.58;
 }
-/* Who Anna is for: one quieter line under the body, muted as the hero note. */
-.hero-who {
-  max-width: 590px;
-  margin: 0.9rem 0 0;
-  color: #aab8d4;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
 
 .hero-visual {
   position: relative;
