@@ -47,8 +47,8 @@ test('headline, sub and actions are verbatim in English and Dutch', () => {
   for (const phrase of [
     "heroTitle: 'Your agenda. Finally decluttered.'",
     "heroTitle: 'Jouw agenda. Eindelijk opgeruimd.'",
-    "'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.'",
-    "'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.'",
+    "'Ask her in Teams or Slack. She does the recurring work in your systems, asks when a decision is yours, and reports back.'",
+    "'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.'",
     "earlyAccess: 'Request early access'",
     "earlyAccess: 'Vraag vroege toegang aan'",
     "contact: 'Contact Anamata'",
@@ -70,7 +70,8 @@ test('three true facts under the actions, no hours, prices or certifications any
     'Works inside Microsoft Teams and Slack',
     'Connects to the systems you already use',
     'Koppelt met de systemen die je al gebruikt',
-    'Asks before she acts, within the rights you grant',
+    'Asks before anything you have not allowed',
+    'Vraagt het eerst bij alles wat je niet hebt toegestaan',
     'Werkt in Microsoft Teams en Slack',
   ]) {
     assert.ok(page.includes(fact), `missing fact: ${fact}`);
@@ -181,7 +182,8 @@ test('the calendar plays only once the hero is in view, and shows the end state 
   assert.match(reduced, /\.reduced-motion-story \{\s*display: grid/);
   assert.match(hero, /className="reduced-motion-story"/);
   assert.match(page, /before: 'Before · 7 routine tasks split up the day'/);
-  assert.match(page, /after: 'After · 08:00–17:00 for work that needs you'/);
+  assert.match(page, /after: 'After · the day as you planned it'/);
+  assert.match(page, /after: 'Daarna · de dag zoals je hem had gepland'/);
 });
 
 test('the hero is navy with the logo colours; the demo sits on a soft blue band, never the bright link blue', () => {

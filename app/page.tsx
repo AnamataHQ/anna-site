@@ -3,6 +3,7 @@
 import {
   ArrowRight,
   BookOpen,
+  CalendarDays,
   Check,
   CheckCircle2,
   CircleCheck,
@@ -58,13 +59,13 @@ const content = {
     eyebrow: 'Your digital AI assistant',
     heroTitle: 'Your agenda. Finally decluttered.',
     heroBody:
-      'Ask her in Teams or Slack. She does the recurring work in your systems, asks before she acts, and reports back.',
+      'Ask her in Teams or Slack. She does the recurring work in your systems, asks when a decision is yours, and reports back.',
     trust: 'Now in early access · 2026',
     heroNote: 'Reply within two working days.',
     facts: [
       'Works inside Microsoft Teams and Slack',
       'Connects to the systems you already use',
-      'Asks before she acts, within the rights you grant',
+      'Asks before anything you have not allowed',
     ],
     day: {
       aria: 'A working day where Anna clears routine administration and gives focus time back.',
@@ -78,10 +79,10 @@ const content = {
       handledCount: '7 routine tasks completed',
       replay: 'Replay',
       before: 'Before · 7 routine tasks split up the day',
-      after: 'After · 08:00–17:00 for work that needs you',
+      after: 'After · the day as you planned it',
       tasks: [
         {
-          label: 'Inbox triage',
+          label: 'Hours',
           time: '09:00–09:25',
           start: 60,
           duration: 25,
@@ -102,14 +103,14 @@ const content = {
           incoming: false,
         },
         {
-          label: 'Meeting prep',
+          label: 'New colleague',
           time: '12:25–12:55',
           start: 265,
           duration: 30,
           incoming: false,
         },
         {
-          label: 'Update records',
+          label: 'Month-end hours',
           time: '13:40–14:00',
           start: 340,
           duration: 20,
@@ -131,20 +132,18 @@ const content = {
         },
       ],
     } satisfies DayCopy,
-    connectorsKicker: 'Every system the work lives in',
     connectorsTitle: 'Anna connects to the systems you already use.',
     connectorsBody:
       'Connect Anna to the systems your work lives in, and she can read and act in them. You decide which rights she gets.',
-    ringLabel: 'Among thousands of connectors',
+    ringLabel: 'Some of the systems Anna works in',
     ringAria:
       "A paper disc with Anna's mark, with twelve smaller paper discs pinned around it, each with the mark and name of one system, and a paper thread from Anna's disc to every one of them. A few threads run on past the edge of the picture.",
     customBody:
       'If it has a workable API, Anamata can build a connector for it during onboarding.',
     requestConnector: 'Request a connector',
-    problemKicker: 'How Anna works',
     problemTitle: 'One request in Teams. Finished work in your systems.',
     problemBody:
-      'Anna picks up the request, gathers what she needs from your systems, asks when something is missing and does the work. You see exactly what she did. Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+      'Anna picks up the request, gathers what she needs from your systems, checks with you when something is missing and does the work. You see exactly what she did. Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
     contrastTitle: 'A chatbot tells you how. Anna does it, in your systems.',
     contrastBody:
       'Writing tools draft the email and leave the rest to you. Anna writes the hours in your time tracking, files the leave in your HR system and logs the follow-up on the deal. Only with the rights your admin gave her, and with a record of every action. You keep the tools you have. Anna finishes the admin in them.',
@@ -157,7 +156,7 @@ const content = {
       {
         number: '02',
         title: 'Anna prepares',
-        body: 'She collects the context from your systems, checks the rules and asks you when a decision is needed.',
+        body: 'She collects the context from your systems, checks the rules and brings you the decisions that are yours.',
       },
       {
         number: '03',
@@ -165,7 +164,6 @@ const content = {
         body: 'She does the approved work in the system itself and reports back what she did.',
       },
     ],
-    examplesKicker: 'Where to start',
     examplesTitle: 'Three things to hand to Anna first.',
     watchThisOne: 'Watch this one',
     examples: [
@@ -194,10 +192,9 @@ const content = {
           'Anna lists the open follow-ups on your deals, drafts them and logs what was sent.',
       },
     ],
-    workflowKicker: 'One request, from start to finish',
     workflowTitle: 'Watch the work happen.',
     workflowIntro:
-      'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, asks when a decision is yours, and reports back in the same conversation.',
+      'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, brings you the calls that are yours, and reports back in the same conversation.',
     demoLabel: 'EXAMPLE · NOT A LIVE RECORD',
     demoChannel: 'Teams · Slack · Anna',
     working: 'Anna is working',
@@ -223,11 +220,11 @@ const content = {
           'Read last week’s hoursheet: 3 projects, 40 h',
           'Pulled Thursday’s tickets on the Rotterdam migration: 4 tickets, 8 h',
           'Drafted week 43: 38 h across 3 projects',
-          'Compared with your usual week: Wednesday afternoon is 2 h short',
+          'Found Wednesday 14:00–16:00 in your calendar: Rotterdam migration, on site. Not in the sheet yet.',
         ],
-        sources: ['Time tracking', 'Ticket board'],
+        sources: ['Time tracking', 'Ticket board', 'Calendar'],
         question:
-          'Week 43 is ready: 38 h over 3 projects. Wednesday 14:00–16:00 is empty. Shall I book those 2 h on the Rotterdam migration as well and submit the week for approval?',
+          'Week 43 is ready: 38 h over 3 projects. Wednesday 14:00–16:00 is in your calendar as the Rotterdam migration but not in the sheet. Shall I add those 2 h and submit the week for approval?',
         reply: 'Yes, and submit it.',
         result:
           'Submitted. Week 43 is with your manager for approval. If it’s still open on Friday at 16:00, I’ll remind you both here.',
@@ -333,12 +330,12 @@ const content = {
         steps: [
           'Read this week’s notes on 12 active deals',
           'Found 4 open promises: a quote, two documents and a call',
-          'Drafted 4 follow-ups in your tone, with the file each customer is waiting for attached where we have it',
+          'Drafted 4 follow-ups, with the file each customer is waiting for attached where we have it',
           'Logged each promise as a task on its deal',
         ],
         sources: ['CRM', 'Mail'],
         question:
-          'Four drafts are ready below. The quote for Van Dijk Logistics needs a price from you first. Shall I send the other three now and remind you about the quote tomorrow at 9:00?',
+          'Four drafts are ready below. The quote for Van Dijk Logistics needs a price from you first. Shall I send the other three now from my own address and remind you about the quote tomorrow at 9:00?',
         reply: 'Send them, remind me tomorrow.',
         result:
           'Sent three, logged on their deals. The Van Dijk quote is on your list for tomorrow 9:00 with the draft ready.',
@@ -349,7 +346,6 @@ const content = {
         ],
       },
     ],
-    controlKicker: 'Initiative, with boundaries',
     controlTitle: 'Anna can move work forward. You decide how far.',
     controlBody:
       'Your admin decides, per person or per role, which systems Anna may use and what she may do in them. Anna works within that, asks when a judgement is yours, and leaves a record of every completed action.',
@@ -465,13 +461,13 @@ const content = {
     eyebrow: 'Jouw digitale AI-assistent',
     heroTitle: 'Jouw agenda. Eindelijk opgeruimd.',
     heroBody:
-      'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt voordat ze handelt en koppelt terug.',
+      'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.',
     trust: 'Nu in vroege toegang · 2026',
     heroNote: 'Antwoord binnen twee werkdagen.',
     facts: [
       'Werkt in Microsoft Teams en Slack',
       'Koppelt met de systemen die je al gebruikt',
-      'Vraagt voordat ze handelt, binnen de rechten die jij geeft',
+      'Vraagt het eerst bij alles wat je niet hebt toegestaan',
     ],
     day: {
       aria: 'Een werkdag waarin Anna routineadministratie afhandelt en focustijd teruggeeft.',
@@ -485,10 +481,10 @@ const content = {
       handledCount: '7 routinetaken afgerond',
       replay: 'Opnieuw afspelen',
       before: 'Voor · 7 routinetaken versnipperen de dag',
-      after: 'Na · 08:00–17:00 voor werk dat jou nodig heeft',
+      after: 'Daarna · de dag zoals je hem had gepland',
       tasks: [
         {
-          label: 'Inbox verwerken',
+          label: 'Uren',
           time: '09:00–09:25',
           start: 60,
           duration: 25,
@@ -509,14 +505,14 @@ const content = {
           incoming: false,
         },
         {
-          label: 'Overleg voorbereiden',
+          label: 'Nieuwe collega',
           time: '12:25–12:55',
           start: 265,
           duration: 30,
           incoming: false,
         },
         {
-          label: 'Dossiers bijwerken',
+          label: 'Maandafsluiting',
           time: '13:40–14:00',
           start: 340,
           duration: 20,
@@ -538,20 +534,18 @@ const content = {
         },
       ],
     } satisfies DayCopy,
-    connectorsKicker: 'Elk systeem waar het werk in staat',
     connectorsTitle: 'Anna verbindt met de systemen die je al gebruikt.',
     connectorsBody:
       'Koppel Anna aan de systemen waar je werk in staat, en ze kan erin lezen en handelen. Jij bepaalt welke rechten ze krijgt.',
-    ringLabel: 'Een greep uit duizenden koppelingen',
+    ringLabel: 'Een aantal systemen waar Anna in werkt',
     ringAria:
       "Een papieren schijf met het merk van Anna, met daaromheen twaalf kleinere papieren schijfjes, elk met het merk en de naam van één systeem, en een papieren draad van Anna's schijf naar elk schijfje. Een paar draden lopen door tot voorbij de rand van het beeld.",
     customBody:
       'Als het een werkbare API heeft, kan Anamata er tijdens de onboarding een koppeling voor bouwen.',
     requestConnector: 'Vraag een koppeling aan',
-    problemKicker: 'Zo werkt Anna',
     problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.',
     problemBody:
-      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, vraagt als iets ontbreekt en doet het werk. Je ziet precies wat ze heeft gedaan. Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, stemt met jou af als iets ontbreekt en doet het werk. Je ziet precies wat ze heeft gedaan. Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
     contrastTitle:
       'Een chatbot vertelt je hoe. Anna doet het, in jouw systemen.',
     contrastBody:
@@ -565,7 +559,7 @@ const content = {
       {
         number: '02',
         title: 'Anna bereidt voor',
-        body: 'Ze verzamelt de context uit je systemen, controleert de regels en vraagt het jou als er een beslissing nodig is.',
+        body: 'Ze verzamelt de context uit je systemen, controleert de regels en legt de beslissingen die van jou zijn aan je voor.',
       },
       {
         number: '03',
@@ -573,7 +567,6 @@ const content = {
         body: 'Ze doet het goedgekeurde werk in het systeem zelf en koppelt terug wat ze heeft gedaan.',
       },
     ],
-    examplesKicker: 'Om mee te beginnen',
     examplesTitle: 'Drie taken om meteen aan Anna te geven.',
     watchThisOne: 'Bekijk deze',
     examples: [
@@ -602,11 +595,10 @@ const content = {
           'Anna zet de openstaande opvolgingen uit je deals op een rij, schrijft ze en legt vast wat is verstuurd.',
       },
     ],
-    workflowKicker: 'Eén verzoek, van begin tot eind',
     workflowTitle: 'Zie hoe het werk gebeurt.',
     workflowIntro:
-      'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, vraagt het jou als een beslissing van jou is en koppelt terug in hetzelfde gesprek.',
-    demoLabel: 'VOORBEELD · GEEN ECHT DOSSIER',
+      'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, legt de keuzes die van jou zijn aan je voor en koppelt terug in hetzelfde gesprek.',
+    demoLabel: 'VOORBEELD · GEEN ECHT VERSLAG',
     demoChannel: 'Teams · Slack · Anna',
     working: 'Anna is bezig',
     ready: 'Gecontroleerd',
@@ -631,11 +623,11 @@ const content = {
           'Urenstaat van vorige week gelezen: 3 projecten, 40 u',
           'Tickets van donderdag op de Rotterdam-migratie opgehaald: 4 tickets, 8 u',
           'Week 43 opgezet: 38 u over 3 projecten',
-          'Vergeleken met je gebruikelijke week: woensdagmiddag komt 2 u tekort',
+          'Woensdag 14:00–16:00 in je agenda gevonden: Rotterdam-migratie, op locatie. Nog niet in de staat.',
         ],
-        sources: ['Urenregistratie', 'Ticketbord'],
+        sources: ['Urenregistratie', 'Ticketbord', 'Agenda'],
         question:
-          'Week 43 staat klaar: 38 u over 3 projecten. Woensdag 14:00–16:00 is leeg. Zal ik die 2 u ook op de Rotterdam-migratie boeken en de week ter goedkeuring indienen?',
+          'Week 43 staat klaar: 38 u over 3 projecten. Woensdag 14:00–16:00 staat in je agenda als de Rotterdam-migratie, maar nog niet in de staat. Zal ik die 2 u toevoegen en de week ter goedkeuring indienen?',
         reply: 'Ja, en dien hem in.',
         result:
           'Ingediend. Week 43 ligt bij je manager ter goedkeuring. Staat hij vrijdag om 16:00 nog open, dan herinner ik jullie hier allebei.',
@@ -735,12 +727,12 @@ const content = {
         steps: [
           'Notities van deze week gelezen op 12 actieve deals',
           '4 open beloftes gevonden: een offerte, twee documenten en een belafspraak',
-          '4 opvolgingen geschreven in jouw toon, met het stuk waar de klant op wacht erbij waar we het hebben',
+          '4 opvolgingen geschreven, met het stuk waar de klant op wacht erbij waar we het hebben',
           'Elke belofte als taak op de deal gezet',
         ],
         sources: ['CRM', 'Mail'],
         question:
-          'Vier concepten staan hieronder klaar. De offerte voor Van Dijk Logistics heeft eerst een prijs van jou nodig. Zal ik de andere drie nu versturen en je morgen om 9:00 aan de offerte herinneren?',
+          'Vier concepten staan hieronder klaar. De offerte voor Van Dijk Logistics heeft eerst een prijs van jou nodig. Zal ik de andere drie nu vanuit mijn eigen adres versturen en je morgen om 9:00 aan de offerte herinneren?',
         reply: 'Versturen, en herinner me morgen.',
         result:
           'Drie verstuurd en op hun deals gelogd. De offerte voor Van Dijk staat morgen 9:00 op je lijst, met het concept klaar.',
@@ -751,7 +743,6 @@ const content = {
         ],
       },
     ],
-    controlKicker: 'Initiatief, met grenzen',
     controlTitle: 'Anna kan werk vooruitbrengen. Jij bepaalt hoe ver.',
     controlBody:
       'Je beheerder bepaalt per persoon of per rol welke systemen Anna mag gebruiken en wat ze erin mag doen. Daarbinnen werkt Anna, vraagt ze het jou als een oordeel van jou is, en laat ze van elke afgeronde actie een verslag achter.',
@@ -851,7 +842,7 @@ const content = {
       site: 'anamata.ai',
     },
     transparency:
-      'Anna is AI. Ze maakt dat altijd duidelijk en mensen houden de regie over wat ze mag doen.',
+      'Anna is AI. Ze maakt dat duidelijk en mensen houden de regie over wat ze mag doen.',
   },
 } as const;
 
@@ -901,6 +892,7 @@ const LOOSE_THREADS = [
 const SOURCE_GLYPHS: readonly (readonly [LucideIcon, readonly string[]])[] = [
   [Clock, ['Time tracking', 'Urenregistratie']],
   [SquareKanban, ['Ticket board', 'Ticketbord']],
+  [CalendarDays, ['Calendar', 'Agenda']],
   [Folder, ['HR system', 'HR-systeem']],
   [FileText, ['Leave policy', 'Verlofbeleid']],
   [Users, ['Team directory', 'Personeelsoverzicht']],
@@ -1111,7 +1103,7 @@ export default function Home() {
       <div id="main-content">
         <section className="hero" id="top" aria-labelledby="hero-title">
           <div className="hero-copy">
-            <p className="eyebrow light hero-eyebrow">
+            <p className="hero-eyebrow">
               <Image
                 src="/brands/anna-mono-light.svg"
                 alt=""
@@ -1175,7 +1167,6 @@ export default function Home() {
           data-in-view={workflowHasEntered}
         >
           <div className="workflow-heading">
-            <p className="eyebrow">{t.workflowKicker}</p>
             <h2 id="workflow-title">{t.workflowTitle}</h2>
             <p>{t.workflowIntro}</p>
           </div>
@@ -1386,7 +1377,6 @@ export default function Home() {
           aria-labelledby="use-case-title"
         >
           <div className="use-case-heading">
-            <p className="eyebrow">{t.examplesKicker}</p>
             <h2 id="use-case-title">{t.examplesTitle}</h2>
           </div>
           <div className="use-case-grid">
@@ -1441,7 +1431,6 @@ export default function Home() {
           <div className="section-intro">
             <div>
               <AnnaMark size="opener" />
-              <p className="eyebrow">{t.problemKicker}</p>
               <h2 id="capability-title">{t.problemTitle}</h2>
             </div>
             <p>{t.problemBody}</p>
@@ -1518,7 +1507,6 @@ export default function Home() {
         >
           <div className="section-intro">
             <div>
-              <p className="eyebrow">{t.connectorsKicker}</p>
               <h2 id="connectors-title">{t.connectorsTitle}</h2>
             </div>
             <p>{t.connectorsBody}</p>
@@ -1577,7 +1565,6 @@ export default function Home() {
         >
           <div className="control-statement">
             <AnnaMark size="opener" />
-            <p className="eyebrow light">{t.controlKicker}</p>
             <h2 id="control-title">{t.controlTitle}</h2>
             <p>{t.controlBody}</p>
           </div>
@@ -1658,7 +1645,7 @@ export default function Home() {
         </section>
 
         <section className="cta-section" aria-labelledby="cta-title">
-          <p className="eyebrow">{t.ctaKicker}</p>
+          <p className="cta-kicker">{t.ctaKicker}</p>
           <h2 id="cta-title">{t.ctaTitle}</h2>
           <p>{t.ctaBody}</p>
           <ol className="cta-steps">

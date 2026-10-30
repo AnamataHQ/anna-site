@@ -62,7 +62,7 @@ test('ships complete English and Dutch page copy', () => {
 test('explains five complete processes, each a conversation that asks when a decision is yours', () => {
   const block = page.slice(
     page.indexOf('scenarios: ['),
-    page.indexOf("controlKicker: 'Initiative"),
+    page.indexOf("controlTitle: 'Anna can move"),
   );
   for (const phrase of [
     "label: 'Close my week'",
@@ -86,8 +86,8 @@ test('explains five complete processes, each a conversation that asks when a dec
     );
   }
   const nl = page.slice(
-    page.indexOf("workflowKicker: 'Eén verzoek"),
-    page.indexOf("controlKicker: 'Initiatief"),
+    page.indexOf("workflowTitle: 'Zie hoe"),
+    page.indexOf("controlTitle: 'Anna kan werk"),
   );
   for (const phrase of [
     'Mijn week afsluiten',
@@ -149,9 +149,7 @@ test('shows Anna working briefly after the reply before reporting completion', (
 
 test('explains how Anna works as the three steps the demo just showed', () => {
   for (const line of [
-    "problemKicker: 'How Anna works'",
     "problemTitle: 'One request in Teams. Finished work in your systems.'",
-    "problemKicker: 'Zo werkt Anna'",
     "problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.'",
     "title: 'You ask'",
     "title: 'Anna prepares'",
@@ -247,7 +245,7 @@ test('the demo window is labelled Teams · Slack · Anna and carries no single-v
   assert.doesNotMatch(toolbar, /microsoft-teams\.svg|slack\.svg/);
 });
 
-test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
+test('the connectors: twelve marks tied to Anna, some of the systems she works in, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
     'Jira',
@@ -296,8 +294,10 @@ test('the connectors: twelve marks tied to Anna, thousands available, no tested-
     page,
     /'Koppel Anna aan de systemen waar je werk in staat, en ze kan erin lezen en handelen\. Jij bepaalt welke rechten ze krijgt\.'/,
   );
-  assert.match(page, /Among thousands of connectors/);
-  assert.match(page, /Een greep uit duizenden koppelingen/);
+  // Step 8: the ring names some of the systems, no "thousands" claim.
+  assert.match(page, /ringLabel: 'Some of the systems Anna works in'/);
+  assert.match(page, /ringLabel: 'Een aantal systemen waar Anna in werkt'/);
+  assert.doesNotMatch(page, /Among thousands|duizenden koppelingen/);
   assert.match(
     page,
     /If it has a workable API, Anamata can build a connector for it during onboarding\./,
@@ -402,9 +402,7 @@ test('tells the story in the agreed order', () => {
     "title: 'Opvolging in je CRM'",
     'Log my hours',
     'Boek mijn uren',
-    "examplesKicker: 'Where to start'",
     "examplesTitle: 'Three things to hand to Anna first.'",
-    "examplesKicker: 'Om mee te beginnen'",
     "examplesTitle: 'Drie taken om meteen aan Anna te geven.'",
   ]) {
     assert.ok(page.includes(useCase), `missing use case: ${useCase}`);
@@ -920,7 +918,7 @@ test('one Anna: the gradient mark on a paper disc at three sizes, wherever she a
   assert.equal([...page.matchAll(/anna-mono-light\.svg/g)].length, 1);
   assert.match(
     page,
-    /className="eyebrow light hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
+    /className="hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
   );
   assert.doesNotMatch(page, /anna-color-navy\.svg/);
   assert.doesNotMatch(page, /anna-color-transparent\.svg/);
@@ -1728,4 +1726,254 @@ test('step 7: both new sections render lazily', () => {
     styles,
     /\.capability-section,\n\.contrast-section,[\s\S]{0,120}\.faq-section,[\s\S]{0,80}content-visibility: auto/,
   );
+});
+
+// Step 8 (step8-gate.md, approved 2026-10-30): softened "asks", calendar
+// hours in the week, follow-ups sent as Anna, Dutch fixes, no mono kickers.
+const STEP8 = {
+  en: {
+    heroBody:
+      'Ask her in Teams or Slack. She does the recurring work in your systems, asks when a decision is yours, and reports back.',
+    fact: 'Asks before anything you have not allowed',
+    after: 'After · the day as you planned it',
+    ringLabel: 'Some of the systems Anna works in',
+    weekStep:
+      'Found Wednesday 14:00–16:00 in your calendar: Rotterdam migration, on site. Not in the sheet yet.',
+    weekQuestion:
+      'Week 43 is ready: 38 h over 3 projects. Wednesday 14:00–16:00 is in your calendar as the Rotterdam migration but not in the sheet. Shall I add those 2 h and submit the week for approval?',
+    calendar: 'Calendar',
+    followUpStep:
+      'Drafted 4 follow-ups, with the file each customer is waiting for attached where we have it',
+    followUpQuestion:
+      'Four drafts are ready below. The quote for Van Dijk Logistics needs a price from you first. Shall I send the other three now from my own address and remind you about the quote tomorrow at 9:00?',
+    ownAddress: 'from my own address',
+    problemFirst:
+      'Anna picks up the request, gathers what she needs from your systems, checks with you when something is missing and does the work.',
+    problemRest:
+      ' You see exactly what she did. Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+    prepares:
+      'She collects the context from your systems, checks the rules and brings you the decisions that are yours.',
+    workflowIntro:
+      'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, brings you the calls that are yours, and reports back in the same conversation.',
+    asks: /\basks (before|when|you)\b/gi,
+    tasks: [
+      'Hours',
+      'Follow-ups',
+      'Leave request',
+      'New colleague',
+      'Month-end hours',
+      'Send reminders',
+      'Status update',
+    ],
+  },
+  nl: {
+    heroBody:
+      'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.',
+    fact: 'Vraagt het eerst bij alles wat je niet hebt toegestaan',
+    after: 'Daarna · de dag zoals je hem had gepland',
+    ringLabel: 'Een aantal systemen waar Anna in werkt',
+    weekStep:
+      'Woensdag 14:00–16:00 in je agenda gevonden: Rotterdam-migratie, op locatie. Nog niet in de staat.',
+    weekQuestion:
+      'Week 43 staat klaar: 38 u over 3 projecten. Woensdag 14:00–16:00 staat in je agenda als de Rotterdam-migratie, maar nog niet in de staat. Zal ik die 2 u toevoegen en de week ter goedkeuring indienen?',
+    calendar: 'Agenda',
+    followUpStep:
+      '4 opvolgingen geschreven, met het stuk waar de klant op wacht erbij waar we het hebben',
+    followUpQuestion:
+      'Vier concepten staan hieronder klaar. De offerte voor Van Dijk Logistics heeft eerst een prijs van jou nodig. Zal ik de andere drie nu vanuit mijn eigen adres versturen en je morgen om 9:00 aan de offerte herinneren?',
+    ownAddress: 'vanuit mijn eigen adres',
+    problemFirst:
+      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, stemt met jou af als iets ontbreekt en doet het werk.',
+    problemRest:
+      ' Je ziet precies wat ze heeft gedaan. Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+    prepares:
+      'Ze verzamelt de context uit je systemen, controleert de regels en legt de beslissingen die van jou zijn aan je voor.',
+    workflowIntro:
+      'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, legt de keuzes die van jou zijn aan je voor en koppelt terug in hetzelfde gesprek.',
+    asks: /\bvraagt (voordat|als|het)\b/gi,
+    tasks: [
+      'Uren',
+      'Opvolging',
+      'Verlofaanvraag',
+      'Nieuwe collega',
+      'Maandafsluiting',
+      'Herinneringen sturen',
+      'Status bijwerken',
+    ],
+  },
+};
+// One scenario's source in one language, from its id to the next scenario.
+const scenarioBlock = (language, id) => {
+  const block = copyValue(language, 'scenarios');
+  const start = block.indexOf(`id: '${id}'`);
+  assert.ok(start >= 0, `${language}: no ${id} scenario`);
+  const next = block.indexOf("id: '", start + 1);
+  return block.slice(start, next < 0 ? undefined : next);
+};
+const scenarioList = (source, key) => {
+  const match = source.match(new RegExp(`${key}: \\[([\\s\\S]*?)\\]`));
+  assert.ok(match, `no ${key} list`);
+  return stringValues(match[1]);
+};
+const scenarioString = (source, key) => {
+  const match = source.match(
+    new RegExp(`${key}:\\s*('(?:[^'\\\\\\n]|\\\\.)*')`),
+  );
+  assert.ok(match, `no ${key}`);
+  return stringValues(match[1])[0];
+};
+
+test('step 8: hero body, third fact, after label and ring label are the approved text', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    assert.deepEqual(
+      stringValues(copyValue(language, 'heroBody')),
+      [copy.heroBody],
+      language,
+    );
+    assert.equal(stringValues(copyValue(language, 'facts'))[2], copy.fact);
+    assert.deepEqual(
+      stringValues(copyValue(language, 'ringLabel')),
+      [copy.ringLabel],
+      language,
+    );
+    const day = copyValue(language, 'day');
+    assert.ok(day.includes(`after: '${copy.after}'`), `${language}: after`);
+    assert.deepEqual(
+      [...day.matchAll(/label: '([^']*)'/g)].map((m) => m[1]),
+      copy.tasks,
+      `${language}: task labels`,
+    );
+  }
+  assert.doesNotMatch(
+    page,
+    /Inbox triage|Meeting prep|Update records|Inbox verwerken|Overleg voorbereiden|Dossiers bijwerken/,
+  );
+});
+
+test('step 8: each renamed or matched task in the hero names a use case or a scenario', () => {
+  const block = contentBlock('en');
+  const targets = [
+    ...[...block.matchAll(/\n {8}title: '([^']*)'/g)].map((m) => m[1]),
+    ...[...copyValue('en', 'scenarios').matchAll(/label: '([^']*)'/g)].map(
+      (m) => m[1],
+    ),
+  ].map((target) => target.toLowerCase());
+  assert.ok(targets.includes('hours in your time tracking'), 'use cases read');
+  assert.ok(targets.includes('new colleague'), 'scenario labels read');
+  // The whole label, or for "Leave request" its first word ("Leave in your
+  // HR system"). "Send reminders" and "Status update" have no use case.
+  const labels = [...copyValue('en', 'day').matchAll(/label: '([^']*)'/g)].map(
+    (m) => m[1],
+  );
+  assert.equal(labels.length, 7);
+  for (const label of labels.filter(
+    (label) => !['Send reminders', 'Status update'].includes(label),
+  )) {
+    const whole = label.toLowerCase();
+    const first = whole.split(' ')[0];
+    assert.ok(
+      targets.some(
+        (target) =>
+          target.includes(whole) ||
+          new RegExp(`(^|\\s)${first}(\\s|$)`).test(target),
+      ),
+      `task without a use case or scenario: ${label}`,
+    );
+  }
+});
+
+test('step 8: the week scenario finds the missing hours in the calendar', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const week = scenarioBlock(language, 'week');
+    const steps = scenarioList(week, 'steps');
+    assert.equal(steps[3], copy.weekStep, `${language}: step 4`);
+    assert.equal(scenarioString(week, 'question'), copy.weekQuestion);
+    const sources = scenarioList(week, 'sources');
+    assert.equal(sources.at(-1), copy.calendar, `${language}: sources`);
+    assert.equal(sources.length, 3);
+  }
+  // The arithmetic holds: drafted 38 h plus the 2 h from the calendar = 40 h.
+  const week = scenarioBlock('en', 'week');
+  const drafted = Number(scenarioList(week, 'steps')[2].match(/(\d+) h/)[1]);
+  const added = Number(
+    scenarioString(week, 'question').match(/add those (\d+) h/)[1],
+  );
+  const recorded = Number(
+    scenarioList(week, 'record')[0].match(/written: (\d+) h/)[1],
+  );
+  assert.equal(drafted, 38);
+  assert.equal(added, 2);
+  assert.equal(recorded, drafted + added);
+});
+
+test('step 8: follow-ups go out from Anna’s own address', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const followUp = scenarioBlock(language, 'follow-up');
+    assert.equal(scenarioList(followUp, 'steps')[2], copy.followUpStep);
+    const question = scenarioString(followUp, 'question');
+    assert.equal(question, copy.followUpQuestion);
+    assert.ok(question.includes(copy.ownAddress), `${language}: own address`);
+  }
+  assert.doesNotMatch(page, /in your tone|in jouw toon/);
+});
+
+test('step 8: Dutch label and transparency line, no DOSSIER and no "altijd"', () => {
+  assert.deepEqual(stringValues(copyValue('nl', 'demoLabel')), [
+    'VOORBEELD · GEEN ECHT VERSLAG',
+  ]);
+  assert.deepEqual(stringValues(copyValue('nl', 'transparency')), [
+    'Anna is AI. Ze maakt dat duidelijk en mensen houden de regie over wat ze mag doen.',
+  ]);
+  for (const value of stringValues(contentBlock('nl')))
+    assert.doesNotMatch(value, /DOSSIER/);
+});
+
+test('step 8: "asks" stays in at most three places per language', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const problem = stringValues(copyValue(language, 'problemBody'))[0];
+    assert.equal(problem, copy.problemFirst + copy.problemRest, language);
+    assert.deepEqual(
+      stringValues(copyValue(language, 'workflowIntro')),
+      [copy.workflowIntro],
+      language,
+    );
+    const capabilities = stringValues(copyValue(language, 'capabilities'));
+    assert.equal(capabilities[capabilities.indexOf('02') + 2], copy.prepares);
+    const count = stringValues(contentBlock(language)).reduce(
+      (total, value) => total + [...value.matchAll(copy.asks)].length,
+      0,
+    );
+    assert.ok(count <= 3, `${language}: "asks" ${count} times`);
+  }
+});
+
+test('step 8: no mono section kickers; descriptor and early-access pills set in sans', () => {
+  for (const key of [
+    'workflowKicker',
+    'examplesKicker',
+    'problemKicker',
+    'connectorsKicker',
+    'controlKicker',
+  ])
+    assert.doesNotMatch(page, new RegExp(`\\b${key}\\b`), key);
+  assert.doesNotMatch(page, /className="(?:[^"]*\s)?eyebrow[\s"]/);
+  assert.match(page, /<p className="hero-eyebrow">/);
+  assert.match(page, /<p className="cta-kicker">\{t\.ctaKicker\}<\/p>/);
+  assert.doesNotMatch(styles, /\.eyebrow\b/);
+  for (const selector of ['.hero-eyebrow', '.hero-trust', '.cta-kicker']) {
+    const rule = baseRule(selector);
+    assert.doesNotMatch(rule, /geist-mono|monospace/, selector);
+    assert.doesNotMatch(rule, /text-transform/, selector);
+    assert.doesNotMatch(rule, /letter-spacing: 0\.\d+em/, selector);
+    assert.match(rule, /font-family: var\(--font-geist-sans\)/, selector);
+    assert.match(rule, /border: 1px solid/, selector);
+    assert.match(rule, /border-radius: 999px/, selector);
+  }
+  assert.match(baseRule('.hero-eyebrow'), /font-size: 0\.9rem/);
+  for (const selector of ['.hero-trust', '.cta-kicker']) {
+    assert.match(baseRule(selector), /font-size: 0\.8rem/, selector);
+    assert.match(baseRule(selector), /font-weight: 560/, selector);
+  }
+  // Mono stays inside the windows.
+  assert.match(baseRule('.cta-step-number'), /geist-mono/);
 });

@@ -851,28 +851,41 @@ button {
   animation-play-state: running;
 }
 
-/* Eyebrow, trust line and facts on the navy. */
+/* Descriptor, early-access pill and facts on the navy. Sans, sentence
+   case: mono stays inside the windows. */
 .hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 1.3rem;
   border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   padding: 0.42rem 0.85rem 0.42rem 0.65rem;
-  color: #dfe6f5;
+  color: #aab8d4;
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 .hero-eyebrow img {
   width: 14px;
   height: 14px;
 }
 .hero-trust {
+  display: inline-flex;
   margin: 1.1rem 0 0;
-  color: #96a5c2;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.7rem;
-  font-weight: 680;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 0.3rem 0.75rem;
+  color: #dfe6f5;
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 560;
+  line-height: 1.4;
 }
-/* One line under the badge; muted for the navy, as the light eyebrow. */
+/* One line under the badge; muted for the navy. */
 .hero-note {
   margin: 0.35rem 0 0;
   color: #aab8d4;
@@ -1193,22 +1206,6 @@ footer {
   }
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 0 0 1.3rem;
-  color: #586172;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 0.74rem;
-  font-weight: 680;
-  letter-spacing: 0.13em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-.eyebrow.light {
-  color: #aab8d4;
-}
 .hero-actions,
 .cta-actions {
   display: flex;
@@ -1396,10 +1393,6 @@ footer {
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem 4rem;
   align-items: end;
-}
-.workflow-heading .eyebrow {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
 }
 .workflow-heading > p:last-child {
   max-width: 560px;
@@ -2029,6 +2022,21 @@ footer {
 .cta-section h2 {
   max-width: 900px;
 }
+/* The same early-access pill as in the hero, ink on paper. */
+.cta-kicker {
+  display: flex;
+  width: fit-content;
+  margin: 0 0 1.3rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  padding: 0.3rem 0.75rem;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), sans-serif;
+  font-size: 0.8rem;
+  font-weight: 560;
+  line-height: 1.4;
+}
 .cta-section > p:nth-of-type(2) {
   max-width: 650px;
   margin: 1.8rem 0 0;
@@ -2203,9 +2211,6 @@ footer {
   .use-case-heading h2,
   .cta-section h2 {
     font-size: clamp(2.2rem, 9vw, 3.3rem);
-  }
-  .workflow-heading .eyebrow {
-    grid-column: 1;
   }
   .workflow-heading > p:last-child {
     margin-top: 0.25rem;
