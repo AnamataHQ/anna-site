@@ -872,6 +872,13 @@ button {
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+/* One line under the badge; muted for the navy, as the light eyebrow. */
+.hero-note {
+  margin: 0.35rem 0 0;
+  color: #aab8d4;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
 .hero-facts {
   position: relative;
   z-index: 2;
@@ -886,12 +893,14 @@ button {
   font-size: 0.86rem;
   font-weight: 560;
 }
-.hero-facts li {
+.hero-facts li,
+.control-facts li {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
-.hero-facts svg {
+.hero-facts svg,
+.control-facts svg {
   flex: 0 0 auto;
   color: var(--coral);
 }
@@ -1298,7 +1307,8 @@ footer {
   background: var(--paper-light);
   transform: translateY(-4px);
 }
-.capability-number {
+.capability-number,
+.cta-step-number {
   color: #c23a22;
   font-family: var(--font-geist-mono), monospace;
   font-size: 0.72rem;
@@ -1317,7 +1327,8 @@ footer {
   padding: 0.9rem;
   font-size: 0.85rem;
 }
-.artefact-row {
+.artefact-row,
+.control-message {
   display: flex;
   gap: 0.6rem;
   align-items: flex-start;
@@ -1436,6 +1447,7 @@ footer {
   color: #626a78;
   font-size: 0.75rem;
 }
+.control-example,
 .demo-window {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -1756,14 +1768,19 @@ footer {
 .control-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(4rem, 9vw, 9rem);
+  /* Statement over the cards on the left, the example beside both with its
+     bottom on the cards' bottom line; the notes run under both. */
+  grid-template-areas:
+    'statement example'
+    'cards example'
+    'notes notes';
+  gap: 2.5rem clamp(4rem, 9vw, 9rem);
   padding: clamp(4rem, 7vw, 7rem) max(4vw, calc((100vw - 1440px) / 2));
   background: var(--navy);
   color: white;
 }
 .control-statement {
-  /* Centred against the stacked cards; the 1180 block puts it back on top. */
-  align-self: center;
+  grid-area: statement;
 }
 .control-statement h2 {
   max-width: 700px;
@@ -1775,12 +1792,12 @@ footer {
   font-size: 1.05rem;
 }
 .boundary-grid {
-  /* The cards stack in the right column beside the statement. */
-  grid-column: 2;
+  /* Two by two under the statement; the 1 px gap shows the dividers. */
+  grid-area: cards;
+  align-self: start;
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1px;
-  margin-top: 1rem;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.17);
   border-radius: 1.1rem;
@@ -1803,8 +1820,47 @@ footer {
   color: #adb9cf;
   font-size: 0.84rem;
 }
-.boundary-card:last-child {
-  background: #14213a;
+/* A static conversation beside the statement and cards, in the demo's window. */
+.control-example {
+  grid-area: example;
+  align-self: end;
+  width: 100%;
+  max-width: 590px;
+  margin: 0;
+}
+.control-example .demo-toolbar {
+  min-height: 44px;
+}
+.control-thread {
+  display: grid;
+  gap: 1rem;
+  padding: 1.4rem 1.2rem;
+}
+.control-message .message-bubble {
+  max-width: none;
+}
+/* The checklist and the privacy line run under both columns. */
+.control-notes {
+  grid-area: notes;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.17);
+}
+.control-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: #c7d0e2;
+  font-size: 0.9rem;
+  font-weight: 560;
+}
+.control-privacy {
+  max-width: 70ch;
+  margin: 1rem 0 0;
+  color: #aab8d4;
+  font-size: 0.9rem;
 }
 .integration-panel {
   border: 1px solid var(--line);
@@ -1900,6 +1956,34 @@ footer {
   color: #596273;
   font-size: 1.05rem;
 }
+/* What early access is, in three steps; numbered as the step cards are. */
+.cta-steps {
+  display: grid;
+  max-width: 900px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cta-step {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.cta-note {
+  max-width: 56ch;
+  margin: 1.4rem 0 0;
+  color: #626a78;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
 .text-link {
   display: inline-flex;
   align-items: center;
@@ -1974,16 +2058,24 @@ footer {
   .desktop-nav {
     display: none;
   }
+  /* One column in DOM order; the cards stay two by two. */
   .control-section {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      'statement'
+      'example'
+      'cards'
+      'notes';
   }
-  /* One column: the cards span the section side by side again. */
   .boundary-grid {
     grid-column: 1 / -1;
-    grid-template-columns: repeat(3, 1fr);
   }
-  .boundary-card {
-    min-height: 235px;
+  /* The example spans the section like the cards; bubbles stay readable. */
+  .control-example {
+    max-width: none;
+  }
+  .control-message .message-bubble {
+    max-width: 680px;
   }
   /* Narrow columns wrap the ask; the three panels keep one height. */
   .capability-artefact {
@@ -2046,9 +2138,6 @@ footer {
   .boundary-grid {
     grid-template-columns: 1fr;
   }
-  .boundary-card {
-    min-height: auto;
-  }
   .scenario-controls {
     align-items: stretch;
     flex-direction: column;
@@ -2093,6 +2182,10 @@ footer {
 /* Large phones report more than 500 CSS px (a Pixel 10 Pro XL about 512),
    so the compact demo controls get a block of their own. */
 @media (max-width: 640px) {
+  .cta-steps {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
   /* The situations: one row of chips that scrolls sideways; replay and
      pause as icons beside it. The chat gets the width of the phone. */
   .scenario-shell.paper-panel {
@@ -2197,7 +2290,8 @@ footer {
     gap: 0.5rem;
   }
   .avatar,
-  .message-row .anna-mark {
+  .message-row .anna-mark,
+  .control-message .anna-mark {
     width: 29px;
     height: 29px;
   }
@@ -2339,6 +2433,11 @@ footer {
   font-size: 1.55rem;
   line-height: 1.15;
   letter-spacing: -0.02em;
+}
+.lead-dialog-note {
+  margin: 0.4rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
 }
 .lead-dialog-close {
   display: inline-flex;

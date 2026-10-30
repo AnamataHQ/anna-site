@@ -136,3 +136,13 @@ test('a result from a closed or reopened dialog is ignored', () => {
 test('narrow phones get the compact Turnstile widget', () => {
   assert.match(form, /clientWidth >= 300 \? 'flexible' : 'compact'/);
 });
+
+test('the dialog says when we reply, under the heading, in both languages', () => {
+  assert.match(form, /note: 'We reply by email within two working days\.'/);
+  assert.match(form, /note: 'We reageren per e-mail binnen twee werkdagen\.'/);
+  assert.match(form, /note approved 2026-10-30/);
+  assert.match(
+    form,
+    /<h2 id=\{headingId\}>\{t\.heading\[shownKind\]\}<\/h2>\s*<p\b[^>]*className="lead-dialog-note"[^>]*>\s*\{t\.note\}\s*<\/p>/,
+  );
+});
