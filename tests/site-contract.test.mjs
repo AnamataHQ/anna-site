@@ -538,9 +538,10 @@ test('hierarchy: the hero promise is the loudest line', () => {
   );
   const wide = mediaBlocks('max-width: 1180px');
   assert.match(wide, /\.boundary-grid \{[^}]*grid-column: 1 \/ -1/);
-  // The example is centred against the statement and cards, as the hero's
-  // calendar against its copy, so neither column reads as a short block.
-  assert.match(baseRule('.control-example'), /align-self: center;/);
+  // The example's top edge lines up with the statement's top, so it reads
+  // as one row with the text instead of floating between text and cards.
+  assert.match(baseRule('.control-example'), /align-self: start;/);
+  assert.doesNotMatch(baseRule('.control-example'), /align-self: center/);
   assert.doesNotMatch(baseRule('.control-statement'), /align-self/);
 
   // The hero facts are a child of the hero grid, not of the copy, so on one

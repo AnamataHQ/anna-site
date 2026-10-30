@@ -1768,8 +1768,8 @@ footer {
 .control-section {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  /* Statement over the cards on the left, the example beside both, centred
-     as the hero's calendar against its copy; the notes run under both. */
+  /* Statement over the cards on the left, the example beside both with its
+     top on the statement's top line; the notes run under both. */
   grid-template-areas:
     'statement example'
     'cards example'
@@ -1823,7 +1823,7 @@ footer {
 /* A static conversation beside the statement and cards, in the demo's window. */
 .control-example {
   grid-area: example;
-  align-self: center;
+  align-self: start;
   width: 100%;
   max-width: 590px;
   margin: 0;
