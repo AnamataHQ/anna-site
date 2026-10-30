@@ -1769,7 +1769,7 @@ footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
   /* Statement over the cards on the left, the example beside both with its
-     top on the statement's top line; the notes run under both. */
+     bottom on the cards' bottom line; the notes run under both. */
   grid-template-areas:
     'statement example'
     'cards example'
@@ -1823,7 +1823,7 @@ footer {
 /* A static conversation beside the statement and cards, in the demo's window. */
 .control-example {
   grid-area: example;
-  align-self: start;
+  align-self: end;
   width: 100%;
   max-width: 590px;
   margin: 0;
@@ -2070,8 +2070,12 @@ footer {
   .boundary-grid {
     grid-column: 1 / -1;
   }
+  /* The example spans the section like the cards; bubbles stay readable. */
   .control-example {
-    justify-self: start;
+    max-width: none;
+  }
+  .control-message .message-bubble {
+    max-width: 680px;
   }
   /* Narrow columns wrap the ask; the three panels keep one height. */
   .capability-artefact {

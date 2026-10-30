@@ -538,10 +538,15 @@ test('hierarchy: the hero promise is the loudest line', () => {
   );
   const wide = mediaBlocks('max-width: 1180px');
   assert.match(wide, /\.boundary-grid \{[^}]*grid-column: 1 \/ -1/);
-  // The example's top edge lines up with the statement's top, so it reads
-  // as one row with the text instead of floating between text and cards.
-  assert.match(baseRule('.control-example'), /align-self: start;/);
-  assert.doesNotMatch(baseRule('.control-example'), /align-self: center/);
+  // The example's bottom edge lines up with the cards' bottom edge, so it
+  // sits on the same line as the cards instead of floating between rows.
+  assert.match(baseRule('.control-example'), /align-self: end;/);
+  assert.doesNotMatch(baseRule('.control-example'), /align-self: (center|start)/);
+  // In one column the example spans the section like the cards; the bubbles
+  // are capped so the lines stay readable in a wide window.
+  assert.match(wide, /\.control-example \{[^}]*max-width: none/);
+  assert.doesNotMatch(wide, /\.control-example \{[^}]*justify-self: start/);
+  assert.match(wide, /\.control-message \.message-bubble \{[^}]*max-width: \d+px/);
   assert.doesNotMatch(baseRule('.control-statement'), /align-self/);
 
   // The hero facts are a child of the hero grid, not of the copy, so on one
