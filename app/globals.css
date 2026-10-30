@@ -1153,10 +1153,6 @@ footer {
   .use-case-grid {
     grid-template-columns: 1fr;
   }
-  .contrast-section {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
 }
 
 @media (max-width: 820px) {
@@ -2141,6 +2137,11 @@ footer {
 @media (max-width: 1180px) {
   .site-header {
     grid-template-columns: 1fr auto;
+  }
+  /* After the base rule, so the one-column layout wins below 1181 px. */
+  .contrast-section {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
   .desktop-nav {
     display: none;

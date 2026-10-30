@@ -1641,6 +1641,16 @@ test('step 7: no who-for line in the hero (Ezra, 2026-10-30: the size band is in
   }
 });
 
+test('step 7: the contrast section one-column override comes after its base rule', () => {
+  // Codex review 2026-10-30: the override sat in the first 1180 px block,
+  // before the base rule, so the cascade kept two columns on phones.
+  const base = styles.indexOf('\n.contrast-section {');
+  const override = styles.indexOf(
+    '  .contrast-section {\n    grid-template-columns: 1fr;',
+  );
+  assert.ok(base > 0 && override > base, 'override must follow the base rule');
+});
+
 test('step 7: the contrast section follows How Anna works, without a kicker', () => {
   const section = sectionMarkup('contrast-section');
   assert.match(
