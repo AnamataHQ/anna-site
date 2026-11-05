@@ -25,7 +25,7 @@ const APPROVED = {
     "Sending didn't work. Email us directly at",
   ],
   nl: [
-    'Vraag vroege toegang aan',
+    'Vraag early access aan',
     'Neem contact op',
     'Naam',
     'Zakelijk e-mailadres',

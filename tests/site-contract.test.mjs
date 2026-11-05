@@ -62,7 +62,7 @@ test('ships complete English and Dutch page copy', () => {
 test('explains five complete processes, each a conversation that asks when a decision is yours', () => {
   const block = page.slice(
     page.indexOf('scenarios: ['),
-    page.indexOf("controlKicker: 'Initiative"),
+    page.indexOf("controlTitle: 'Anna can move"),
   );
   for (const phrase of [
     "label: 'Close my week'",
@@ -86,8 +86,8 @@ test('explains five complete processes, each a conversation that asks when a dec
     );
   }
   const nl = page.slice(
-    page.indexOf("workflowKicker: 'Eén verzoek"),
-    page.indexOf("controlKicker: 'Initiatief"),
+    page.indexOf("workflowTitle: 'Zie hoe"),
+    page.indexOf("controlTitle: 'Anna kan werk"),
   );
   for (const phrase of [
     'Mijn week afsluiten',
@@ -149,9 +149,7 @@ test('shows Anna working briefly after the reply before reporting completion', (
 
 test('explains how Anna works as the three steps the demo just showed', () => {
   for (const line of [
-    "problemKicker: 'How Anna works'",
     "problemTitle: 'One request in Teams. Finished work in your systems.'",
-    "problemKicker: 'Zo werkt Anna'",
     "problemTitle: 'Eén vraag in Teams. Afgerond werk in jouw systemen.'",
     "title: 'You ask'",
     "title: 'Anna prepares'",
@@ -223,7 +221,7 @@ test('asks for what is due, never for what the asker forgot they promised', () =
 
 test('offers early access and contact, with identical wording in hero and closing section', () => {
   assert.equal((page.match(/'Request early access'/g) ?? []).length, 1);
-  assert.equal((page.match(/'Vraag vroege toegang aan'/g) ?? []).length, 1);
+  assert.equal((page.match(/'Vraag early access aan'/g) ?? []).length, 1);
   assert.match(page, /Contact Anamata/);
   assert.match(page, /mailto:info@anamata\.ai/);
   assert.doesNotMatch(page, /Book a demo|Plan een demo|Demo%20ANNA/);
@@ -233,7 +231,7 @@ test('offers early access and contact, with identical wording in hero and closin
     'utf8',
   );
   assert.match(form, /demo: 'Request early access'/);
-  assert.match(form, /demo: 'Vraag vroege toegang aan'/);
+  assert.match(form, /demo: 'Vraag early access aan'/);
   assert.doesNotMatch(form, /Book a demo|Plan een demo/);
   assert.match(page, /workflowTitle: 'Zie hoe het werk gebeurt\.'/);
 });
@@ -247,7 +245,7 @@ test('the demo window is labelled Teams · Slack · Anna and carries no single-v
   assert.doesNotMatch(toolbar, /microsoft-teams\.svg|slack\.svg/);
 });
 
-test('the connectors: twelve marks tied to Anna, thousands available, no tested-with list', () => {
+test('the connectors: twelve marks tied to Anna, some of the systems she works in, no tested-with list', () => {
   const stream = [
     'Microsoft 365',
     'Jira',
@@ -296,8 +294,10 @@ test('the connectors: twelve marks tied to Anna, thousands available, no tested-
     page,
     /'Koppel Anna aan de systemen waar je werk in staat, en ze kan erin lezen en handelen\. Jij bepaalt welke rechten ze krijgt\.'/,
   );
-  assert.match(page, /Among thousands of connectors/);
-  assert.match(page, /Een greep uit duizenden koppelingen/);
+  // Step 8: the ring names some of the systems, no "thousands" claim.
+  assert.match(page, /ringLabel: 'Some of the systems Anna works in'/);
+  assert.match(page, /ringLabel: 'Een aantal systemen waar Anna in werkt'/);
+  assert.doesNotMatch(page, /Among thousands|duizenden koppelingen/);
   assert.match(
     page,
     /If it has a workable API, Anamata can build a connector for it during onboarding\./,
@@ -365,8 +365,10 @@ test('tells the story in the agreed order', () => {
     'workflow-section',
     'use-case-section',
     'capability-section',
+    'contrast-section',
     'connectors',
     'control-section',
+    'faq-section',
     'cta-section',
   ];
   const positions = order.map((name) => page.indexOf(`className="${name}"`));
@@ -400,9 +402,7 @@ test('tells the story in the agreed order', () => {
     "title: 'Opvolging in je CRM'",
     'Log my hours',
     'Boek mijn uren',
-    "examplesKicker: 'Where to start'",
     "examplesTitle: 'Three things to hand to Anna first.'",
-    "examplesKicker: 'Om mee te beginnen'",
     "examplesTitle: 'Drie taken om meteen aan Anna te geven.'",
   ]) {
     assert.ok(page.includes(useCase), `missing use case: ${useCase}`);
@@ -918,7 +918,7 @@ test('one Anna: the gradient mark on a paper disc at three sizes, wherever she a
   assert.equal([...page.matchAll(/anna-mono-light\.svg/g)].length, 1);
   assert.match(
     page,
-    /className="eyebrow light hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
+    /className="hero-eyebrow">\s*<Image\s+src="\/brands\/anna-mono-light\.svg"/,
   );
   assert.doesNotMatch(page, /anna-color-navy\.svg/);
   assert.doesNotMatch(page, /anna-color-transparent\.svg/);
@@ -1015,8 +1015,9 @@ test('steps 3 to 8 together add at most 16 KB to index.html', () => {
   const index = new URL('../dist/client/index.html', import.meta.url);
   if (!existsSync(index)) return;
   // 64 010 bytes on main at ba508d6, before step 3. Step 3 +1.2 KB, step 4
-  // +1.9 KB, step 5 +1.0 KB, step 6 +4.0 KB (72 095). The 90 KB budget is
-  // asserted in cleared-day.test.mjs; this keeps the copy steps honest below it.
+  // +1.9 KB, step 5 +1.0 KB, step 6 +4.0 KB (72 095), step 7 +4.0 KB
+  // (76 119). The 90 KB budget is asserted in cleared-day.test.mjs; this
+  // keeps the copy steps honest below it.
   const size = readFileSync(index).length;
   assert.ok(size <= 64_010 + 16_384, `index.html is ${size} bytes`);
 });
@@ -1165,10 +1166,10 @@ const EARLY_ACCESS = {
       'Anna is built in the Netherlands by Anamata, a quality engineering and testing company from Utrecht.',
   },
   nl: {
-    trust: 'Nu in vroege toegang · 2026',
-    ctaKicker: 'Nu in vroege toegang · 2026',
+    trust: 'Nu in early access · 2026',
+    ctaKicker: 'Nu in early access · 2026',
     ctaBody:
-      'Anna is in vroege toegang. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
+      'Anna is in early access. We beginnen met een kleine groep bedrijven. Vertel ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken.',
     ctaSteps: [
       'Jij noemt de taken',
       'We lopen ze met je door en laten zien hoe Anna ze aanpakt',
@@ -1514,4 +1515,485 @@ test('control layout: example under the statement, four cards, then checklist an
     mediaBlocks('max-width: 820px'),
     /\.boundary-grid \{[^}]*grid-template-columns: 1fr/,
   );
+});
+
+// Step 7, the contrast block, repeat work and the FAQ
+// (approved copy, step7-gate.md, 2026-10-30).
+const STEP7 = {
+  en: {
+    contrastTitle: 'A chatbot tells you how. Anna does it, in your systems.',
+    contrastBody:
+      'Writing tools draft the email and leave the rest to you. Anna writes the hours in your time tracking, files the leave in your HR system and logs the follow-up on the deal. Only with the rights your admin gave her, and with a record of every action. You keep the tools you have. Anna finishes the admin in them.',
+    problemBodyEnd:
+      'Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+    faqTitle: 'Questions and answers',
+    faq: [
+      'Is Anna a chatbot?',
+      'No. You talk to her in Teams or Slack, but the work happens in your systems: she writes the hours, files the leave, logs the follow-up. A chat window gives you text. Anna gives you a finished task and a record of it.',
+      'Which systems does she work in today?',
+      'Today: ClockWise, Claim a Seat, Notion and HubSpot, plus systems with a standard sign-in. Loket and Microsoft 365 follow soon. Anything else with a workable API can follow: Anamata builds the connection during onboarding, with no developer needed on your side.',
+      'Who decides what Anna may access and do?',
+      'Your admin, per person or per role, per system. Your admin adds Anna to Teams or Slack through the Microsoft 365 admin centre or the Slack settings: a short configuration that needs their approval. They can cut a connection or switch Anna off at any moment; the record of what she did stays.',
+      'Which AI is behind Anna, and who can see our data?',
+      'The model setup behind Anna is agreed with your company; Anamata manages it, and your admin’s rights apply to everything Anna reads or does. Your data is not used to train models, not by Anamata and not by the model providers we contract. In group chats Anna reads along by default so she can pick up requests; she says so when she is added, and any group can switch that off. Your IT or security lead can ask us anything before a single system is connected; we answer in writing.',
+      'Can my colleagues see what I ask Anna?',
+      'No. Each person has their own Anna. Colleagues do not see your requests, your hours or your leave. What lands in a shared system, such as a submitted hoursheet, follows that system’s own rights, as it does today.',
+      'What happens when she is wrong or unsure, and where do I see what she did?',
+      'She shows her work before anything is submitted, says so when she is unsure, and tells you plainly when a task is outside what she can do. Every completed action is in the record, for you and for your admin.',
+      'Does she work in Dutch?',
+      'Yes. Ask her in Dutch or English; she answers in the language you use.',
+      'What does early access involve, and what does Anna cost?',
+      'You tell us which recurring tasks eat your team’s week. We reply within two working days, go through those tasks with you and show how Anna would take them on. Together we decide whether she is a fit and where she starts. Pricing is agreed per company during early access and shared with you before anything is connected.',
+    ],
+  },
+  nl: {
+    contrastTitle:
+      'Een chatbot vertelt je hoe. Anna doet het, in jouw systemen.',
+    contrastBody:
+      'Schrijfhulpen maken de mail en laten de rest aan jou. Anna boekt de uren in je urenregistratie, dient het verlof in je HR-systeem in en legt de opvolging vast op de deal. Alleen met de rechten die je beheerder haar gaf, en met een verslag van elke actie. Je houdt de programma’s die je hebt. Anna maakt de administratie erin af.',
+    problemBodyEnd:
+      'Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+    faqTitle: 'Vragen en antwoorden',
+    faq: [
+      'Is Anna een chatbot?',
+      'Nee. Je praat met haar in Teams of Slack, maar het werk gebeurt in jouw systemen: ze boekt de uren, dient het verlof in, legt de opvolging vast. Een chatvenster geeft je tekst. Anna geeft je een afgeronde taak en een verslag ervan.',
+      'In welke systemen werkt ze vandaag?',
+      'Vandaag: ClockWise, Claim a Seat, Notion en HubSpot, plus systemen met een standaard inlog. Loket en Microsoft 365 volgen binnenkort. Al het andere met een bruikbare API kan volgen: Anamata bouwt de koppeling tijdens de onboarding, zonder dat je er een ontwikkelaar voor nodig hebt.',
+      'Wie bepaalt waar Anna bij mag en wat ze mag doen?',
+      'Je beheerder, per persoon of per rol, per systeem. Je beheerder voegt Anna toe aan Teams of Slack via het Microsoft 365-beheercentrum of de Slack-instellingen: een korte configuratie waar hun goedkeuring voor nodig is. Ze kunnen een koppeling op elk moment verbreken of Anna uitzetten; het verslag van wat ze deed blijft.',
+      'Welke AI zit achter Anna, en wie kan onze gegevens zien?',
+      'De modelopstelling achter Anna spreken we met jullie bedrijf af; Anamata beheert die, en de rechten van je beheerder gelden voor alles wat Anna leest of doet. Jullie gegevens worden niet gebruikt om modellen te trainen, niet door Anamata en niet door de modelleveranciers waarmee wij werken. In groepsgesprekken leest Anna standaard mee zodat ze verzoeken kan oppakken; ze zegt dat als ze wordt toegevoegd, en elke groep kan dat uitzetten. Je IT’er of security-verantwoordelijke kan ons alles vragen voordat er één systeem gekoppeld wordt; we antwoorden schriftelijk.',
+      'Kunnen mijn collega’s zien wat ik Anna vraag?',
+      'Nee. Iedereen heeft een eigen Anna. Collega’s zien jouw verzoeken, uren of verlof niet. Wat in een gedeeld systeem terechtkomt, zoals een ingediende urenstaat, volgt de rechten van dat systeem, net als nu.',
+      'Wat gebeurt er als ze het mis heeft of twijfelt, en waar zie ik wat ze deed?',
+      'Ze laat haar werk zien voordat iets wordt ingediend, zegt het als ze twijfelt, en zegt eerlijk wanneer een taak buiten haar kunnen valt. Elke afgeronde actie staat in het verslag, voor jou en voor je beheerder.',
+      'Werkt ze in het Nederlands?',
+      'Ja. Stel je vraag in het Nederlands of Engels; ze antwoordt in de taal die jij gebruikt.',
+      'Wat houdt early access in, en wat kost Anna?',
+      'Je vertelt ons welke terugkerende taken de week van je team opslokken. We reageren binnen twee werkdagen, lopen die taken met je door en laten zien hoe Anna ze zou oppakken. Samen bepalen we of ze past en waar ze begint. De prijs spreken we per bedrijf af tijdens early access en delen we met je voordat er iets gekoppeld wordt.',
+    ],
+  },
+};
+const sectionMarkup = (className) => {
+  const start = page.indexOf(`className="${className}"`);
+  assert.ok(start >= 0, `no ${className}`);
+  return page.slice(start, page.indexOf('</section>', start));
+};
+const faqAnswers = (language) =>
+  stringValues(copyValue(language, 'faq')).filter((_, i) => i % 2 === 1);
+
+test('step 7 copy is the approved text: contrast, repeat work, FAQ', () => {
+  for (const [language, copy] of Object.entries(STEP7)) {
+    for (const key of [
+      'contrastTitle',
+      'contrastBody',
+      'faqTitle',
+      'faq',
+    ]) {
+      const source = copyValue(language, key);
+      assert.ok(source, `${language}: no ${key}`);
+      const expected = Array.isArray(copy[key]) ? copy[key] : [copy[key]];
+      assert.deepEqual(stringValues(source), expected, `${language}: ${key}`);
+    }
+    // The two sentences close the "How Anna works" body, after a space.
+    const [body] = stringValues(copyValue(language, 'problemBody'));
+    assert.ok(
+      body.endsWith(` ${copy.problemBodyEnd}`),
+      `${language}: problemBody does not end with the repeat-work sentences`,
+    );
+  }
+});
+
+test('step 7: eight FAQ items per language, no price figure in the answers', () => {
+  for (const language of ['en', 'nl']) {
+    const faq = copyValue(language, 'faq');
+    assert.equal([...faq.matchAll(/\bq:\s+'/g)].length, 8, `${language}: q`);
+    assert.equal([...faq.matchAll(/\ba:\s+'/g)].length, 8, `${language}: a`);
+    const answers = faqAnswers(language);
+    assert.equal(answers.length, 8);
+    for (const answer of answers) {
+      assert.doesNotMatch(
+        answer,
+        /\d\s*(€|euro|per month|per maand)|€\s*\d/i,
+        `${language}: price in ${answer}`,
+      );
+    }
+  }
+});
+
+test('step 7: the contrast block names no vendor and never calls Anna a colleague', () => {
+  for (const language of ['en', 'nl']) {
+    const text = ['contrastTitle', 'contrastBody']
+      .map((key) => stringValues(copyValue(language, key)).join(' '))
+      .join(' ');
+    assert.ok(text.length > 100, `${language}: contrast copy found`);
+    assert.doesNotMatch(text, /Copilot|ChatGPT|Microsoft|OpenAI/i, language);
+    assert.doesNotMatch(text, /colleague|collega/i, language);
+  }
+});
+
+test('step 7: no who-for line in the hero (Ezra, 2026-10-30: the size band is internal)', () => {
+  assert.doesNotMatch(page, /heroWho|hero-who/);
+  assert.doesNotMatch(styles, /\.hero-who/);
+  for (const language of ['en', 'nl']) {
+    const [body] = stringValues(copyValue(language, 'heroBody'));
+    assert.doesNotMatch(body, /10 to 75|10 tot 75/, language);
+  }
+});
+
+test('two-sentence headings break after the first sentence (Ezra, 2026-10-30)', () => {
+  assert.match(page, /function Sentences\(\{ text \}: \{ text: string \}\)/);
+  for (const key of ['heroTitle', 'problemTitle', 'contrastTitle', 'controlTitle']) {
+    assert.match(page, new RegExp(`<Sentences text=\\{t\\.${key}\\} />`), key);
+  }
+  assert.match(baseRule('.sentence'), /display: block;/);
+  // Single-sentence headings balance their lines instead of leaving a widow.
+  assert.match(
+    styles,
+    /\.cta-section h2 \{\n  margin: 0;\n(?:.*\n){0,6}?  text-wrap: balance;/,
+  );
+});
+
+test('step 7: the contrast section one-column override comes after its base rule', () => {
+  // Codex review 2026-10-30: the override sat in the first 1180 px block,
+  // before the base rule, so the cascade kept two columns on phones.
+  const base = styles.indexOf('\n.contrast-section {');
+  const override = styles.indexOf(
+    '  .contrast-section {\n    grid-template-columns: 1fr;',
+  );
+  assert.ok(base > 0 && override > base, 'override must follow the base rule');
+});
+
+test('step 7: the contrast section follows How Anna works, without a kicker', () => {
+  const section = sectionMarkup('contrast-section');
+  assert.match(
+    page,
+    /<section\s+className="contrast-section"\s+aria-labelledby="contrast-title"\s*>/,
+  );
+  assert.match(section, /<h2 id="contrast-title">\s*<Sentences text=\{t\.contrastTitle\} \/>\s*<\/h2>/);
+  assert.match(section, /<p>\{t\.contrastBody\}<\/p>/);
+  assert.doesNotMatch(section, /eyebrow|Kicker/);
+  // Same heading scale as the other sections; a quiet paper band.
+  assert.match(
+    styles,
+    /\n\.contrast-section h2,\n\.faq-section h2,\n\.section-intro h2,[^{]*\.cta-section h2 \{\n  margin: 0;\n  font-size: clamp\(2\.2rem, 3\.6vw, 3\.3rem\);/,
+  );
+  const base = baseRule('.contrast-section');
+  assert.match(base, /background: var\(--paper-light\);/);
+  assert.match(
+    base,
+    /padding: clamp\(4rem, 7vw, 7rem\) max\(4vw, calc\(\(100vw - 1440px\) \/ 2\)\);/,
+  );
+  assert.match(base, /grid-template-columns: 1fr 1fr;/);
+  assert.match(base, /align-items: start;/);
+  assert.match(baseRule('.contrast-section p'), /max-width: 620px;/);
+  assert.match(baseRule('.contrast-section p'), /color: #596273;/);
+  assert.match(
+    mediaBlocks('max-width: 1180px'),
+    /\.contrast-section \{[^}]*grid-template-columns: 1fr;/,
+  );
+  assert.match(
+    mediaBlocks('max-width: 820px'),
+    /\.contrast-section,\n\s*\.faq-section \{\s*padding: 5rem 1\.25rem;/,
+  );
+});
+
+test('step 7: the FAQ is native details and summary, no script, before the closing section', () => {
+  const section = sectionMarkup('faq-section');
+  assert.match(
+    page,
+    /<section\s+className="faq-section"\s+id="faq"\s+aria-labelledby="faq-title"\s*>/,
+  );
+  assert.match(section, /<h2 id="faq-title">\{t\.faqTitle\}<\/h2>/);
+  assert.doesNotMatch(section, /eyebrow|Kicker/);
+  assert.match(section, /t\.faq\.map\(/);
+  assert.match(page, /<details className="faq-item"/);
+  assert.match(section, /<summary>\{item\.q\}<\/summary>/);
+  assert.match(section, /<p className="faq-answer">\{item\.a\}<\/p>/);
+  assert.doesNotMatch(section, /onClick|useState|onToggle/);
+  assert.doesNotMatch(page, /useState[^\n]*[Ff]aq/);
+  // The nav keeps its three anchors.
+  assert.doesNotMatch(page, /<a href="#faq">/);
+  // Summary without the native marker; a CSS plus that turns into a cross.
+  assert.match(baseRule('.faq-item summary'), /list-style: none;/);
+  assert.match(
+    baseRule('.faq-item summary::-webkit-details-marker'),
+    /display: none;/,
+  );
+  assert.match(baseRule('.faq-item summary:focus-visible'), /outline: /);
+  assert.match(baseRule('.faq-item summary::after'), /content: '\+';/);
+  assert.match(
+    baseRule('.faq-item[open] summary::after'),
+    /transform: rotate\(45deg\);/,
+  );
+  assert.match(
+    baseRule('.faq-item'),
+    /border-bottom: 1px solid var\(--line\);/,
+  );
+  assert.match(baseRule('.faq-answer'), /color: #596273;/);
+  assert.match(baseRule('.faq-answer'), /max-width: 62ch;/);
+  assert.match(baseRule('.faq-section'), /background: var\(--paper\);/);
+  assert.match(baseRule('.faq-list'), /max-width: 780px;/);
+  // Heading left, list right at full width, so the section does not read as
+  // a half-empty page; one column below 1181 px with the list under the h2.
+  assert.match(baseRule('.faq-section'), /grid-template-columns: 1fr 1\.4fr;/);
+  assert.match(baseRule('.faq-section'), /align-items: start;/);
+  assert.match(
+    mediaBlocks('max-width: 1180px'),
+    /\.faq-section \{[^}]*grid-template-columns: 1fr/,
+  );
+});
+
+test('step 7: both new sections render lazily', () => {
+  assert.match(
+    styles,
+    /\.capability-section,\n\.contrast-section,[\s\S]{0,120}\.faq-section,[\s\S]{0,80}content-visibility: auto/,
+  );
+});
+
+// Step 8 (step8-gate.md, approved 2026-10-30): softened "asks", calendar
+// hours in the week, follow-ups sent as Anna, Dutch fixes, no mono kickers.
+const STEP8 = {
+  en: {
+    heroBody:
+      'Ask her in Teams or Slack. She does the recurring work in your systems, asks when a decision is yours, and reports back.',
+    fact: 'Asks before anything you have not allowed',
+    after: 'After · the day as you planned it',
+    ringLabel: 'Some of the systems Anna works in',
+    weekStep:
+      'Found Wednesday 14:00–16:00 in your calendar: Rotterdam migration, on site. Not in the sheet yet.',
+    weekQuestion:
+      'Week 43 is ready: 38 h over 3 projects. Wednesday 14:00–16:00 is in your calendar as the Rotterdam migration but not in the sheet. Shall I add those 2 h and submit the week for approval?',
+    calendar: 'Calendar',
+    followUpStep:
+      'Drafted 4 follow-ups, with the file each customer is waiting for attached where we have it',
+    followUpQuestion:
+      'Four drafts are ready below. The quote for Van Dijk Logistics needs a price from you first. Shall I send the other three now from my own address and remind you about the quote tomorrow at 9:00?',
+    ownAddress: 'from my own address',
+    problemFirst:
+      'Anna picks up the request, gathers what she needs from your systems, checks with you when something is missing and does the work.',
+    problemRest:
+      ' You see exactly what she did. Anna can remind you and the team on a schedule, every Friday or every month-end. She works from your own policies and handbook, and how your team does things is set up together with your admin.',
+    prepares:
+      'She collects the context from your systems, checks the rules and brings you the decisions that are yours.',
+    workflowIntro:
+      'A colleague asks in Microsoft Teams or Slack. Anna gathers what she needs, does the work, brings you the calls that are yours, and reports back in the same conversation.',
+    asks: /\basks (before|when|you)\b/gi,
+    tasks: [
+      'Hours',
+      'Follow-ups',
+      'Leave request',
+      'New colleague',
+      'Month-end hours',
+      'Send reminders',
+      'Status update',
+    ],
+  },
+  nl: {
+    heroBody:
+      'Vraag het haar in Teams of Slack. Ze doet het terugkerende werk in jouw systemen, vraagt het jou als een beslissing van jou is en koppelt terug.',
+    fact: 'Vraagt het eerst bij alles wat je niet hebt toegestaan',
+    after: 'Daarna · de dag zoals je hem had gepland',
+    ringLabel: 'Een aantal systemen waar Anna in werkt',
+    weekStep:
+      'Woensdag 14:00–16:00 in je agenda gevonden: Rotterdam-migratie, op locatie. Nog niet in de staat.',
+    weekQuestion:
+      'Week 43 staat klaar: 38 u over 3 projecten. Woensdag 14:00–16:00 staat in je agenda als de Rotterdam-migratie, maar nog niet in de staat. Zal ik die 2 u toevoegen en de week ter goedkeuring indienen?',
+    calendar: 'Agenda',
+    followUpStep:
+      '4 opvolgingen geschreven, met het stuk waar de klant op wacht erbij waar we het hebben',
+    followUpQuestion:
+      'Vier concepten staan hieronder klaar. De offerte voor Van Dijk Logistics heeft eerst een prijs van jou nodig. Zal ik de andere drie nu vanuit mijn eigen adres versturen en je morgen om 9:00 aan de offerte herinneren?',
+    ownAddress: 'vanuit mijn eigen adres',
+    problemFirst:
+      'Anna pakt je vraag op, haalt op wat ze nodig heeft uit je systemen, stemt met jou af als iets ontbreekt en doet het werk.',
+    problemRest:
+      ' Je ziet precies wat ze heeft gedaan. Anna kan jou en het team op een vast moment herinneren, elke vrijdag of elke maandafsluiting. Ze werkt vanuit jullie eigen beleid en handboek, en hoe jullie team het doet wordt samen met je beheerder ingesteld.',
+    prepares:
+      'Ze verzamelt de context uit je systemen, controleert de regels en legt de beslissingen die van jou zijn aan je voor.',
+    workflowIntro:
+      'Een collega vraagt iets in Microsoft Teams of Slack. Anna verzamelt wat ze nodig heeft, doet het werk, legt de keuzes die van jou zijn aan je voor en koppelt terug in hetzelfde gesprek.',
+    asks: /\bvraagt (voordat|als|het)\b/gi,
+    tasks: [
+      'Uren',
+      'Opvolging',
+      'Verlofaanvraag',
+      'Nieuwe collega',
+      'Maandafsluiting',
+      'Herinneringen sturen',
+      'Status bijwerken',
+    ],
+  },
+};
+// One scenario's source in one language, from its id to the next scenario.
+const scenarioBlock = (language, id) => {
+  const block = copyValue(language, 'scenarios');
+  const start = block.indexOf(`id: '${id}'`);
+  assert.ok(start >= 0, `${language}: no ${id} scenario`);
+  const next = block.indexOf("id: '", start + 1);
+  return block.slice(start, next < 0 ? undefined : next);
+};
+const scenarioList = (source, key) => {
+  const match = source.match(new RegExp(`${key}: \\[([\\s\\S]*?)\\]`));
+  assert.ok(match, `no ${key} list`);
+  return stringValues(match[1]);
+};
+const scenarioString = (source, key) => {
+  const match = source.match(
+    new RegExp(`${key}:\\s*('(?:[^'\\\\\\n]|\\\\.)*')`),
+  );
+  assert.ok(match, `no ${key}`);
+  return stringValues(match[1])[0];
+};
+
+test('step 8: hero body, third fact, after label and ring label are the approved text', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    assert.deepEqual(
+      stringValues(copyValue(language, 'heroBody')),
+      [copy.heroBody],
+      language,
+    );
+    assert.equal(stringValues(copyValue(language, 'facts'))[2], copy.fact);
+    assert.deepEqual(
+      stringValues(copyValue(language, 'ringLabel')),
+      [copy.ringLabel],
+      language,
+    );
+    const day = copyValue(language, 'day');
+    assert.ok(day.includes(`after: '${copy.after}'`), `${language}: after`);
+    assert.deepEqual(
+      [...day.matchAll(/label: '([^']*)'/g)].map((m) => m[1]),
+      copy.tasks,
+      `${language}: task labels`,
+    );
+  }
+  assert.doesNotMatch(
+    page,
+    /Inbox triage|Meeting prep|Update records|Inbox verwerken|Overleg voorbereiden|Dossiers bijwerken/,
+  );
+});
+
+test('step 8: each renamed or matched task in the hero names a use case or a scenario', () => {
+  const block = contentBlock('en');
+  const targets = [
+    ...[...block.matchAll(/\n {8}title: '([^']*)'/g)].map((m) => m[1]),
+    ...[...copyValue('en', 'scenarios').matchAll(/label: '([^']*)'/g)].map(
+      (m) => m[1],
+    ),
+  ].map((target) => target.toLowerCase());
+  assert.ok(targets.includes('hours in your time tracking'), 'use cases read');
+  assert.ok(targets.includes('new colleague'), 'scenario labels read');
+  // The whole label, or for "Leave request" its first word ("Leave in your
+  // HR system"). "Send reminders" and "Status update" have no use case.
+  const labels = [...copyValue('en', 'day').matchAll(/label: '([^']*)'/g)].map(
+    (m) => m[1],
+  );
+  assert.equal(labels.length, 7);
+  for (const label of labels.filter(
+    (label) => !['Send reminders', 'Status update'].includes(label),
+  )) {
+    const whole = label.toLowerCase();
+    const first = whole.split(' ')[0];
+    assert.ok(
+      targets.some(
+        (target) =>
+          target.includes(whole) ||
+          new RegExp(`(^|\\s)${first}(\\s|$)`).test(target),
+      ),
+      `task without a use case or scenario: ${label}`,
+    );
+  }
+});
+
+test('step 8: the week scenario finds the missing hours in the calendar', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const week = scenarioBlock(language, 'week');
+    const steps = scenarioList(week, 'steps');
+    assert.equal(steps[3], copy.weekStep, `${language}: step 4`);
+    assert.equal(scenarioString(week, 'question'), copy.weekQuestion);
+    const sources = scenarioList(week, 'sources');
+    assert.equal(sources.at(-1), copy.calendar, `${language}: sources`);
+    assert.equal(sources.length, 3);
+  }
+  // The arithmetic holds: drafted 38 h plus the 2 h from the calendar = 40 h.
+  const week = scenarioBlock('en', 'week');
+  const drafted = Number(scenarioList(week, 'steps')[2].match(/(\d+) h/)[1]);
+  const added = Number(
+    scenarioString(week, 'question').match(/add those (\d+) h/)[1],
+  );
+  const recorded = Number(
+    scenarioList(week, 'record')[0].match(/written: (\d+) h/)[1],
+  );
+  assert.equal(drafted, 38);
+  assert.equal(added, 2);
+  assert.equal(recorded, drafted + added);
+});
+
+test('step 8: follow-ups go out from Anna’s own address', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const followUp = scenarioBlock(language, 'follow-up');
+    assert.equal(scenarioList(followUp, 'steps')[2], copy.followUpStep);
+    const question = scenarioString(followUp, 'question');
+    assert.equal(question, copy.followUpQuestion);
+    assert.ok(question.includes(copy.ownAddress), `${language}: own address`);
+  }
+  assert.doesNotMatch(page, /in your tone|in jouw toon/);
+});
+
+test('step 8: Dutch label and transparency line, no DOSSIER and no "altijd"', () => {
+  assert.deepEqual(stringValues(copyValue('nl', 'demoLabel')), [
+    'VOORBEELD · GEEN ECHT VERSLAG',
+  ]);
+  assert.deepEqual(stringValues(copyValue('nl', 'transparency')), [
+    'Anna is AI. Ze maakt dat duidelijk en mensen houden de regie over wat ze mag doen.',
+  ]);
+  for (const value of stringValues(contentBlock('nl')))
+    assert.doesNotMatch(value, /DOSSIER/);
+});
+
+test('step 8: "asks" stays in at most three places per language', () => {
+  for (const [language, copy] of Object.entries(STEP8)) {
+    const problem = stringValues(copyValue(language, 'problemBody'))[0];
+    assert.equal(problem, copy.problemFirst + copy.problemRest, language);
+    assert.deepEqual(
+      stringValues(copyValue(language, 'workflowIntro')),
+      [copy.workflowIntro],
+      language,
+    );
+    const capabilities = stringValues(copyValue(language, 'capabilities'));
+    assert.equal(capabilities[capabilities.indexOf('02') + 2], copy.prepares);
+    const count = stringValues(contentBlock(language)).reduce(
+      (total, value) => total + [...value.matchAll(copy.asks)].length,
+      0,
+    );
+    assert.ok(count <= 3, `${language}: "asks" ${count} times`);
+  }
+});
+
+test('step 8: no mono section kickers; descriptor and early-access pills set in sans', () => {
+  for (const key of [
+    'workflowKicker',
+    'examplesKicker',
+    'problemKicker',
+    'connectorsKicker',
+    'controlKicker',
+  ])
+    assert.doesNotMatch(page, new RegExp(`\\b${key}\\b`), key);
+  assert.doesNotMatch(page, /className="(?:[^"]*\s)?eyebrow[\s"]/);
+  assert.match(page, /<p className="hero-eyebrow">/);
+  assert.match(page, /<p className="cta-kicker">\{t\.ctaKicker\}<\/p>/);
+  assert.doesNotMatch(styles, /\.eyebrow\b/);
+  // Ezra, 2026-10-30: mono is fine where it differentiates a label (the
+  // badge and the two early-access pills), not as a kicker over a heading.
+  for (const selector of ['.hero-eyebrow', '.hero-trust', '.cta-kicker']) {
+    const rule = baseRule(selector);
+    assert.match(rule, /font-family: var\(--font-geist-mono\)/, selector);
+    assert.match(rule, /text-transform: uppercase/, selector);
+    assert.match(rule, /letter-spacing: 0\.13em/, selector);
+    assert.match(rule, /font-size: 0\.74rem/, selector);
+    assert.match(rule, /border: 1px solid/, selector);
+    assert.match(rule, /border-radius: 999px/, selector);
+  }
+  // Mono stays inside the windows.
+  assert.match(baseRule('.cta-step-number'), /geist-mono/);
 });
